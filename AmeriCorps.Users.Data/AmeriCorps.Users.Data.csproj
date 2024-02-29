@@ -8,7 +8,11 @@
 
   <ItemGroup>
     <PackageReference Include="FedTec.Data" Version="1.1.0" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AmeriCorps.Users.Data.Core\AmeriCorps.Users.Data.Core.csproj" />
   </ItemGroup>
 
 </Project>

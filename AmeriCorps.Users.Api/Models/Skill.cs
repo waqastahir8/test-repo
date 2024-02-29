@@ -1,4 +1,4 @@
-﻿namespace AmeriCorps.Users.Data.Core;
+﻿namespace AmeriCorps.Users.Api;
 
 public sealed class Skill
 {

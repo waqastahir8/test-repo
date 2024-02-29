@@ -1,0 +1,54 @@
+name: Release Dev
+
+on: 
+  workflow_dispatch:
+  push:
+    branches:
+    - dev
+
+env:
+  AZURE_WEBAPP_NAME: app-userservice-dev-001
+  AZURE_WEBAPP_PACKAGE_PATH: './publish'
+  SOLUTION_FILE: ./AmeriCorpsUsers.sln
+  API_PROJECT: ./AmeriCorps.Users.Api
+  MIGRATION_PROJECT: ./AmeriCorps.Users.Data.Migrations
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: Dev
+
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4
+
+      - name: setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: .net restore
+        run: |
+          dotnet nuget update source github --username "${{ secrets.NUGET_USER }}" --password "${{ secrets.NUGET_PWD }}" --store-password-in-clear-text
+          dotnet restore ${{ env.SOLUTION_FILE }}
+
+      - name: .net test
+        run: dotnet test ${{ env.SOLUTION_FILE }} --no-restore
+
+      - name: .net publish
+        run: dotnet publish ${{ env.API_PROJECT }} --configuration Release --no-restore --output '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}'
+      
+      - name: .net ef migrations
+        env:
+          KeyVaultOptions__ClientSecret: ${{ secrets.CLIENT_SECRET_DEV }}
+        run: |
+          cd ${{ env.MIGRATION_PROJECT }}
+          dotnet tool install --global dotnet-ef
+          # dotnet-ef database update -- --no-restore
+
+      - name: release
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE_DEV }}
+          package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}

@@ -1,4 +1,6 @@
-﻿namespace AmeriCorps.Users.Data.Core;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace AmeriCorps.Users.Api;
 
 public sealed class Education
 {

@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AmeriCorps.Users.Data.Migrations.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20240214085550_UsersInitialMigration")]
+    [Migration("20240223055545_UsersInitialMigration")]
     partial class UsersInitialMigration
     {
         /// <inheritdoc />
@@ -20,7 +20,7 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.1")
+                .HasAnnotation("ProductVersion", "8.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -28,9 +28,16 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
             modelBuilder.Entity("AmeriCorps.Users.Data.Core.Address", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
                     b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Country")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -52,7 +59,11 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("Type")
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int?>("UserId")
                         .HasColumnType("integer");
 
                     b.Property<string>("ZipCode")
@@ -61,7 +72,35 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("UserId");
+
                     b.ToTable("Address");
+                });
+
+            modelBuilder.Entity("AmeriCorps.Users.Data.Core.Attribute", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Attribute");
                 });
 
             modelBuilder.Entity("AmeriCorps.Users.Data.Core.CommunicationMethod", b =>
@@ -101,32 +140,38 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("City")
-                        .HasColumnType("integer");
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("DateAttendedFrom")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("date");
 
                     b.Property<DateTime>("DateAttendedTo")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("date");
 
                     b.Property<bool>("DegreeCompleted")
                         .HasColumnType("boolean");
 
-                    b.Property<int>("DegreeTypePursued")
-                        .HasColumnType("integer");
+                    b.Property<string>("DegreeTypePursued")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                    b.Property<int>("Institution")
-                        .HasColumnType("integer");
+                    b.Property<string>("Institution")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                    b.Property<int>("Level")
-                        .HasColumnType("integer");
+                    b.Property<string>("Level")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                    b.Property<int>("MajorAreaOfStudy")
-                        .HasColumnType("integer");
+                    b.Property<string>("MajorAreaOfStudy")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                    b.Property<int>("State")
-                        .HasColumnType("integer");
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<int?>("UserId")
                         .HasColumnType("integer");
@@ -153,14 +198,16 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("SpeakingAbility")
-                        .HasColumnType("integer");
+                    b.Property<string>("SpeakingAbility")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<int?>("UserId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("WritingAbility")
-                        .HasColumnType("integer");
+                    b.Property<string>("WritingAbility")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -176,6 +223,9 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AnnualIncome")
+                        .HasColumnType("integer");
 
                     b.Property<string>("HighestEducationLevel")
                         .IsRequired()
@@ -225,23 +275,50 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("DateOfBirth")
+                        .HasColumnType("date");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("MiddleName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PreferredName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Prefix")
+                        .HasColumnType("text");
+
                     b.Property<bool>("Searchable")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("User", (string)null);
                 });
 
             modelBuilder.Entity("AmeriCorps.Users.Data.Core.Address", b =>
                 {
-                    b.HasOne("AmeriCorps.Users.Data.Core.User", "User")
+                    b.HasOne("AmeriCorps.Users.Data.Core.User", null)
                         .WithMany("Addresses")
-                        .HasForeignKey("Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
+                });
 
-                    b.Navigation("User");
+            modelBuilder.Entity("AmeriCorps.Users.Data.Core.Attribute", b =>
+                {
+                    b.HasOne("AmeriCorps.Users.Data.Core.User", null)
+                        .WithMany("Attributes")
+                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("AmeriCorps.Users.Data.Core.CommunicationMethod", b =>
@@ -281,109 +358,9 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
 
             modelBuilder.Entity("AmeriCorps.Users.Data.Core.User", b =>
                 {
-                    b.OwnsOne("AmeriCorps.Users.Data.Core.About", "About", b1 =>
-                        {
-                            b1.Property<int>("UserId")
-                                .HasColumnType("integer");
-
-                            b1.Property<string>("CitizenshipStatus")
-                                .IsRequired()
-                                .HasColumnType("text")
-                                .HasColumnName("CitizenshipStatus");
-
-                            b1.Property<string>("Ethnicity")
-                                .IsRequired()
-                                .HasColumnType("text")
-                                .HasColumnName("Ethnicity");
-
-                            b1.Property<int>("FamilyCombinedIncome")
-                                .HasColumnType("integer")
-                                .HasColumnName("FamilyCombinedIncome");
-
-                            b1.Property<int>("Gender")
-                                .HasColumnType("integer")
-                                .HasColumnName("Gender");
-
-                            b1.Property<bool>("HasValidGovtDriversLicense")
-                                .HasColumnType("boolean")
-                                .HasColumnName("HasValidGovtDriversLicense");
-
-                            b1.Property<string>("Race")
-                                .IsRequired()
-                                .HasColumnType("text")
-                                .HasColumnName("Race");
-
-                            b1.Property<string>("UnexpectedExpenseConfidence")
-                                .IsRequired()
-                                .HasColumnType("text")
-                                .HasColumnName("UnexpectedExpenseConfidence");
-
-                            b1.Property<string>("VeteranStatus")
-                                .IsRequired()
-                                .HasColumnType("text")
-                                .HasColumnName("VeteranStatus");
-
-                            b1.HasKey("UserId");
-
-                            b1.ToTable("Users");
-
-                            b1.WithOwner()
-                                .HasForeignKey("UserId");
-                        });
-
-                    b.OwnsOne("AmeriCorps.Users.Data.Core.BasicInfo", "BasicInfo", b1 =>
-                        {
-                            b1.Property<int>("UserId")
-                                .HasColumnType("integer");
-
-                            b1.Property<DateTime>("DateOfBirth")
-                                .HasColumnType("timestamp with time zone")
-                                .HasColumnName("DateOfBirth");
-
-                            b1.Property<string>("FirstName")
-                                .IsRequired()
-                                .HasColumnType("text")
-                                .HasColumnName("FirstName");
-
-                            b1.Property<string>("LastName")
-                                .IsRequired()
-                                .HasColumnType("text")
-                                .HasColumnName("LastName");
-
-                            b1.Property<string>("MiddleName")
-                                .HasColumnType("text")
-                                .HasColumnName("MiddleName");
-
-                            b1.Property<string>("PreferredName")
-                                .HasColumnType("text")
-                                .HasColumnName("PreferredName");
-
-                            b1.Property<string>("Prefix")
-                                .HasColumnType("text")
-                                .HasColumnName("Prefix");
-
-                            b1.Property<string>("UserName")
-                                .IsRequired()
-                                .HasColumnType("text")
-                                .HasColumnName("UserName");
-
-                            b1.HasKey("UserId");
-
-                            b1.ToTable("Users");
-
-                            b1.WithOwner()
-                                .HasForeignKey("UserId");
-                        });
-
-                    b.Navigation("About");
-
-                    b.Navigation("BasicInfo")
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AmeriCorps.Users.Data.Core.User", b =>
-                {
                     b.Navigation("Addresses");
+
+                    b.Navigation("Attributes");
 
                     b.Navigation("CommunicationMethods");
 

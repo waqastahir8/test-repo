@@ -13,7 +13,7 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Users",
+                name: "User",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -25,44 +25,58 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                     LastName = table.Column<string>(type: "text", nullable: false),
                     MiddleName = table.Column<string>(type: "text", nullable: true),
                     PreferredName = table.Column<string>(type: "text", nullable: true),
-                    DateOfBirth = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Gender = table.Column<int>(type: "integer", nullable: true),
-                    Ethnicity = table.Column<string>(type: "text", nullable: true),
-                    Race = table.Column<string>(type: "text", nullable: true),
-                    CitizenshipStatus = table.Column<string>(type: "text", nullable: true),
-                    FamilyCombinedIncome = table.Column<int>(type: "integer", nullable: true),
-                    UnexpectedExpenseConfidence = table.Column<string>(type: "text", nullable: true),
-                    HasValidGovtDriversLicense = table.Column<bool>(type: "boolean", nullable: true),
-                    VeteranStatus = table.Column<string>(type: "text", nullable: true)
+                    DateOfBirth = table.Column<DateTime>(type: "date", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.PrimaryKey("PK_User", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Address",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false),
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     IsForeign = table.Column<bool>(type: "boolean", nullable: false),
-                    Type = table.Column<int>(type: "integer", nullable: false),
+                    Type = table.Column<string>(type: "text", nullable: false),
                     Street1 = table.Column<string>(type: "text", nullable: false),
                     Street2 = table.Column<string>(type: "text", nullable: false),
                     City = table.Column<string>(type: "text", nullable: false),
                     State = table.Column<string>(type: "text", nullable: false),
+                    Country = table.Column<string>(type: "text", nullable: false),
                     ZipCode = table.Column<string>(type: "text", nullable: false),
-                    MovingWithinSixMonths = table.Column<bool>(type: "boolean", nullable: false)
+                    MovingWithinSixMonths = table.Column<bool>(type: "boolean", nullable: false),
+                    UserId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Address", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Address_Users_Id",
-                        column: x => x.Id,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        name: "FK_Address_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Attribute",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Type = table.Column<string>(type: "text", nullable: false),
+                    Value = table.Column<string>(type: "text", nullable: false),
+                    UserId = table.Column<int>(type: "integer", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Attribute", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Attribute_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -80,9 +94,9 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                 {
                     table.PrimaryKey("PK_CommunicationMethod", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CommunicationMethod_Users_UserId",
+                        name: "FK_CommunicationMethod_User_UserId",
                         column: x => x.UserId,
-                        principalTable: "Users",
+                        principalTable: "User",
                         principalColumn: "Id");
                 });
 
@@ -92,14 +106,14 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Level = table.Column<int>(type: "integer", nullable: false),
-                    MajorAreaOfStudy = table.Column<int>(type: "integer", nullable: false),
-                    Institution = table.Column<int>(type: "integer", nullable: false),
-                    City = table.Column<int>(type: "integer", nullable: false),
-                    State = table.Column<int>(type: "integer", nullable: false),
-                    DateAttendedFrom = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    DateAttendedTo = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    DegreeTypePursued = table.Column<int>(type: "integer", nullable: false),
+                    Level = table.Column<string>(type: "text", nullable: false),
+                    MajorAreaOfStudy = table.Column<string>(type: "text", nullable: false),
+                    Institution = table.Column<string>(type: "text", nullable: false),
+                    City = table.Column<string>(type: "text", nullable: false),
+                    State = table.Column<string>(type: "text", nullable: false),
+                    DateAttendedFrom = table.Column<DateTime>(type: "date", nullable: false),
+                    DateAttendedTo = table.Column<DateTime>(type: "date", nullable: false),
+                    DegreeTypePursued = table.Column<string>(type: "text", nullable: false),
                     DegreeCompleted = table.Column<bool>(type: "boolean", nullable: false),
                     UserId = table.Column<int>(type: "integer", nullable: true)
                 },
@@ -107,9 +121,9 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                 {
                     table.PrimaryKey("PK_Education", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Education_Users_UserId",
+                        name: "FK_Education_User_UserId",
                         column: x => x.UserId,
-                        principalTable: "Users",
+                        principalTable: "User",
                         principalColumn: "Id");
                 });
 
@@ -121,17 +135,17 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     PickListId = table.Column<string>(type: "text", nullable: false),
                     IsPrimary = table.Column<bool>(type: "boolean", nullable: false),
-                    SpeakingAbility = table.Column<int>(type: "integer", nullable: false),
-                    WritingAbility = table.Column<int>(type: "integer", nullable: false),
+                    SpeakingAbility = table.Column<string>(type: "text", nullable: false),
+                    WritingAbility = table.Column<string>(type: "text", nullable: false),
                     UserId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Language", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Language_Users_UserId",
+                        name: "FK_Language_User_UserId",
                         column: x => x.UserId,
-                        principalTable: "Users",
+                        principalTable: "User",
                         principalColumn: "Id");
                 });
 
@@ -143,15 +157,16 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Relationship = table.Column<string>(type: "text", nullable: false),
                     HighestEducationLevel = table.Column<string>(type: "text", nullable: false),
+                    AnnualIncome = table.Column<int>(type: "integer", nullable: false),
                     UserId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Relative", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Relative_Users_UserId",
+                        name: "FK_Relative_User_UserId",
                         column: x => x.UserId,
-                        principalTable: "Users",
+                        principalTable: "User",
                         principalColumn: "Id");
                 });
 
@@ -168,11 +183,21 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                 {
                     table.PrimaryKey("PK_Skill", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Skill_Users_UserId",
+                        name: "FK_Skill_User_UserId",
                         column: x => x.UserId,
-                        principalTable: "Users",
+                        principalTable: "User",
                         principalColumn: "Id");
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Address_UserId",
+                table: "Address",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Attribute_UserId",
+                table: "Attribute",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CommunicationMethod_UserId",
@@ -207,6 +232,9 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                 name: "Address");
 
             migrationBuilder.DropTable(
+                name: "Attribute");
+
+            migrationBuilder.DropTable(
                 name: "CommunicationMethod");
 
             migrationBuilder.DropTable(
@@ -222,7 +250,7 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                 name: "Skill");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "User");
         }
     }
 }
