@@ -12,8 +12,12 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.EnsureSchema(
+                name: "users");
+
             migrationBuilder.CreateTable(
                 name: "User",
+                schema: "users",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -23,9 +27,9 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                     Prefix = table.Column<string>(type: "text", nullable: true),
                     FirstName = table.Column<string>(type: "text", nullable: false),
                     LastName = table.Column<string>(type: "text", nullable: false),
-                    MiddleName = table.Column<string>(type: "text", nullable: true),
-                    PreferredName = table.Column<string>(type: "text", nullable: true),
-                    DateOfBirth = table.Column<DateTime>(type: "date", nullable: false)
+                    MiddleName = table.Column<string>(type: "text", nullable: false),
+                    PreferredName = table.Column<string>(type: "text", nullable: false),
+                    DateOfBirth = table.Column<DateOnly>(type: "date", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -34,6 +38,7 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Address",
+                schema: "users",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -55,12 +60,14 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                     table.ForeignKey(
                         name: "FK_Address_User_UserId",
                         column: x => x.UserId,
+                        principalSchema: "users",
                         principalTable: "User",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
                 name: "Attribute",
+                schema: "users",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -75,12 +82,14 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                     table.ForeignKey(
                         name: "FK_Attribute_User_UserId",
                         column: x => x.UserId,
+                        principalSchema: "users",
                         principalTable: "User",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
                 name: "CommunicationMethod",
+                schema: "users",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -96,12 +105,14 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                     table.ForeignKey(
                         name: "FK_CommunicationMethod_User_UserId",
                         column: x => x.UserId,
+                        principalSchema: "users",
                         principalTable: "User",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
                 name: "Education",
+                schema: "users",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -111,8 +122,8 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                     Institution = table.Column<string>(type: "text", nullable: false),
                     City = table.Column<string>(type: "text", nullable: false),
                     State = table.Column<string>(type: "text", nullable: false),
-                    DateAttendedFrom = table.Column<DateTime>(type: "date", nullable: false),
-                    DateAttendedTo = table.Column<DateTime>(type: "date", nullable: false),
+                    DateAttendedFrom = table.Column<DateOnly>(type: "date", nullable: false),
+                    DateAttendedTo = table.Column<DateOnly>(type: "date", nullable: false),
                     DegreeTypePursued = table.Column<string>(type: "text", nullable: false),
                     DegreeCompleted = table.Column<bool>(type: "boolean", nullable: false),
                     UserId = table.Column<int>(type: "integer", nullable: true)
@@ -123,12 +134,14 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                     table.ForeignKey(
                         name: "FK_Education_User_UserId",
                         column: x => x.UserId,
+                        principalSchema: "users",
                         principalTable: "User",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
                 name: "Language",
+                schema: "users",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -145,12 +158,14 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                     table.ForeignKey(
                         name: "FK_Language_User_UserId",
                         column: x => x.UserId,
+                        principalSchema: "users",
                         principalTable: "User",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
                 name: "Relative",
+                schema: "users",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -166,12 +181,14 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                     table.ForeignKey(
                         name: "FK_Relative_User_UserId",
                         column: x => x.UserId,
+                        principalSchema: "users",
                         principalTable: "User",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
                 name: "Skill",
+                schema: "users",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -185,42 +202,50 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                     table.ForeignKey(
                         name: "FK_Skill_User_UserId",
                         column: x => x.UserId,
+                        principalSchema: "users",
                         principalTable: "User",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Address_UserId",
+                schema: "users",
                 table: "Address",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Attribute_UserId",
+                schema: "users",
                 table: "Attribute",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CommunicationMethod_UserId",
+                schema: "users",
                 table: "CommunicationMethod",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Education_UserId",
+                schema: "users",
                 table: "Education",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Language_UserId",
+                schema: "users",
                 table: "Language",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Relative_UserId",
+                schema: "users",
                 table: "Relative",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Skill_UserId",
+                schema: "users",
                 table: "Skill",
                 column: "UserId");
         }
@@ -229,28 +254,36 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Address");
+                name: "Address",
+                schema: "users");
 
             migrationBuilder.DropTable(
-                name: "Attribute");
+                name: "Attribute",
+                schema: "users");
 
             migrationBuilder.DropTable(
-                name: "CommunicationMethod");
+                name: "CommunicationMethod",
+                schema: "users");
 
             migrationBuilder.DropTable(
-                name: "Education");
+                name: "Education",
+                schema: "users");
 
             migrationBuilder.DropTable(
-                name: "Language");
+                name: "Language",
+                schema: "users");
 
             migrationBuilder.DropTable(
-                name: "Relative");
+                name: "Relative",
+                schema: "users");
 
             migrationBuilder.DropTable(
-                name: "Skill");
+                name: "Skill",
+                schema: "users");
 
             migrationBuilder.DropTable(
-                name: "User");
+                name: "User",
+                schema: "users");
         }
     }
 }

@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AmeriCorps.Users.Data.Migrations.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20240223055545_UsersInitialMigration")]
+    [Migration("20240305191415_UsersInitialMigration")]
     partial class UsersInitialMigration
     {
         /// <inheritdoc />
@@ -20,6 +20,7 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
+                .HasDefaultSchema("users")
                 .HasAnnotation("ProductVersion", "8.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
@@ -74,7 +75,7 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Address");
+                    b.ToTable("Address", "users");
                 });
 
             modelBuilder.Entity("AmeriCorps.Users.Data.Core.Attribute", b =>
@@ -100,7 +101,7 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Attribute");
+                    b.ToTable("Attribute", "users");
                 });
 
             modelBuilder.Entity("AmeriCorps.Users.Data.Core.CommunicationMethod", b =>
@@ -129,7 +130,7 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("CommunicationMethod");
+                    b.ToTable("CommunicationMethod", "users");
                 });
 
             modelBuilder.Entity("AmeriCorps.Users.Data.Core.Education", b =>
@@ -144,10 +145,10 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("DateAttendedFrom")
+                    b.Property<DateOnly>("DateAttendedFrom")
                         .HasColumnType("date");
 
-                    b.Property<DateTime>("DateAttendedTo")
+                    b.Property<DateOnly>("DateAttendedTo")
                         .HasColumnType("date");
 
                     b.Property<bool>("DegreeCompleted")
@@ -180,7 +181,7 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Education");
+                    b.ToTable("Education", "users");
                 });
 
             modelBuilder.Entity("AmeriCorps.Users.Data.Core.Language", b =>
@@ -213,7 +214,7 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Language");
+                    b.ToTable("Language", "users");
                 });
 
             modelBuilder.Entity("AmeriCorps.Users.Data.Core.Relative", b =>
@@ -242,7 +243,7 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Relative");
+                    b.ToTable("Relative", "users");
                 });
 
             modelBuilder.Entity("AmeriCorps.Users.Data.Core.Skill", b =>
@@ -264,7 +265,7 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Skill");
+                    b.ToTable("Skill", "users");
                 });
 
             modelBuilder.Entity("AmeriCorps.Users.Data.Core.User", b =>
@@ -275,7 +276,7 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("DateOfBirth")
+                    b.Property<DateOnly>("DateOfBirth")
                         .HasColumnType("date");
 
                     b.Property<string>("FirstName")
@@ -287,9 +288,11 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("MiddleName")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("PreferredName")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Prefix")
@@ -304,7 +307,7 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("User", (string)null);
+                    b.ToTable("User", "users");
                 });
 
             modelBuilder.Entity("AmeriCorps.Users.Data.Core.Address", b =>
