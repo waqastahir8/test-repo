@@ -1,6 +1,6 @@
-﻿namespace AmeriCorps.Users.Api;
+﻿namespace AmeriCorps.Users.Api.Models;
 
-public sealed class Relative
+public sealed class RelativeDTO
 {
     public int Id { get; set; }
     public required string Relationship { get; set; } = string.Empty;

@@ -6,7 +6,7 @@ builder.Services.AddControllers();
 builder.Services.AddApiVersioning();
 
 builder.Services
-    .AddSingleton<IValidator<UserRequestModel>, UserRequestValidator>()
+    .AddSingleton<IValidator<UserDTO>, UserRequestValidator>()
     .AddScoped<IContextFactory, DefaultContextFactory>()
     .AddScoped<IUserRepository, UserRepository>()
     .AddScoped<IRequestMapper, RequestMapper>()
@@ -20,13 +20,13 @@ var clientSecret = builder.Configuration["KeyVaultOptions:ClientSecret"];
 
 var configuration =
     builder.Configuration
-    .AddAzureKeyVault(new Uri(keyVaultUri), 
-                     new ClientSecretCredential(
-                            tenantId,
-                            clientId,
-                            clientSecret))
     .AddJsonFile("appsettings.json", optional: false)
     .AddJsonFile("appsettings.{env.EnvironmentName}.json", optional: true)
+    .AddAzureKeyVault(new Uri(keyVaultUri), 
+                    new ClientSecretCredential(
+                        tenantId,
+                        clientId,
+                        clientSecret))
     .AddJsonFile("appsettings.local.json", optional: true)
     .Build();
 

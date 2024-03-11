@@ -1,8 +1,9 @@
 ﻿using FluentValidation;
+using AmeriCorps.Users.Api.Models;
 
 namespace AmeriCorps.Users.Api;
 
-public class UserRequestValidator : AbstractValidator<UserRequestModel>
+public class UserRequestValidator : AbstractValidator<UserDTO>
 {
     public UserRequestValidator() {
         RuleFor(user => user.LastName).NotEmpty();
@@ -11,7 +12,7 @@ public class UserRequestValidator : AbstractValidator<UserRequestModel>
         RuleFor(user => user.DateOfBirth).Must(BeOver18);
     }
 
-    private bool BeOver18(DateTime dateOfBirth)
+    private bool BeOver18(DateOnly dateOfBirth)
     {
         var startDate = dateOfBirth;
         var endDate = DateTime.Now;

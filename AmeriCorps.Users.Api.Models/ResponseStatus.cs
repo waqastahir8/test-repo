@@ -1,4 +1,4 @@
-﻿namespace AmeriCorps.Users.Api;
+﻿namespace AmeriCorps.Users.Api.Models;
 
 public enum ResponseStatus
 {

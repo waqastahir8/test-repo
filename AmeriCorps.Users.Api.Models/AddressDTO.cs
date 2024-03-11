@@ -1,6 +1,6 @@
-﻿namespace AmeriCorps.Users.Api {
+﻿namespace AmeriCorps.Users.Api.Models;
 
-public sealed class Address
+public sealed class AddressDTO
 {
     public int Id { get; set; } 
     public bool IsForeign { get; set; }
@@ -12,5 +12,4 @@ public sealed class Address
     public required string Country { get; set; }
     public required string ZipCode { get; set; }
     public bool MovingWithinSixMonths { get; set; }
-}
 }

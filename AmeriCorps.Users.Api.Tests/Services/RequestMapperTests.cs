@@ -1,4 +1,5 @@
 ﻿using Xunit;
+using AmeriCorps.Users.Api.Models;
 using AmeriCorps.Users.Api.Services;
 
 namespace AmeriCorps.Users.Api.Tests;
@@ -9,52 +10,52 @@ public sealed class RequestMapperTests
     public void Map_CorrectlyMapsProperties()
     {
         // Arrange
-        var requestModel = new UserRequestModel
+        var requestModel = new UserDTO
         {
             FirstName = "John",
             LastName = "Doe",
             MiddleName = "Middle",
             PreferredName = "Preferred",
             UserName = "johndoe",
-            DateOfBirth = new DateTime(2000, 1, 1),
-            Attributes = new List<Attribute>(){
-                            new Attribute{ Type = "type1", Value = "value1"},
-                            new Attribute{ Type = "type2", Value = "value2"}},
+            DateOfBirth = new DateOnly(2000, 1, 1),
+            Attributes = new List<AttributeDTO>(){
+                            new AttributeDTO{ Type = "type1", Value = "value1"},
+                            new AttributeDTO{ Type = "type2", Value = "value2"}},
 
-            Languages = new List<Language>(){
-                            new Language { PickListId = "english", IsPrimary = true, 
+            Languages = new List<LanguageDTO>(){
+                            new LanguageDTO { PickListId = "english", IsPrimary = true, 
                                            SpeakingAbility = "proficient", WritingAbility = "proficient"},   
-                            new Language { PickListId = "spanish", IsPrimary = false, 
+                            new LanguageDTO { PickListId = "spanish", IsPrimary = false, 
                                            SpeakingAbility = "basic", WritingAbility = "basic"}},
 
-            Addresses = new List<Address>() {
-                            new Address { IsForeign = false, Type = "permanent", Street1 = "123 Main Rd", 
+            Addresses = new List<AddressDTO>() {
+                            new AddressDTO { IsForeign = false, Type = "permanent", Street1 = "123 Main Rd", 
                                           Street2 = "Apt 16", City = "City", State = "State", Country = "US", ZipCode = "11111", MovingWithinSixMonths = true},
-                            new Address { IsForeign = true, Type = "mailing", Street1 = "123 El Camino", 
+                            new AddressDTO { IsForeign = true, Type = "mailing", Street1 = "123 El Camino", 
                                           Street2 = "Apt 16", City = "City", State = "State", Country = "Mexico", ZipCode = "11111", MovingWithinSixMonths = false}},
 
-            Education = new List<Education>() {
-                            new Education { Level = "college", MajorAreaOfStudy = "basket weaving", 
+            Education = new List<EducationDTO>() {
+                            new EducationDTO { Level = "college", MajorAreaOfStudy = "basket weaving", 
                                             Institution = "the ohio state university",City = "city",State = "state",
                                             DateAttendedFrom = new DateOnly(2000,1,1),DateAttendedTo = new DateOnly(2005,1,1),
                                             DegreeTypePursued = "bs", DegreeCompleted = true},         
-                            new Education { Level = "college", MajorAreaOfStudy = "basket weaving", 
+                            new EducationDTO { Level = "college", MajorAreaOfStudy = "basket weaving", 
                                             Institution = "michigan state",City = "city",State = "state",
                                             DateAttendedFrom = new DateOnly(2000,1,1),DateAttendedTo = new DateOnly(2005,1,1),
                                             DegreeTypePursued = "bs", DegreeCompleted = true}},
 
-            Skills = new List<Skill>() {
-                            new Skill { PickListId = "skill1"},
-                            new Skill { PickListId = "skill2"}},
+            Skills = new List<SkillDTO>() {
+                            new SkillDTO { PickListId = "skill1"},
+                            new SkillDTO { PickListId = "skill2"}},
 
-            Relatives = new List<Relative>() {
-                            new Relative { Relationship = "spouse", HighestEducationLevel = "college", AnnualIncome = 35000},
-                            new Relative { Relationship = "mother", HighestEducationLevel = "highschool", AnnualIncome = 65000}},
+            Relatives = new List<RelativeDTO>() {
+                            new RelativeDTO { Relationship = "spouse", HighestEducationLevel = "college", AnnualIncome = 35000},
+                            new RelativeDTO { Relationship = "mother", HighestEducationLevel = "highschool", AnnualIncome = 65000}},
             
             //TODO:  Use Fixtures
-            CommunicationMethods = new List<CommunicationMethod>() {
-                            new CommunicationMethod { Type = "email", Value = "test@gmail.com", IsPreferred = true},
-                            new CommunicationMethod { Type = "phone", Value = "9154344334", IsPreferred = false}}
+            CommunicationMethods = new List<CommunicationMethodDTO>() {
+                            new CommunicationMethodDTO { Type = "email", Value = "test@gmail.com", IsPreferred = true},
+                            new CommunicationMethodDTO { Type = "phone", Value = "9154344334", IsPreferred = false}}
 
         };
 
@@ -70,7 +71,7 @@ public sealed class RequestMapperTests
         Assert.Equal(requestModel.MiddleName, result.MiddleName);
         Assert.Equal(requestModel.PreferredName, result.PreferredName);
         Assert.Equal(requestModel.UserName, result.UserName);
-        Assert.Equal(DateOnly.FromDateTime(requestModel.DateOfBirth), result.DateOfBirth);
+        Assert.Equal(requestModel.DateOfBirth, result.DateOfBirth);
 
         //Assert attributes
         Assert.Equal(2, result.Attributes.Count);  

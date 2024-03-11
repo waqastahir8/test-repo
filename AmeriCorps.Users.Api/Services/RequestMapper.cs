@@ -1,37 +1,38 @@
 ﻿using AmeriCorps.Users.Data.Core;
+using AmeriCorps.Users.Api.Models;
 
 namespace AmeriCorps.Users.Api.Services;
 
 public interface IRequestMapper {
-    User Map(UserRequestModel requestModel);
+    User Map(UserDTO requestModel);
 }
 public sealed class RequestMapper : IRequestMapper
 {
-    public User Map(UserRequestModel requestModel) => new() {
+    public User Map(UserDTO requestModel) => new() {
         FirstName = requestModel.FirstName,
         LastName = requestModel.LastName,
         MiddleName = requestModel.MiddleName,
         PreferredName = requestModel.PreferredName,
         UserName = requestModel.UserName,
-        DateOfBirth =  DateOnly.FromDateTime(requestModel.DateOfBirth),
+        DateOfBirth =  requestModel.DateOfBirth,
  
-        Attributes = MapperUtils.MapList<Attribute, AmeriCorps.Users.Data.Core.Attribute>(
+        Attributes = MapperUtils.MapList<AttributeDTO, AmeriCorps.Users.Data.Core.Attribute>(
                         requestModel.Attributes, 
                         a => new AmeriCorps.Users.Data.Core.Attribute { 
                                         Type = a.Type, Value = a.Value}),
 
 
-        Languages = MapperUtils.MapList<Language, AmeriCorps.Users.Data.Core.Language>(
+        Languages = MapperUtils.MapList<LanguageDTO, Language>(
                         requestModel.Languages, l =>
-                        new AmeriCorps.Users.Data.Core.Language {
+                        new Language {
                                                 PickListId = l.PickListId, 
                                                 IsPrimary = l.IsPrimary, 
                                                 SpeakingAbility = l.SpeakingAbility, 
                                                 WritingAbility = l.WritingAbility}),
 
-        Addresses = MapperUtils.MapList<Address, AmeriCorps.Users.Data.Core.Address>(
+        Addresses = MapperUtils.MapList<AddressDTO, Address>(
                         requestModel.Addresses, a =>
-                        new AmeriCorps.Users.Data.Core.Address {
+                        new Address {
                                                 IsForeign = a.IsForeign,
                                                 Type = a.Type,
                                                 Street1 = a.Street1,
@@ -42,9 +43,9 @@ public sealed class RequestMapper : IRequestMapper
                                                 ZipCode = a.ZipCode,
                                                 MovingWithinSixMonths = a.MovingWithinSixMonths}),
 
-        Education = MapperUtils.MapList<Education, AmeriCorps.Users.Data.Core.Education>(
+        Education = MapperUtils.MapList<EducationDTO, Education>(
                         requestModel.Education, e =>
-                        new AmeriCorps.Users.Data.Core.Education {
+                        new Education {
                                 Level = e.Level,
                                 MajorAreaOfStudy = e.MajorAreaOfStudy,
                                 Institution = e.Institution,
@@ -56,24 +57,24 @@ public sealed class RequestMapper : IRequestMapper
                                 DegreeCompleted = e.DegreeCompleted
                         }),
 
-        Skills = MapperUtils.MapList<Skill, AmeriCorps.Users.Data.Core.Skill>(
+        Skills = MapperUtils.MapList<SkillDTO, Skill>(
                         requestModel.Skills, s =>
-                        new AmeriCorps.Users.Data.Core.Skill {
+                        new Skill {
                                 PickListId = s.PickListId
                         }),
                 
-        Relatives = MapperUtils.MapList<Relative, AmeriCorps.Users.Data.Core.Relative>(
+        Relatives = MapperUtils.MapList<RelativeDTO, Relative>(
                         requestModel.Relatives, r => 
-                        new AmeriCorps.Users.Data.Core.Relative {
+                        new Relative {
                                 Relationship = r.Relationship,
                                 HighestEducationLevel = r.HighestEducationLevel,
                                 AnnualIncome = r.AnnualIncome
                         }),
         
-        CommunicationMethods = MapperUtils.MapList<CommunicationMethod,
-                                        AmeriCorps.Users.Data.Core.CommunicationMethod>(
+        CommunicationMethods = MapperUtils.MapList<CommunicationMethodDTO,
+                                        CommunicationMethod>(
                         requestModel.CommunicationMethods, cm => 
-                        new AmeriCorps.Users.Data.Core.CommunicationMethod {
+                        new CommunicationMethod {
                                 Type = cm.Type,
                                 Value = cm.Value, 
                                 IsPreferred = cm.IsPreferred

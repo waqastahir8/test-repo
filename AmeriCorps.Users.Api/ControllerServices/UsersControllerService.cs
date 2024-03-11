@@ -1,21 +1,23 @@
 ﻿using FluentValidation;
 using AmeriCorps.Users.Data.Core;
 using AmeriCorps.Users.Data;
+using AmeriCorps.Users.Api.Models;
 using AmeriCorps.Users.Api.Services;
+
 
 namespace AmeriCorps.Users.Api;
 
 public interface IUsersControllerService
 {
-    Task<(ResponseStatus Status, UserResponseModel? Response)> GetAsync(int id);
+    Task<(ResponseStatus Status, UserResponse? Response)> GetAsync(int id);
 
-    Task<(ResponseStatus Status, UserResponseModel? Responce)> CreateAsync(UserRequestModel userRequest);
+    Task<(ResponseStatus Status, UserResponse? Response)> CreateAsync(UserDTO userRequest);
 }
 public sealed class UsersControllerService(
     ILogger<UsersControllerService> logger,
     IRequestMapper reqMapper,
     IResponseMapper respMapper,
-    IValidator<UserRequestModel> validator,
+    IValidator<UserDTO> validator,
     IUserRepository repository)
     : IUsersControllerService
 {
@@ -23,9 +25,9 @@ public sealed class UsersControllerService(
 
     private readonly IRequestMapper _reqMapper = reqMapper;
     private readonly IResponseMapper _respMapper = respMapper;
-    private readonly IValidator<UserRequestModel> _validator = validator;
+    private readonly IValidator<UserDTO> _validator = validator;
     private readonly IUserRepository _repository = repository;
-    public async Task<(ResponseStatus Status, UserResponseModel? Response)> GetAsync(int id) {
+    public async Task<(ResponseStatus Status, UserResponse? Response)> GetAsync(int id) {
        
         User? user;
         
@@ -45,8 +47,8 @@ public sealed class UsersControllerService(
         return (ResponseStatus.Successful, response);
     }
 
-    public async Task<(ResponseStatus Status, UserResponseModel? Responce)> 
-                                                    CreateAsync(UserRequestModel userRequest){
+    public async Task<(ResponseStatus Status, UserResponse? Response)> 
+                                                    CreateAsync(UserDTO userRequest){
 
         var validationResult = await _validator.ValidateAsync(userRequest);
 

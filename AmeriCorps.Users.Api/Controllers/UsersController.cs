@@ -1,6 +1,8 @@
 ﻿using System.Net;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
+using AmeriCorps.Users.Api.Models;
+
 
 namespace AmeriCorps.Users.Api.Controllers;
 
@@ -17,7 +19,7 @@ public sealed class UsersController(IUsersControllerService service) : Controlle
     
 
     [HttpPost]
-    public async Task<IActionResult> CreateUserAsync([FromBody] UserRequestModel userRequest) =>
+    public async Task<IActionResult> CreateUserAsync([FromBody] UserDTO userRequest) =>
         await ServeAsync(async () => await _service.CreateAsync(userRequest));
 
 

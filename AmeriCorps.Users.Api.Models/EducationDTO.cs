@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace AmeriCorps.Users.Api;
+namespace AmeriCorps.Users.Api.Models;
 
-public sealed class Education
+public sealed class EducationDTO
 {
     public int Id { get; set; }
     public string Level { get; set; } = string.Empty;

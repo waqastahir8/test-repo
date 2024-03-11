@@ -1,6 +1,6 @@
-﻿namespace AmeriCorps.Users.Api;
+﻿namespace AmeriCorps.Users.Api.Models;
 
-public class Attribute
+public sealed class AttributeDTO
 {
     public int Id { get; set; }
     public string Type { get; set; } = string.Empty;
