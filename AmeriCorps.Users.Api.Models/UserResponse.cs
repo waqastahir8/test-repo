@@ -2,7 +2,7 @@
 
 namespace AmeriCorps.Users.Api.Models;
 
-public sealed class UserResponse : UserDTO
+public sealed class UserResponse : UserRequestModel
 {
     public int Id { get; set; }
 }

@@ -1,6 +1,6 @@
 ﻿namespace AmeriCorps.Users.Api.Models;
 
-public sealed class AddressDTO
+public sealed class AddressRequestModel
 {
     public int Id { get; set; } 
     public bool IsForeign { get; set; }

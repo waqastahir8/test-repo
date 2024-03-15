@@ -4,11 +4,11 @@ using AmeriCorps.Users.Api.Models;
 namespace AmeriCorps.Users.Api.Services;
 
 public interface IRequestMapper {
-    User Map(UserDTO requestModel);
+    User Map(UserRequestModel requestModel);
 }
 public sealed class RequestMapper : IRequestMapper
 {
-    public User Map(UserDTO requestModel) => new() {
+    public User Map(UserRequestModel requestModel) => new() {
         FirstName = requestModel.FirstName,
         LastName = requestModel.LastName,
         MiddleName = requestModel.MiddleName,
@@ -16,13 +16,13 @@ public sealed class RequestMapper : IRequestMapper
         UserName = requestModel.UserName,
         DateOfBirth =  requestModel.DateOfBirth,
  
-        Attributes = MapperUtils.MapList<AttributeDTO, AmeriCorps.Users.Data.Core.Attribute>(
+        Attributes = MapperUtils.MapList<AttributeRequestModel, AmeriCorps.Users.Data.Core.Attribute>(
                         requestModel.Attributes, 
                         a => new AmeriCorps.Users.Data.Core.Attribute { 
                                         Type = a.Type, Value = a.Value}),
 
 
-        Languages = MapperUtils.MapList<LanguageDTO, Language>(
+        Languages = MapperUtils.MapList<LanguageRequestModel, Language>(
                         requestModel.Languages, l =>
                         new Language {
                                                 PickListId = l.PickListId, 
@@ -30,7 +30,7 @@ public sealed class RequestMapper : IRequestMapper
                                                 SpeakingAbility = l.SpeakingAbility, 
                                                 WritingAbility = l.WritingAbility}),
 
-        Addresses = MapperUtils.MapList<AddressDTO, Address>(
+        Addresses = MapperUtils.MapList<AddressRequestModel, Address>(
                         requestModel.Addresses, a =>
                         new Address {
                                                 IsForeign = a.IsForeign,
@@ -43,7 +43,7 @@ public sealed class RequestMapper : IRequestMapper
                                                 ZipCode = a.ZipCode,
                                                 MovingWithinSixMonths = a.MovingWithinSixMonths}),
 
-        Education = MapperUtils.MapList<EducationDTO, Education>(
+        Education = MapperUtils.MapList<EducationRequestModel, Education>(
                         requestModel.Education, e =>
                         new Education {
                                 Level = e.Level,
@@ -57,13 +57,13 @@ public sealed class RequestMapper : IRequestMapper
                                 DegreeCompleted = e.DegreeCompleted
                         }),
 
-        Skills = MapperUtils.MapList<SkillDTO, Skill>(
+        Skills = MapperUtils.MapList<SkillRequestModel, Skill>(
                         requestModel.Skills, s =>
                         new Skill {
                                 PickListId = s.PickListId
                         }),
                 
-        Relatives = MapperUtils.MapList<RelativeDTO, Relative>(
+        Relatives = MapperUtils.MapList<RelativeRequestModel, Relative>(
                         requestModel.Relatives, r => 
                         new Relative {
                                 Relationship = r.Relationship,
@@ -71,7 +71,7 @@ public sealed class RequestMapper : IRequestMapper
                                 AnnualIncome = r.AnnualIncome
                         }),
         
-        CommunicationMethods = MapperUtils.MapList<CommunicationMethodDTO,
+        CommunicationMethods = MapperUtils.MapList<CommunicationMethodRequestModel,
                                         CommunicationMethod>(
                         requestModel.CommunicationMethods, cm => 
                         new CommunicationMethod {

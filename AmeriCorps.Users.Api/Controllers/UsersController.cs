@@ -19,7 +19,7 @@ public sealed class UsersController(IUsersControllerService service) : Controlle
     
 
     [HttpPost]
-    public async Task<IActionResult> CreateUserAsync([FromBody] UserDTO userRequest) =>
+    public async Task<IActionResult> CreateUserAsync([FromBody] UserRequestModel userRequest) =>
         await ServeAsync(async () => await _service.CreateAsync(userRequest));
 
 

@@ -11,13 +11,13 @@ public interface IUsersControllerService
 {
     Task<(ResponseStatus Status, UserResponse? Response)> GetAsync(int id);
 
-    Task<(ResponseStatus Status, UserResponse? Response)> CreateAsync(UserDTO userRequest);
+    Task<(ResponseStatus Status, UserResponse? Response)> CreateAsync(UserRequestModel userRequest);
 }
 public sealed class UsersControllerService(
     ILogger<UsersControllerService> logger,
     IRequestMapper reqMapper,
     IResponseMapper respMapper,
-    IValidator<UserDTO> validator,
+    IValidator<UserRequestModel> validator,
     IUserRepository repository)
     : IUsersControllerService
 {
@@ -25,7 +25,7 @@ public sealed class UsersControllerService(
 
     private readonly IRequestMapper _reqMapper = reqMapper;
     private readonly IResponseMapper _respMapper = respMapper;
-    private readonly IValidator<UserDTO> _validator = validator;
+    private readonly IValidator<UserRequestModel> _validator = validator;
     private readonly IUserRepository _repository = repository;
     public async Task<(ResponseStatus Status, UserResponse? Response)> GetAsync(int id) {
        
@@ -48,7 +48,7 @@ public sealed class UsersControllerService(
     }
 
     public async Task<(ResponseStatus Status, UserResponse? Response)> 
-                                                    CreateAsync(UserDTO userRequest){
+                                                    CreateAsync(UserRequestModel userRequest){
 
         var validationResult = await _validator.ValidateAsync(userRequest);
 

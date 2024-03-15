@@ -10,7 +10,7 @@ public sealed class RequestMapperTests
     public void Map_CorrectlyMapsProperties()
     {
         // Arrange
-        var requestModel = new UserDTO
+        var requestModel = new UserRequestModel
         {
             FirstName = "John",
             LastName = "Doe",
@@ -18,44 +18,44 @@ public sealed class RequestMapperTests
             PreferredName = "Preferred",
             UserName = "johndoe",
             DateOfBirth = new DateOnly(2000, 1, 1),
-            Attributes = new List<AttributeDTO>(){
-                            new AttributeDTO{ Type = "type1", Value = "value1"},
-                            new AttributeDTO{ Type = "type2", Value = "value2"}},
+            Attributes = new List<AttributeRequestModel>(){
+                            new AttributeRequestModel{ Type = "type1", Value = "value1"},
+                            new AttributeRequestModel{ Type = "type2", Value = "value2"}},
 
-            Languages = new List<LanguageDTO>(){
-                            new LanguageDTO { PickListId = "english", IsPrimary = true, 
+            Languages = new List<LanguageRequestModel>(){
+                            new LanguageRequestModel { PickListId = "english", IsPrimary = true, 
                                            SpeakingAbility = "proficient", WritingAbility = "proficient"},   
-                            new LanguageDTO { PickListId = "spanish", IsPrimary = false, 
+                            new LanguageRequestModel { PickListId = "spanish", IsPrimary = false, 
                                            SpeakingAbility = "basic", WritingAbility = "basic"}},
 
-            Addresses = new List<AddressDTO>() {
-                            new AddressDTO { IsForeign = false, Type = "permanent", Street1 = "123 Main Rd", 
+            Addresses = new List<AddressRequestModel>() {
+                            new AddressRequestModel { IsForeign = false, Type = "permanent", Street1 = "123 Main Rd", 
                                           Street2 = "Apt 16", City = "City", State = "State", Country = "US", ZipCode = "11111", MovingWithinSixMonths = true},
-                            new AddressDTO { IsForeign = true, Type = "mailing", Street1 = "123 El Camino", 
+                            new AddressRequestModel { IsForeign = true, Type = "mailing", Street1 = "123 El Camino", 
                                           Street2 = "Apt 16", City = "City", State = "State", Country = "Mexico", ZipCode = "11111", MovingWithinSixMonths = false}},
 
-            Education = new List<EducationDTO>() {
-                            new EducationDTO { Level = "college", MajorAreaOfStudy = "basket weaving", 
+            Education = new List<EducationRequestModel>() {
+                            new EducationRequestModel { Level = "college", MajorAreaOfStudy = "basket weaving", 
                                             Institution = "the ohio state university",City = "city",State = "state",
                                             DateAttendedFrom = new DateOnly(2000,1,1),DateAttendedTo = new DateOnly(2005,1,1),
                                             DegreeTypePursued = "bs", DegreeCompleted = true},         
-                            new EducationDTO { Level = "college", MajorAreaOfStudy = "basket weaving", 
+                            new EducationRequestModel { Level = "college", MajorAreaOfStudy = "basket weaving", 
                                             Institution = "michigan state",City = "city",State = "state",
                                             DateAttendedFrom = new DateOnly(2000,1,1),DateAttendedTo = new DateOnly(2005,1,1),
                                             DegreeTypePursued = "bs", DegreeCompleted = true}},
 
-            Skills = new List<SkillDTO>() {
-                            new SkillDTO { PickListId = "skill1"},
-                            new SkillDTO { PickListId = "skill2"}},
+            Skills = new List<SkillRequestModel>() {
+                            new SkillRequestModel { PickListId = "skill1"},
+                            new SkillRequestModel { PickListId = "skill2"}},
 
-            Relatives = new List<RelativeDTO>() {
-                            new RelativeDTO { Relationship = "spouse", HighestEducationLevel = "college", AnnualIncome = 35000},
-                            new RelativeDTO { Relationship = "mother", HighestEducationLevel = "highschool", AnnualIncome = 65000}},
+            Relatives = new List<RelativeRequestModel>() {
+                            new RelativeRequestModel { Relationship = "spouse", HighestEducationLevel = "college", AnnualIncome = 35000},
+                            new RelativeRequestModel { Relationship = "mother", HighestEducationLevel = "highschool", AnnualIncome = 65000}},
             
             //TODO:  Use Fixtures
-            CommunicationMethods = new List<CommunicationMethodDTO>() {
-                            new CommunicationMethodDTO { Type = "email", Value = "test@gmail.com", IsPreferred = true},
-                            new CommunicationMethodDTO { Type = "phone", Value = "9154344334", IsPreferred = false}}
+            CommunicationMethods = new List<CommunicationMethodRequestModel>() {
+                            new CommunicationMethodRequestModel { Type = "email", Value = "test@gmail.com", IsPreferred = true},
+                            new CommunicationMethodRequestModel { Type = "phone", Value = "9154344334", IsPreferred = false}}
 
         };
 

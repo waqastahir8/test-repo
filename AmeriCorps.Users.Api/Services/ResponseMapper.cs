@@ -17,25 +17,25 @@ public sealed class ResponseMapper : IResponseMapper
         UserName = user.UserName,
         DateOfBirth = user.DateOfBirth,
 
-        Attributes = MapperUtils.MapList<AmeriCorps.Users.Data.Core.Attribute, AttributeDTO>(
+        Attributes = MapperUtils.MapList<AmeriCorps.Users.Data.Core.Attribute, AttributeRequestModel>(
                         user.Attributes, 
-                        a => new AttributeDTO { 
+                        a => new AttributeRequestModel { 
                                         Id = a.Id,
                                         Type = a.Type, Value = a.Value}),
 
 
-        Languages = MapperUtils.MapList<Language, LanguageDTO>(
+        Languages = MapperUtils.MapList<Language, LanguageRequestModel>(
                         user.Languages, l =>
-                        new LanguageDTO {
+                        new LanguageRequestModel {
                                                 Id = l.Id,
                                                 PickListId = l.PickListId, 
                                                 IsPrimary = l.IsPrimary, 
                                                 SpeakingAbility = l.SpeakingAbility, 
                                                 WritingAbility = l.WritingAbility}),
 
-        Addresses = MapperUtils.MapList<Address, AddressDTO>(
+        Addresses = MapperUtils.MapList<Address, AddressRequestModel>(
                         user.Addresses, a =>
-                        new AddressDTO {
+                        new AddressRequestModel {
                                                 Id = a.Id,
                                                 IsForeign = a.IsForeign,
                                                 Type = a.Type,
@@ -47,9 +47,9 @@ public sealed class ResponseMapper : IResponseMapper
                                                 ZipCode = a.ZipCode,
                                                 MovingWithinSixMonths = a.MovingWithinSixMonths}),
 
-        Education = MapperUtils.MapList<Education, EducationDTO>(
+        Education = MapperUtils.MapList<Education, EducationRequestModel>(
                         user.Education, e =>
-                        new EducationDTO {
+                        new EducationRequestModel {
                                 Id = e.Id,
                                 Level = e.Level,
                                 MajorAreaOfStudy = e.MajorAreaOfStudy,
@@ -62,16 +62,16 @@ public sealed class ResponseMapper : IResponseMapper
                                 DegreeCompleted = e.DegreeCompleted
                         }),
 
-        Skills = MapperUtils.MapList<Skill, SkillDTO>(
+        Skills = MapperUtils.MapList<Skill, SkillRequestModel>(
                         user.Skills, s =>
-                        new SkillDTO {
+                        new SkillRequestModel {
                                 Id = s.Id,
                                 PickListId = s.PickListId
                         }),
                 
-        Relatives = MapperUtils.MapList<Relative, RelativeDTO>(
+        Relatives = MapperUtils.MapList<Relative, RelativeRequestModel>(
                         user.Relatives, r => 
-                        new RelativeDTO {
+                        new RelativeRequestModel {
                                 Id = r.Id,
                                 Relationship = r.Relationship,
                                 HighestEducationLevel = r.HighestEducationLevel,
@@ -79,9 +79,9 @@ public sealed class ResponseMapper : IResponseMapper
                         }),
         
         CommunicationMethods = MapperUtils.MapList<CommunicationMethod,
-                                        CommunicationMethodDTO>(
+                                        CommunicationMethodRequestModel>(
                         user.CommunicationMethods, cm => 
-                        new CommunicationMethodDTO {
+                        new CommunicationMethodRequestModel {
                                 Id = cm.Id,
                                 Type = cm.Type,
                                 Value = cm.Value, 

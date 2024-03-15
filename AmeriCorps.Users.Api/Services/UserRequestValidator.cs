@@ -3,7 +3,7 @@ using AmeriCorps.Users.Api.Models;
 
 namespace AmeriCorps.Users.Api;
 
-public class UserRequestValidator : AbstractValidator<UserDTO>
+public class UserRequestValidator : AbstractValidator<UserRequestModel>
 {
     public UserRequestValidator() {
         RuleFor(user => user.LastName).NotEmpty();

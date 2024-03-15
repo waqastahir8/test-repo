@@ -1,6 +1,6 @@
 ﻿namespace AmeriCorps.Users.Api.Models;
 
-public sealed class LanguageDTO
+public sealed class LanguageRequestModel
 {
     public int Id { get; set; }
     public string PickListId { get; set; } = string.Empty;

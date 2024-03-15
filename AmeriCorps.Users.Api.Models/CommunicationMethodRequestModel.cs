@@ -1,6 +1,6 @@
 ﻿namespace AmeriCorps.Users.Api.Models;
 
-public sealed class CommunicationMethodDTO {
+public sealed class CommunicationMethodRequestModel {
 
     public int Id { get; set; }
     public required string Type { get; set; }

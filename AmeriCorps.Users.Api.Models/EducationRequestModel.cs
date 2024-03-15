@@ -2,7 +2,7 @@
 
 namespace AmeriCorps.Users.Api.Models;
 
-public sealed class EducationDTO
+public sealed class EducationRequestModel
 {
     public int Id { get; set; }
     public string Level { get; set; } = string.Empty;
