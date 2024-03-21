@@ -1,4 +1,4 @@
-﻿namespace AmeriCorps.Users.Api.Models;
+﻿namespace AmeriCorps.Users.Models;
 
 public sealed class LanguageRequestModel
 {

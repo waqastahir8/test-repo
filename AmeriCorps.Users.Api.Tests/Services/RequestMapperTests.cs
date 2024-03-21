@@ -1,5 +1,5 @@
 ﻿using Xunit;
-using AmeriCorps.Users.Api.Models;
+using AmeriCorps.Users.Models;
 using AmeriCorps.Users.Api.Services;
 
 namespace AmeriCorps.Users.Api.Tests;

@@ -11,7 +11,10 @@ env:
   AZURE_WEBAPP_PACKAGE_PATH: './publish'
   SOLUTION_FILE: ./AmeriCorpsUsers.sln
   API_PROJECT: ./AmeriCorps.Users.Api
+  NUGET_PROJECT_FILE: ./AmeriCorps.Users.Models/AmeriCorps.Users.Models.csproj
   MIGRATION_PROJECT: ./AmeriCorps.Users.Data.Migrations
+  GITHUB_NUGET: https://nuget.pkg.github.com/free-alliance/index.json
+  BUILD_CONFIGURATION: Release
 
 jobs:
   publish:
@@ -27,6 +30,12 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
+      - name: publish nuget package
+        run: |
+          dotnet pack ${{ env.NUGET_PROJECT_FILE }} --configuration ${{ env.BUILD_CONFIGURATION }} --artifacts-path ./nuget
+          dotnet nuget update source github --username USERNAME --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text
+          dotnet nuget push "./nuget/package/release/*.nupkg" --source "github" --skip-duplicate
+
       - name: .net restore
         run: |
           dotnet nuget update source github --username "${{ secrets.NUGET_USER }}" --password "${{ secrets.NUGET_PWD }}" --store-password-in-clear-text
@@ -37,7 +46,8 @@ jobs:
 
       - name: .net publish
         run: dotnet publish ${{ env.API_PROJECT }} --configuration Release --no-restore --output '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}'
-      
+    
+
       - name: .net ef migrations
         env:
           KeyVaultOptions__ClientSecret: ${{ secrets.CLIENT_SECRET_DEV }}

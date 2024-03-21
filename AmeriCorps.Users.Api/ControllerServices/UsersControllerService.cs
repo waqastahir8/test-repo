@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using AmeriCorps.Users.Data.Core;
 using AmeriCorps.Users.Data;
-using AmeriCorps.Users.Api.Models;
+using AmeriCorps.Users.Models;
 using AmeriCorps.Users.Api.Services;
 
 

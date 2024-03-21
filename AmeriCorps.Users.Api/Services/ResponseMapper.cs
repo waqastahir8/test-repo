@@ -1,5 +1,5 @@
 ﻿using AmeriCorps.Users.Data.Core;
-using AmeriCorps.Users.Api.Models;
+using AmeriCorps.Users.Models;
 
 namespace AmeriCorps.Users.Api.Services;
 

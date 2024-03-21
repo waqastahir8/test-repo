@@ -1,10 +1,10 @@
 ﻿using System.Net;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
-using AmeriCorps.Users.Api.Models;
+using AmeriCorps.Users.Models;
 
 
-namespace AmeriCorps.Users.Api.Controllers;
+namespace AmeriCorps.Users.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
