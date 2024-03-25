@@ -3,9 +3,10 @@ using AmeriCorps.Users.Models;
 
 namespace AmeriCorps.Users.Api;
 
-public class UserRequestValidator : AbstractValidator<UserRequestModel>
+public sealed class UserRequestValidator : AbstractValidator<UserRequestModel>
 {
-    public UserRequestValidator() {
+    public UserRequestValidator()
+    {
         RuleFor(user => user.LastName).NotEmpty();
         RuleFor(user => user.FirstName).NotEmpty();
         RuleFor(user => user.UserName).NotEmpty();

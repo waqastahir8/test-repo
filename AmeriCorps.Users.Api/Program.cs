@@ -7,6 +7,7 @@ builder.Services.AddApiVersioning();
 
 builder.Services
     .AddSingleton<IValidator<UserRequestModel>, UserRequestValidator>()
+    .AddSingleton<IValidator<SavedSearchRequestModel>, SearchRequestValidator>()
     .AddScoped<IContextFactory, DefaultContextFactory>()
     .AddScoped<IUserRepository, UserRepository>()
     .AddScoped<IRequestMapper, RequestMapper>()
@@ -22,7 +23,7 @@ var configuration =
     builder.Configuration
     .AddJsonFile("appsettings.json", optional: false)
     .AddJsonFile("appsettings.{env.EnvironmentName}.json", optional: true)
-    .AddAzureKeyVault(new Uri(keyVaultUri), 
+    .AddAzureKeyVault(new Uri(keyVaultUri),
                     new ClientSecretCredential(
                         tenantId,
                         clientId,

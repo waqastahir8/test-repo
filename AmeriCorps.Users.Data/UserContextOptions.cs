@@ -3,4 +3,4 @@
 namespace AmeriCorps.Users.Data;
 
 public sealed class UserContextOptions : ContextOptions
-{}
+{ }

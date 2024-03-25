@@ -16,6 +16,8 @@ public class UserRequestModel
     public List<AddressRequestModel> Addresses { get; set; } = new List<AddressRequestModel>();    
     public List<EducationRequestModel> Education { get; set; } = new List<EducationRequestModel>();
     public List<SkillRequestModel> Skills { get; set; } = new List<SkillRequestModel>();
+    public List<MilitaryServiceRequestModel> MilitaryService { get; set; } = new List<MilitaryServiceRequestModel>();
+    public List<SavedSearchRequestModel> SavedSearches { get; set; } = new List<SavedSearchRequestModel>();
     public List<RelativeRequestModel> Relatives { get; set; } = new List<RelativeRequestModel>();
     public List<CommunicationMethodRequestModel> CommunicationMethods { get; set; } = new List<CommunicationMethodRequestModel>();
 }
