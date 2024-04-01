@@ -8,6 +8,7 @@ public sealed class User
     public int Id { get; set; }
     public bool Searchable { get; set; }
     public string UserName { get; set; } = string.Empty;
+    public string ExternalAccountId { get; set; } = string.Empty;
     public string? Prefix { get; set; }
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;

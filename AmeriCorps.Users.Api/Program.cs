@@ -6,8 +6,7 @@ builder.Services.AddControllers();
 builder.Services.AddApiVersioning();
 
 builder.Services
-    .AddSingleton<IValidator<UserRequestModel>, UserRequestValidator>()
-    .AddSingleton<IValidator<SavedSearchRequestModel>, SearchRequestValidator>()
+    .AddSingleton<IValidator, Validator>()
     .AddScoped<IContextFactory, DefaultContextFactory>()
     .AddScoped<IUserRepository, UserRepository>()
     .AddScoped<IRequestMapper, RequestMapper>()

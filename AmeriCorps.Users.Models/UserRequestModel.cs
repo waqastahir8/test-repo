@@ -9,6 +9,7 @@ public class UserRequestModel
     public string MiddleName { get; set; } = string.Empty;
     public string PreferredName{ get; set; } = string.Empty;
     public string UserName {get; set; } = string.Empty;
+    public string ExternalAccountId { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public DateOnly DateOfBirth { get; set; } 
     public List<AttributeRequestModel> Attributes { get; set; } = new List<AttributeRequestModel>();

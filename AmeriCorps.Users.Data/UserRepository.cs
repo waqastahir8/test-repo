@@ -10,7 +10,7 @@ public interface IUserRepository
 {
     Task<User?> GetAsync(int id);
     Task<List<SavedSearch>?> GetUserSearchesAsync(int id);
-    Task<bool> Exists(int id);
+    Task<bool> ExistsAsync(int id);
     Task<User> CreateAsync(User user);
     Task<SavedSearch> SaveAsync(SavedSearch search);
     Task DeleteSearchAsync(int id);
@@ -41,7 +41,7 @@ public sealed class UserRepository(
 
         return user != null ? user.SavedSearches : null;
     }
-    public async Task<bool> Exists(int id) =>
+    public async Task<bool> ExistsAsync(int id) =>
             await ExecuteAsync(async context =>
                     await context.Users.AnyAsync(u => u.Id == id));
     public async Task<User> CreateAsync(User user)

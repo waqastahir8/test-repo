@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AmeriCorps.Users.Api\AmeriCorps.Users.Api.csproj" />
+    <ProjectReference Include="..\AmeriCorps.Users.Data\AmeriCorps.Users.Data.csproj" />
   </ItemGroup>
 
 </Project>

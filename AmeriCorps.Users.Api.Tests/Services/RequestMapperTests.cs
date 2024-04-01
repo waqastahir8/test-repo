@@ -4,79 +4,34 @@ using AmeriCorps.Users.Api.Services;
 
 namespace AmeriCorps.Users.Api.Tests;
 
-public sealed class RequestMapperTests
+public sealed class RequestMapperTests : BaseTests<RequestMapper>
 {
     [Fact]
     public void Map_CorrectlyMapsProperties()
     {
         // Arrange
-        var requestModel = new UserRequestModel
-        {
-            FirstName = "John",
-            LastName = "Doe",
-            MiddleName = "Middle",
-            PreferredName = "Preferred",
-            UserName = "johndoe",
-            DateOfBirth = new DateOnly(2000, 1, 1),
-            Attributes = new List<AttributeRequestModel>(){
-                            new AttributeRequestModel{ Type = "type1", Value = "value1"},
-                            new AttributeRequestModel{ Type = "type2", Value = "value2"}},
+        var sut = Setup();
+        var model = Fixture.Create<UserRequestModel>();
 
-            Languages = new List<LanguageRequestModel>(){
-                            new LanguageRequestModel { PickListId = "english", IsPrimary = true,
-                                           SpeakingAbility = "proficient", WritingAbility = "proficient"},
-                            new LanguageRequestModel { PickListId = "spanish", IsPrimary = false,
-                                           SpeakingAbility = "basic", WritingAbility = "basic"}},
-
-            Addresses = new List<AddressRequestModel>() {
-                            new AddressRequestModel { IsForeign = false, Type = "permanent", Street1 = "123 Main Rd",
-                                          Street2 = "Apt 16", City = "City", State = "State", Country = "US", ZipCode = "11111", MovingWithinSixMonths = true},
-                            new AddressRequestModel { IsForeign = true, Type = "mailing", Street1 = "123 El Camino",
-                                          Street2 = "Apt 16", City = "City", State = "State", Country = "Mexico", ZipCode = "11111", MovingWithinSixMonths = false}},
-
-            Education = new List<EducationRequestModel>() {
-                            new EducationRequestModel { Level = "college", MajorAreaOfStudy = "basket weaving",
-                                            Institution = "the ohio state university",City = "city",State = "state",
-                                            DateAttendedFrom = new DateOnly(2000,1,1),DateAttendedTo = new DateOnly(2005,1,1),
-                                            DegreeTypePursued = "bs", DegreeCompleted = true},
-                            new EducationRequestModel { Level = "college", MajorAreaOfStudy = "basket weaving",
-                                            Institution = "michigan state",City = "city",State = "state",
-                                            DateAttendedFrom = new DateOnly(2000,1,1),DateAttendedTo = new DateOnly(2005,1,1),
-                                            DegreeTypePursued = "bs", DegreeCompleted = true}},
-
-            Skills = new List<SkillRequestModel>() {
-                            new SkillRequestModel { PickListId = "skill1"},
-                            new SkillRequestModel { PickListId = "skill2"}},
-
-            Relatives = new List<RelativeRequestModel>() {
-                            new RelativeRequestModel { Relationship = "spouse", HighestEducationLevel = "college", AnnualIncome = 35000},
-                            new RelativeRequestModel { Relationship = "mother", HighestEducationLevel = "highschool", AnnualIncome = 65000}},
-
-            //TODO:  Use Fixtures
-            CommunicationMethods = new List<CommunicationMethodRequestModel>() {
-                            new CommunicationMethodRequestModel { Type = "email", Value = "test@gmail.com", IsPreferred = true},
-                            new CommunicationMethodRequestModel { Type = "phone", Value = "9154344334", IsPreferred = false}}
-
-        };
-
-
-        IRequestMapper mapper = new RequestMapper(); // Assuming this is the class containing the Map method
+        IRequestMapper mapper = new RequestMapper();
 
         // Act
-        var result = mapper.Map(requestModel);
+        var result = mapper.Map(model);
 
         // Assert
-        Assert.Equal(requestModel.FirstName, result.FirstName);
-        Assert.Equal(requestModel.LastName, result.LastName);
-        Assert.Equal(requestModel.MiddleName, result.MiddleName);
-        Assert.Equal(requestModel.PreferredName, result.PreferredName);
-        Assert.Equal(requestModel.UserName, result.UserName);
-        Assert.Equal(requestModel.DateOfBirth, result.DateOfBirth);
+        Assert.Equal(model.FirstName, result.FirstName);
+        Assert.Equal(model.LastName, result.LastName);
+        Assert.Equal(model.MiddleName, result.MiddleName);
+        Assert.Equal(model.UserName, result.UserName);
+        Assert.Equal(model.ExternalAccountId, result.ExternalAccountId);
+        Assert.Equal(model.PreferredName, result.PreferredName);
+        Assert.Equal(model.UserName, result.UserName);
+        Assert.Equal(model.DateOfBirth, result.DateOfBirth);
 
         //Assert attributes
-        Assert.Equal(2, result.Attributes.Count);
+        Assert.Equal(model.Attributes.Count, result.Attributes.Count);
 
-        Assert.All(result.Attributes.Zip(requestModel.Attributes, (mapped, source) => (mapped, source)),
+        Assert.All(result.Attributes.Zip(model.Attributes, (mapped, source) => (mapped, source)),
             pair =>
             {
                 Assert.Equal(pair.source.Type, pair.mapped.Type);
@@ -84,9 +39,9 @@ public sealed class RequestMapperTests
             });
 
         //Assert languages
-        Assert.Equal(2, result.Languages.Count);
+        Assert.Equal(model.Languages.Count, result.Languages.Count);
 
-        Assert.All(result.Languages.Zip(requestModel.Languages, (mapped, source) => (mapped, source)),
+        Assert.All(result.Languages.Zip(model.Languages, (mapped, source) => (mapped, source)),
             pair =>
             {
                 Assert.Equal(pair.source.PickListId, pair.mapped.PickListId);
@@ -96,8 +51,8 @@ public sealed class RequestMapperTests
             });
 
         //Assert addresses
-        Assert.Equal(2, result.Addresses.Count);
-        Assert.All(result.Addresses.Zip(requestModel.Addresses, (mapped, source) => (mapped, source)),
+        Assert.Equal(model.Addresses.Count, result.Addresses.Count);
+        Assert.All(result.Addresses.Zip(model.Addresses, (mapped, source) => (mapped, source)),
         pair =>
         {
             Assert.Equal(pair.source.IsForeign, pair.mapped.IsForeign);
@@ -112,8 +67,8 @@ public sealed class RequestMapperTests
         });
 
         //Assert education
-        Assert.Equal(2, result.Education.Count);
-        Assert.All(result.Education.Zip(requestModel.Education, (mapped, source) => (mapped, source)),
+        Assert.Equal(model.Education.Count, result.Education.Count);
+        Assert.All(result.Education.Zip(model.Education, (mapped, source) => (mapped, source)),
         pair =>
         {
             Assert.Equal(pair.source.Level, pair.mapped.Level);
@@ -128,18 +83,39 @@ public sealed class RequestMapperTests
         });
 
         //Assert Skills
-        Assert.Equal(2, result.Skills.Count);
+        Assert.Equal(model.Skills.Count, result.Skills.Count);
 
-        Assert.All(result.Skills.Zip(requestModel.Skills, (mapped, source) => (mapped, source)),
+        Assert.All(result.Skills.Zip(model.Skills, (mapped, source) => (mapped, source)),
             pair =>
             {
                 Assert.Equal(pair.source.PickListId, pair.mapped.PickListId);
             });
 
-        //Assert Relatives
-        Assert.Equal(2, result.Relatives.Count);
+        //Assert Military Service
+        Assert.Equal(model.MilitaryService.Count, result.MilitaryService.Count);
 
-        Assert.All(result.Relatives.Zip(requestModel.Relatives, (mapped, source) => (mapped, source)),
+        Assert.All(result.MilitaryService.Zip(model.MilitaryService, (mapped, source) => (mapped, source)),
+            pair =>
+            {
+                Assert.Equal(pair.source.PickListId, pair.mapped.PickListId);
+            });
+
+        //Assert Saved Searches
+        Assert.Equal(model.SavedSearches.Count, result.SavedSearches.Count);
+
+        Assert.All(result.SavedSearches.Zip(model.SavedSearches, (mapped, source) => (mapped, source)),
+            pair =>
+            {
+                Assert.Equal(pair.source.UserId, pair.mapped.UserId);
+                Assert.Equal(pair.source.Name, pair.mapped.Name);
+                Assert.Equal(pair.source.Filters, pair.mapped.Filters);
+                Assert.Equal(pair.source.NotificationsOn, pair.mapped.NotificationsOn);
+            });
+
+        //Assert Relatives
+        Assert.Equal(model.Relatives.Count, result.Relatives.Count);
+
+        Assert.All(result.Relatives.Zip(model.Relatives, (mapped, source) => (mapped, source)),
             pair =>
             {
                 Assert.Equal(pair.source.Relationship, pair.mapped.Relationship);
@@ -148,14 +124,21 @@ public sealed class RequestMapperTests
             });
 
         //Assert Communication Methods
-        Assert.Equal(2, result.CommunicationMethods.Count);
+        Assert.Equal(model.CommunicationMethods.Count, result.CommunicationMethods.Count);
 
-        Assert.All(result.CommunicationMethods.Zip(requestModel.CommunicationMethods, (mapped, source) => (mapped, source)),
+        Assert.All(result.CommunicationMethods.Zip(model.CommunicationMethods, (mapped, source) => (mapped, source)),
             pair =>
             {
                 Assert.Equal(pair.source.Type, pair.mapped.Type);
                 Assert.Equal(pair.source.Value, pair.mapped.Value);
                 Assert.Equal(pair.source.IsPreferred, pair.mapped.IsPreferred);
             });
+    }
+
+    protected override RequestMapper Setup()
+    {
+        Fixture = new Fixture();
+        Fixture.Customize<DateOnly>(x => x.FromFactory<DateTime>(DateOnly.FromDateTime));
+        return new();
     }
 }

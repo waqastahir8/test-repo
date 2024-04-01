@@ -40,6 +40,7 @@ public sealed class ResponseMapper : IResponseMapper
         MiddleName = user.MiddleName,
         PreferredName = user.PreferredName,
         UserName = user.UserName,
+        ExternalAccountId = user.ExternalAccountId,
         DateOfBirth = user.DateOfBirth,
 
         Attributes = MapperUtils.MapList<AmeriCorps.Users.Data.Core.Attribute, AttributeRequestModel>(

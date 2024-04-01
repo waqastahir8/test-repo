@@ -18,6 +18,7 @@ public sealed class RequestMapper : IRequestMapper
         MiddleName = requestModel.MiddleName,
         PreferredName = requestModel.PreferredName,
         UserName = requestModel.UserName,
+        ExternalAccountId = requestModel.ExternalAccountId,
         DateOfBirth = requestModel.DateOfBirth,
 
         Attributes = MapperUtils.MapList<AttributeRequestModel, AmeriCorps.Users.Data.Core.Attribute>(

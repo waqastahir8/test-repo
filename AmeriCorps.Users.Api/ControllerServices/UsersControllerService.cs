@@ -10,18 +10,17 @@ namespace AmeriCorps.Users.Api;
 public interface IUsersControllerService
 {
     Task<(ResponseStatus Status, UserResponse? Response)> GetAsync(int id);
-    Task<(ResponseStatus Status, UserResponse? Response)> CreateAsync(UserRequestModel userRequest);
+    Task<(ResponseStatus Status, UserResponse? Response)> CreateAsync(UserRequestModel? userRequest);
     Task<(ResponseStatus Status, UserSearchListResponseModel? Response)> GetUserSearchesAsync(int userId);
-    Task<(ResponseStatus Status, SavedSearchResponseModel? Response)> CreateSearchAsync(int userId, SavedSearchRequestModel searchRequest);
-    Task<(ResponseStatus Status, SavedSearchResponseModel? Response)> UpdateSearchAsync(int userId, int searchId, SavedSearchRequestModel searchRequest);
+    Task<(ResponseStatus Status, SavedSearchResponseModel? Response)> CreateSearchAsync(int userId, SavedSearchRequestModel? searchRequest);
+    Task<(ResponseStatus Status, SavedSearchResponseModel? Response)> UpdateSearchAsync(int userId, int searchId, SavedSearchRequestModel? searchRequest);
     Task<(ResponseStatus Status, bool Response)> DeleteSearchAsync(int userId, int searchId);
 }
 public sealed class UsersControllerService(
     ILogger<UsersControllerService> logger,
     IRequestMapper reqMapper,
     IResponseMapper respMapper,
-    IValidator<UserRequestModel> validator,
-    IValidator<SavedSearchRequestModel> searchValidator,
+    IValidator validator,
     IUserRepository repository)
     : IUsersControllerService
 {
@@ -29,8 +28,7 @@ public sealed class UsersControllerService(
 
     private readonly IRequestMapper _reqMapper = reqMapper;
     private readonly IResponseMapper _respMapper = respMapper;
-    private readonly IValidator<UserRequestModel> _validator = validator;
-    private readonly IValidator<SavedSearchRequestModel> _searchValidator = searchValidator;
+    private readonly IValidator _validator = validator;
     private readonly IUserRepository _repository = repository;
     public async Task<(ResponseStatus Status, UserResponse? Response)> GetAsync(int id)
     {
@@ -89,12 +87,9 @@ public sealed class UsersControllerService(
     }
 
     public async Task<(ResponseStatus Status, UserResponse? Response)>
-                                                    CreateAsync(UserRequestModel userRequest)
+                                                    CreateAsync(UserRequestModel? userRequest)
     {
-
-        var validationResult = await _validator.ValidateAsync(userRequest);
-
-        if (userRequest == null || !validationResult.IsValid)
+        if (userRequest == null || !_validator.Validate(userRequest))
         {
             return (ResponseStatus.MissingInformation, null);
         }
@@ -122,12 +117,20 @@ public sealed class UsersControllerService(
     }
 
     public async Task<(ResponseStatus Status, SavedSearchResponseModel? Response)>
-              CreateSearchAsync(int userId, SavedSearchRequestModel searchRequest)
+              CreateSearchAsync(int userId, SavedSearchRequestModel? searchRequest)
     {
+        bool userExists = false;
+        try
+        {
+            userExists = await _repository.ExistsAsync(userId);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Unable to check if user {userId} exists.");
+            return (ResponseStatus.UnknownError, null);
+        }
 
-        var validationResult = await _searchValidator.ValidateAsync(searchRequest);
-
-        if (searchRequest == null || !validationResult.IsValid)
+        if (searchRequest == null || !_validator.Validate(searchRequest) || !userExists)
         {
             return (ResponseStatus.MissingInformation, null);
         }
@@ -138,12 +141,20 @@ public sealed class UsersControllerService(
     }
 
     public async Task<(ResponseStatus Status, SavedSearchResponseModel? Response)>
-                UpdateSearchAsync(int userId, int searchId, SavedSearchRequestModel searchRequest)
+                UpdateSearchAsync(int userId, int searchId, SavedSearchRequestModel? searchRequest)
     {
-        var validationResult = await _searchValidator.ValidateAsync(searchRequest);
-        var userExists = await _repository.Exists(userId);
+        bool userExists = false;
+        try
+        {
+            userExists = await _repository.ExistsAsync(userId);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Unable to check if user {userId} exists.");
+            return (ResponseStatus.UnknownError, null);
+        }
 
-        if (searchRequest == null || !validationResult.IsValid || !userExists)
+        if (searchRequest == null || !_validator.Validate(searchRequest) || !userExists)
         {
             return (ResponseStatus.MissingInformation, null);
         }
