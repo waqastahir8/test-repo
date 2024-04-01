@@ -2,12 +2,13 @@ using AmeriCorps.Users.Models;
 
 namespace AmeriCorps.Users.Api;
 
-public interface IValidator {
+public interface IValidator
+{
     bool Validate(UserRequestModel model);
     bool Validate(SavedSearchRequestModel model);
 }
 
-public sealed class Validator : IValidator 
+public sealed class Validator : IValidator
 {
     public bool Validate(UserRequestModel model) =>
         !string.IsNullOrWhiteSpace(model.FirstName) &&
@@ -17,8 +18,7 @@ public sealed class Validator : IValidator
 
     public bool Validate(SavedSearchRequestModel model) =>
         !string.IsNullOrWhiteSpace(model.Name) &&
-        !string.IsNullOrWhiteSpace(model.Filters) &&
-        model.UserId == default;
+        !string.IsNullOrWhiteSpace(model.Filters);
     private bool IsOver18(DateOnly dateOfBirth)
     {
         var startDate = dateOfBirth;

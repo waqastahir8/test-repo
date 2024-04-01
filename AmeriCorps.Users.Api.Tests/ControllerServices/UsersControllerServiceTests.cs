@@ -14,7 +14,8 @@ public sealed class UsersControllerServiceTests : BaseTests<UsersControllerServi
     private Mock<IValidator>? _validatorMock;
 
     [Fact]
-    public async Task CreateAsync_NullUser_MissingInformationStatus(){
+    public async Task CreateAsync_NullUser_MissingInformationStatus()
+    {
         //Arrange
         var sut = Setup();
 
@@ -26,7 +27,8 @@ public sealed class UsersControllerServiceTests : BaseTests<UsersControllerServi
     }
 
     [Fact]
-    public async Task CreateAsync_InvalidUser_MissingInformationStatus(){
+    public async Task CreateAsync_InvalidUser_MissingInformationStatus()
+    {
         //Arrange
         var sut = Setup();
         var model = Fixture.Create<UserRequestModel>();
@@ -71,8 +73,9 @@ public sealed class UsersControllerServiceTests : BaseTests<UsersControllerServi
     }
 
     [Fact]
-    public async Task CreateAsync_UserSaved_SuccessfulStatus(){
-         // Arrange
+    public async Task CreateAsync_UserSaved_SuccessfulStatus()
+    {
+        // Arrange
         var sut = Setup();
         var model =
             Fixture
@@ -99,8 +102,9 @@ public sealed class UsersControllerServiceTests : BaseTests<UsersControllerServi
     }
 
     [Fact]
-    public async Task CreateAsync_UserSaved_ReturnsMappedObject(){
-         // Arrange
+    public async Task CreateAsync_UserSaved_ReturnsMappedObject()
+    {
+        // Arrange
         var sut = Setup();
         var model =
             Fixture
@@ -109,7 +113,7 @@ public sealed class UsersControllerServiceTests : BaseTests<UsersControllerServi
             Fixture
             .Build<User>()
             .Create();
-        var expected = 
+        var expected =
             Fixture
             .Create<UserResponse>();
         _validatorMock!
@@ -126,26 +130,28 @@ public sealed class UsersControllerServiceTests : BaseTests<UsersControllerServi
             .ReturnsAsync(user);
 
         // Act
-        var (_,actual) = await sut.CreateAsync(model);
+        var (_, actual) = await sut.CreateAsync(model);
 
         // Assert
         Assert.Equal(actual, expected);
     }
 
     [Fact]
-    public async Task CreateAsync_NullSearch_MissingInformationStatus(){
+    public async Task CreateAsync_NullSearch_MissingInformationStatus()
+    {
         //Arrange
         var sut = Setup();
 
         //Act
-        var (status, _) = await sut.CreateSearchAsync(Fixture.Create<int>(),null);
+        var (status, _) = await sut.CreateSearchAsync(Fixture.Create<int>(), null);
 
         //Assert
         Assert.Equal(ResponseStatus.MissingInformation, status);
     }
 
     [Fact]
-    public async Task CreateAsync_InvalidSearch_MissingInformationStatus(){
+    public async Task CreateAsync_InvalidSearch_MissingInformationStatus()
+    {
         //Arrange
         var sut = Setup();
         var model = Fixture.Create<SavedSearchRequestModel>();
@@ -154,14 +160,15 @@ public sealed class UsersControllerServiceTests : BaseTests<UsersControllerServi
             .Returns(false);
 
         //Act
-        var (status, _) = await sut.CreateSearchAsync(Fixture.Create<int>(),model);
+        var (status, _) = await sut.CreateSearchAsync(Fixture.Create<int>(), model);
 
         //Assert
         Assert.Equal(ResponseStatus.MissingInformation, status);
     }
 
     [Fact]
-    public async Task CreateAsync_InvalidUserId_MissingInformationStatus(){
+    public async Task CreateAsync_InvalidUserId_MissingInformationStatus()
+    {
         //Arrange
         var sut = Setup();
         var model = Fixture.Create<SavedSearchRequestModel>();
@@ -173,12 +180,12 @@ public sealed class UsersControllerServiceTests : BaseTests<UsersControllerServi
             .ReturnsAsync(false);
 
         //Act
-        var (status, _) = await sut.CreateSearchAsync(Fixture.Create<int>(),model);
+        var (status, _) = await sut.CreateSearchAsync(Fixture.Create<int>(), model);
 
         //Assert
         Assert.Equal(ResponseStatus.MissingInformation, status);
     }
-    
+
     [Fact]
     public async Task CreateSearchAsync_RepositoryThrowsException_UnknownErrorStatus()
     {
@@ -206,14 +213,15 @@ public sealed class UsersControllerServiceTests : BaseTests<UsersControllerServi
             .ThrowsAsync(new Exception());
 
         // Act
-        var (status, _) = await sut.CreateSearchAsync(userId,model);
+        var (status, _) = await sut.CreateSearchAsync(userId, model);
 
         // Assert
         Assert.Equal(ResponseStatus.UnknownError, status);
     }
 
     [Fact]
-    public async Task CreateAsync_SearchSaved_SuccessfulStatus(){
+    public async Task CreateAsync_SearchSaved_SuccessfulStatus()
+    {
         // Arrange
         var sut = Setup();
         var model =
@@ -238,15 +246,16 @@ public sealed class UsersControllerServiceTests : BaseTests<UsersControllerServi
             .ReturnsAsync(search);
 
         // Act
-        var (status, _) = await sut.CreateSearchAsync(userId,model);
+        var (status, _) = await sut.CreateSearchAsync(userId, model);
 
         // Assert
         Assert.Equal(ResponseStatus.Successful, status);
     }
 
-        [Fact]
-    public async Task CreateAsync_SearchSaved_ReturnsMappedObject(){
-         // Arrange
+    [Fact]
+    public async Task CreateAsync_SearchSaved_ReturnsMappedObject()
+    {
+        // Arrange
         var sut = Setup();
         var model =
             Fixture
@@ -256,7 +265,7 @@ public sealed class UsersControllerServiceTests : BaseTests<UsersControllerServi
             Fixture
             .Build<SavedSearch>()
             .Create();
-        var expected = 
+        var expected =
             Fixture
             .Create<SavedSearchResponseModel>();
         _validatorMock!
@@ -276,7 +285,7 @@ public sealed class UsersControllerServiceTests : BaseTests<UsersControllerServi
             .ReturnsAsync(search);
 
         // Act
-        var (_,actual) = await sut.CreateSearchAsync(userId,model);
+        var (_, actual) = await sut.CreateSearchAsync(userId, model);
 
         // Assert
         Assert.Equal(actual, expected);

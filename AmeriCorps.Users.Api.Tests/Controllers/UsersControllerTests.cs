@@ -4,12 +4,13 @@ using System.Net;
 
 namespace AmeriCorps.Users.Api.Tests;
 
-public sealed class UsersControllerTests : BaseTests<UsersController> 
+public sealed class UsersControllerTests : BaseTests<UsersController>
 {
     private Mock<IUsersControllerService>? _serviceMock;
 
     [Fact]
-    public async Task CreateUserAsync_InformationMissing_422StatusCode() {
+    public async Task CreateUserAsync_InformationMissing_422StatusCode()
+    {
 
         //Arrange
         var sut = Setup();
@@ -28,9 +29,10 @@ public sealed class UsersControllerTests : BaseTests<UsersController>
         Assert.Equal((int)HttpStatusCode.UnprocessableEntity, response.StatusCode);
     }
 
-    
+
     [Fact]
-    public async Task CreateUserAsync_UnknownError_500StatusCode() {
+    public async Task CreateUserAsync_UnknownError_500StatusCode()
+    {
 
         //Arrange
         var sut = Setup();
@@ -68,7 +70,7 @@ public sealed class UsersControllerTests : BaseTests<UsersController>
     }
 
 
-     protected override UsersController Setup()
+    protected override UsersController Setup()
     {
         _serviceMock = new();
         Fixture = new Fixture();
