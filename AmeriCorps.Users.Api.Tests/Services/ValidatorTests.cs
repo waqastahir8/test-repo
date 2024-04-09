@@ -28,6 +28,14 @@ public sealed class ValidatorTests : BaseTests<Validator>
     public void Validate_MissingUserName_Fails(string? value) =>
         AssertUserValidationFailsOnMissingProperty(u => u.UserName, value);
 
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("\t\t\r\n")]
+    [InlineData("      ")]
+    public void Validate_MissingExternalAccountId_Fails(string? value) =>
+        AssertUserValidationFailsOnMissingProperty(u => u.ExternalAccountId, value);
+
     [Fact]
     public void Validate_Over18_DateOfBirth_Succeeds()
     {

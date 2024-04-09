@@ -17,10 +17,17 @@ public sealed class UsersController(IUsersControllerService service) : Controlle
     public async Task<IActionResult> GetUserAsync(int id) =>
         await ServeAsync(async () => await _service.GetAsync(id));
 
+    [HttpGet]
+    public async Task<IActionResult> GetUserByExternalAccountId([FromQuery] string externalAccountId) =>
+        await ServeAsync(async() => await _service.GetByExternalAccountId(externalAccountId));
 
     [HttpPost]
     public async Task<IActionResult> CreateUserAsync([FromBody] UserRequestModel userRequest) =>
-        await ServeAsync(async () => await _service.CreateAsync(userRequest));
+        await ServeAsync(async () => await _service.CreateOrPatchAsync(userRequest));
+
+    [HttpPatch]
+    public async Task<IActionResult> PatchUserAsync([FromBody] UserRequestModel userRequest) =>
+        await ServeAsync(async () => await _service.CreateOrPatchAsync(userRequest));
 
     [HttpGet("{userId}/Searches")]
     public async Task<IActionResult> GetUserSearchesAsync(int userId) =>

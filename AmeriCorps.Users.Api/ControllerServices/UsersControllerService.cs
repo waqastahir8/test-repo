@@ -1,8 +1,8 @@
-﻿using FluentValidation;
-using AmeriCorps.Users.Data.Core;
+﻿using AmeriCorps.Users.Data.Core;
 using AmeriCorps.Users.Data;
 using AmeriCorps.Users.Models;
 using AmeriCorps.Users.Api.Services;
+
 
 
 namespace AmeriCorps.Users.Api;
@@ -10,7 +10,8 @@ namespace AmeriCorps.Users.Api;
 public interface IUsersControllerService
 {
     Task<(ResponseStatus Status, UserResponse? Response)> GetAsync(int id);
-    Task<(ResponseStatus Status, UserResponse? Response)> CreateAsync(UserRequestModel? userRequest);
+    Task<(ResponseStatus Status, UserResponse? Response)> GetByExternalAccountId(string externalAccountId);
+    Task<(ResponseStatus Status, UserResponse? Response)> CreateOrPatchAsync(UserRequestModel? userRequest);
     Task<(ResponseStatus Status, UserSearchListResponseModel? Response)> GetUserSearchesAsync(int userId);
     Task<(ResponseStatus Status, SavedSearchResponseModel? Response)> CreateSearchAsync(int userId, SavedSearchRequestModel? searchRequest);
     Task<(ResponseStatus Status, SavedSearchResponseModel? Response)> UpdateSearchAsync(int userId, int searchId, SavedSearchRequestModel? searchRequest);
@@ -41,6 +42,30 @@ public sealed class UsersControllerService(
         catch (Exception e)
         {
             _logger.LogError(e, $"Could not retrieve user with id {id}.");
+            user = null;
+        }
+
+        if (user == null)
+        {
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        var response = _respMapper.Map(user);
+
+        return (ResponseStatus.Successful, response);
+    }
+
+    public async Task<(ResponseStatus Status, UserResponse? Response)> GetByExternalAccountId(string externalAccountId)
+    {
+        User? user;
+
+        try
+        {
+            user = await _repository.GetByExternalAcctId(externalAccountId);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Could not retrieve user with external account {externalAccountId}.");
             user = null;
         }
 
@@ -87,27 +112,42 @@ public sealed class UsersControllerService(
     }
 
     public async Task<(ResponseStatus Status, UserResponse? Response)>
-                                                    CreateAsync(UserRequestModel? userRequest)
+        CreateOrPatchAsync(UserRequestModel? userRequest)
     {
+
         if (userRequest == null || !_validator.Validate(userRequest))
         {
             return (ResponseStatus.MissingInformation, null);
         }
 
-        User? user = _reqMapper.Map(userRequest);
+        User user = _reqMapper.Map(userRequest);
+        User? existingUser = null;
 
         try
         {
-            user = await _repository.CreateAsync(user);
+            existingUser = await _repository.GetByExternalAcctId(user.ExternalAccountId);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Unable to check for user with external account id: {user?.ExternalAccountId}");
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        try
+        {
+            if (existingUser == null)
+            {   // create user
+                user = await _repository.SaveAsync(user);
+            }
+            else
+            {   //patch partial user
+                existingUser = PatchExistingUser(existingUser, user);
+                user = await _repository.SaveAsync(existingUser);
+            }
         }
         catch (Exception e)
         {
             _logger.LogError(e, $"Unable to create user for {userRequest.LastName}, {userRequest.FirstName}.");
-            user = null;
-        }
-
-        if (user == null)
-        {
             return (ResponseStatus.UnknownError, null);
         }
 
@@ -224,5 +264,24 @@ public sealed class UsersControllerService(
         var response = _respMapper.Map(search);
 
         return (ResponseStatus.Successful, response);
+    }
+
+    private User PatchExistingUser(User existingUser, User updatedUser)
+    {
+        existingUser.FirstName = updatedUser.FirstName;
+        existingUser.LastName = updatedUser.LastName;
+        existingUser.UserName = updatedUser.UserName;
+        existingUser.ExternalAccountId = updatedUser.ExternalAccountId;
+
+        //NOTE: this logic assumes that a user only has 1 email address
+        var updatedEmail = updatedUser.CommunicationMethods.FirstOrDefault(c => c.Type == "email");
+
+        if (updatedEmail != null)
+        {
+            existingUser.CommunicationMethods.RemoveAll(c => c.Type == "email");
+            existingUser.CommunicationMethods.Add(updatedEmail);
+        }
+
+        return existingUser;
     }
 }

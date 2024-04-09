@@ -14,6 +14,7 @@ public sealed class Validator : IValidator
         !string.IsNullOrWhiteSpace(model.FirstName) &&
         !string.IsNullOrWhiteSpace(model.LastName) &&
         !string.IsNullOrWhiteSpace(model.UserName) &&
+        !string.IsNullOrWhiteSpace(model.ExternalAccountId) &&
         IsOver18(model.DateOfBirth);
 
     public bool Validate(SavedSearchRequestModel model) =>

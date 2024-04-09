@@ -17,7 +17,7 @@ public sealed class UsersControllerTests : BaseTests<UsersController>
         var model = Fixture.Create<UserRequestModel>();
 
         _serviceMock!
-            .Setup(x => x.CreateAsync(model))
+            .Setup(x => x.CreateOrPatchAsync(model))
             .ReturnsAsync((ResponseStatus.MissingInformation, null));
 
         //Act
@@ -39,7 +39,7 @@ public sealed class UsersControllerTests : BaseTests<UsersController>
         var model = Fixture.Create<UserRequestModel>();
 
         _serviceMock!
-            .Setup(x => x.CreateAsync(model))
+            .Setup(x => x.CreateOrPatchAsync(model))
             .ReturnsAsync((ResponseStatus.UnknownError, null));
 
         //Act
@@ -58,7 +58,7 @@ public sealed class UsersControllerTests : BaseTests<UsersController>
         var sut = Setup();
         var model = Fixture.Create<UserRequestModel>();
         _serviceMock!
-            .Setup(x => x.CreateAsync(model))
+            .Setup(x => x.CreateOrPatchAsync(model))
             .ReturnsAsync((ResponseStatus.Successful, Fixture.Create<UserResponse>()));
 
         // Act

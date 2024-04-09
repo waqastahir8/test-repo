@@ -20,7 +20,7 @@ public sealed class UsersControllerServiceTests : BaseTests<UsersControllerServi
         var sut = Setup();
 
         //Act
-        var (status, _) = await sut.CreateAsync(null);
+        var (status, _) = await sut.CreateOrPatchAsync(null);
 
         //Assert
         Assert.Equal(ResponseStatus.MissingInformation, status);
@@ -37,7 +37,7 @@ public sealed class UsersControllerServiceTests : BaseTests<UsersControllerServi
             .Returns(false);
 
         //Act
-        var (status, _) = await sut.CreateAsync(model);
+        var (status, _) = await sut.CreateOrPatchAsync(model);
 
         //Assert
         Assert.Equal(ResponseStatus.MissingInformation, status);
@@ -62,11 +62,11 @@ public sealed class UsersControllerServiceTests : BaseTests<UsersControllerServi
             .Setup(x => x.Map(model))
             .Returns(user);
         _repositoryMock!
-            .Setup(x => x.CreateAsync(user))
+            .Setup(x => x.SaveAsync(user))
             .ThrowsAsync(new Exception());
 
         // Act
-        var (status, _) = await sut.CreateAsync(model);
+        var (status, _) = await sut.CreateOrPatchAsync(model);
 
         // Assert
         Assert.Equal(ResponseStatus.UnknownError, status);
@@ -91,11 +91,11 @@ public sealed class UsersControllerServiceTests : BaseTests<UsersControllerServi
             .Setup(x => x.Map(model))
             .Returns(user);
         _repositoryMock!
-            .Setup(x => x.CreateAsync(user))
+            .Setup(x => x.SaveAsync(user))
             .ReturnsAsync(user);
 
         // Act
-        var (status, _) = await sut.CreateAsync(model);
+        var (status, _) = await sut.CreateOrPatchAsync(model);
 
         // Assert
         Assert.Equal(ResponseStatus.Successful, status);
@@ -126,11 +126,11 @@ public sealed class UsersControllerServiceTests : BaseTests<UsersControllerServi
             .Setup(x => x.Map(user))
             .Returns(expected);
         _repositoryMock!
-            .Setup(x => x.CreateAsync(user))
+            .Setup(x => x.SaveAsync(user))
             .ReturnsAsync(user);
 
         // Act
-        var (_, actual) = await sut.CreateAsync(model);
+        var (_, actual) = await sut.CreateOrPatchAsync(model);
 
         // Assert
         Assert.Equal(actual, expected);
