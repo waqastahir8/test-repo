@@ -1,4 +1,4 @@
-global using FedTec.Data;
+global using AmeriCorps.Data;
 global using AmeriCorps.Users.Api;
 global using AmeriCorps.Users.Data;
 global using AmeriCorps.Users.Models;

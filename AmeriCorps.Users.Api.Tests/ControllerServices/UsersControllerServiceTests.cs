@@ -14,6 +14,44 @@ public sealed class UsersControllerServiceTests : BaseTests<UsersControllerServi
     private Mock<IValidator>? _validatorMock;
 
     [Fact]
+    public async Task GetUserAsync_NonExistent_InformationMissing_Status()
+    {
+        // Arrange
+        var sut = Setup();
+        var userId =
+            Fixture
+            .Create<int>();
+        _repositoryMock!
+            .Setup(x => x.GetAsync(userId))
+            .ReturnsAsync(() => null);
+
+        // Act
+        var (status, _) = await sut.GetAsync(userId);
+
+        // Assert
+        Assert.Equal(ResponseStatus.MissingInformation, status);
+    }
+
+        [Fact]
+    public async Task GetByExternalAccountId_NonExistent_InformationMissing_Status()
+    {
+        // Arrange
+        var sut = Setup();
+        var externalAccountId =
+            Fixture
+            .Create<string>();
+        _repositoryMock!
+            .Setup(x => x.GetByExternalAcctId(externalAccountId))
+            .ReturnsAsync(() => null);
+
+        // Act
+        var (status, _) = await sut.GetByExternalAccountId(externalAccountId);
+
+        // Assert
+        Assert.Equal(ResponseStatus.MissingInformation, status);
+    }
+
+    [Fact]
     public async Task CreateAsync_NullUser_MissingInformationStatus()
     {
         //Arrange
@@ -186,6 +224,24 @@ public sealed class UsersControllerServiceTests : BaseTests<UsersControllerServi
         Assert.Equal(ResponseStatus.MissingInformation, status);
     }
 
+    [Fact]
+    public async Task GetUserSearchesAsync_NonExistent_InformationMissing_Status()
+    {
+        // Arrange
+        var sut = Setup();
+        var userId =
+            Fixture
+            .Create<int>();
+        _repositoryMock!
+            .Setup(x => x.GetUserSearchesAsync(userId))
+            .ReturnsAsync(() => null);
+
+        // Act
+        var (status, _) = await sut.GetUserSearchesAsync(userId);
+
+        // Assert
+        Assert.Equal(ResponseStatus.MissingInformation, status);
+    }
     [Fact]
     public async Task CreateSearchAsync_RepositoryThrowsException_UnknownErrorStatus()
     {

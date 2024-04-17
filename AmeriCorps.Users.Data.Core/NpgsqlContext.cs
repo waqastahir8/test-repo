@@ -1,4 +1,4 @@
-﻿using FedTec.Data;
+﻿using AmeriCorps.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

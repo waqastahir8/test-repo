@@ -42,12 +42,12 @@ public sealed class UsersControllerService(
         catch (Exception e)
         {
             _logger.LogError(e, $"Could not retrieve user with id {id}.");
-            user = null;
+            return (ResponseStatus.UnknownError, null);
         }
 
         if (user == null)
         {
-            return (ResponseStatus.UnknownError, null);
+            return (ResponseStatus.MissingInformation, null);
         }
 
         var response = _respMapper.Map(user);
@@ -66,12 +66,12 @@ public sealed class UsersControllerService(
         catch (Exception e)
         {
             _logger.LogError(e, $"Could not retrieve user with external account {externalAccountId}.");
-            user = null;
+            return (ResponseStatus.UnknownError, null);
         }
 
         if (user == null)
         {
-            return (ResponseStatus.UnknownError, null);
+            return (ResponseStatus.MissingInformation, null);
         }
 
         var response = _respMapper.Map(user);
@@ -92,12 +92,12 @@ public sealed class UsersControllerService(
         catch (Exception e)
         {
             _logger.LogError(e, $"Could not retrieve searches for user with id {userId}.");
-            searches = null;
+            return (ResponseStatus.UnknownError, null);
         }
 
         if (searches == null)
         {
-            return (ResponseStatus.UnknownError, null);
+            return (ResponseStatus.MissingInformation, null);
         }
 
         var response = new UserSearchListResponseModel
