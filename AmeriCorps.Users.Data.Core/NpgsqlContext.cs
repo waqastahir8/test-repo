@@ -19,23 +19,48 @@ public abstract class NpgsqlContext : ContextBase
         base.OnModelCreating(modelBuilder);
         modelBuilder.HasDefaultSchema(Schema);
 
-        modelBuilder.Entity<User>()
-                .ToTable("User")
-                .Property(u => u.DateOfBirth)
-                .HasColumnType("date");
+        var address = Create<Address>("address");
 
-        modelBuilder.Entity<Education>(e =>
+        var attribute = Create<Attribute>("attribute");
+
+        var communicationMethod = Create<CommunicationMethod>("communication_method");
+
+        var education = Create<Education>("education");
+        education.Property(p => p.DateAttendedFrom).HasColumnType("date");
+        education.Property(p => p.DateAttendedTo).HasColumnType("date");
+
+        var language = Create<Language>("language");
+
+        var militaryService = Create<MilitaryService>("military_service");
+
+        var reference = Create<Reference>("reference");
+        reference.Property(s => s.DateContacted).HasColumnType("date");
+
+        var relative = Create<Relative>("relative");
+
+        var savedSearch = Create<SavedSearch>("saved_search");
+        savedSearch.Property(p => p.LastRun).HasColumnType("date");
+        savedSearch.Property(p => p.LastRun).HasColumnType("date");
+        savedSearch.Property(p => p.Name).HasMaxLength(256);
+
+        var skill = Create<Skill>("skill");
+
+        var user = Create<User>("user");
+        user.Property(p => p.DateOfBirth).HasColumnType("date");
+
+
+
+        EntityTypeBuilder<T> Create<T>(string tableName) where T : Entity
         {
-            e.Property(p => p.DateAttendedFrom).HasColumnType("date");
-            e.Property(p => p.DateAttendedTo).HasColumnType("date");
-        });
+            var entity = modelBuilder.Entity<T>();
 
+            entity.ToTable(tableName);
+            entity.HasKey(x => x.Id);
+            entity.Property(x => x.Id).ValueGeneratedOnAdd();
 
-        modelBuilder.Entity<SavedSearch>(s =>
-        {
-            s.Property(p => p.LastRun).HasColumnType("date");
-            s.Property(p => p.Name).HasMaxLength(256);
-        });
+            return entity;
+        }
+
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -43,7 +68,9 @@ public abstract class NpgsqlContext : ContextBase
         base.OnConfiguring(optionsBuilder);
         if (!optionsBuilder.IsConfigured)
         {
-            optionsBuilder.UseNpgsql(ConnectionString);
+            optionsBuilder
+                .UseNpgsql(ConnectionString)
+                .UseSnakeCaseNamingConvention();
         }
     }
 }

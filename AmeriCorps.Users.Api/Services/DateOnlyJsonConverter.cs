@@ -27,12 +27,12 @@ public class DateOnlyJsonConverter : JsonConverter<DateOnly>
             {
                 if (reader.TokenType == JsonTokenType.EndObject)
                 {
-                    break; 
+                    break;
                 }
                 else if (reader.TokenType == JsonTokenType.PropertyName)
                 {
                     string propertyName = reader.GetString()!;
-                    reader.Read(); 
+                    reader.Read();
                     switch (propertyName)
                     {
                         case "year":

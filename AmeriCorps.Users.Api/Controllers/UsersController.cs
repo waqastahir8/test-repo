@@ -19,7 +19,7 @@ public sealed class UsersController(IUsersControllerService service) : Controlle
 
     [HttpGet]
     public async Task<IActionResult> GetUserByExternalAccountId([FromQuery] string externalAccountId) =>
-        await ServeAsync(async() => await _service.GetByExternalAccountId(externalAccountId));
+        await ServeAsync(async () => await _service.GetByExternalAccountId(externalAccountId));
 
     [HttpPost]
     public async Task<IActionResult> CreateUserAsync([FromBody] UserRequestModel userRequest) =>
@@ -38,12 +38,29 @@ public sealed class UsersController(IUsersControllerService service) : Controlle
         await ServeAsync(async () => await _service.CreateSearchAsync(userId, searchRequest));
 
     [HttpPut("{userId}/Searches/{searchId}")]
-    public async Task<IActionResult> CreateSearchAsync(int userId, int searchId, [FromBody] SavedSearchRequestModel searchRequest) =>
+    public async Task<IActionResult> UpdateSearchAsync(int userId, int searchId, [FromBody] SavedSearchRequestModel searchRequest) =>
        await ServeAsync(async () => await _service.UpdateSearchAsync(userId, searchId, searchRequest));
 
     [HttpDelete("{userId}/Searches/{searchId}")]
     public async Task<IActionResult> DeleteSearchAsync(int userId, int searchId) =>
         await ServeAsync(async () => await _service.DeleteSearchAsync(userId, searchId));
+
+    [HttpGet("{userId}/Reference")]
+    public async Task<IActionResult> GetUserReferencesAsync(int userId) =>
+        await ServeAsync(async () => await _service.GetReferencesAsync(userId));
+
+    [HttpPost("{userId}/References")]
+    public async Task<IActionResult> CreateReferenceAsync(int userId, [FromBody] ReferenceRequestModel referenceRequest) =>
+        await ServeAsync(async () => await _service.CreateReferenceAsync(userId, referenceRequest));
+
+    [HttpPut("{userId}/References/{referenceId}")]
+    public async Task<IActionResult> UpdateReferenceAsync(int userId, int referenceId, [FromBody] ReferenceRequestModel referenceRequest) =>
+       await ServeAsync(async () => await _service.UpdateReferenceAsync(userId, referenceId, referenceRequest));
+
+    [HttpDelete("{userId}/References/{referenceId}")]
+    public async Task<IActionResult> DeleteReferenceAsync(int userId, int referenceId) =>
+        await ServeAsync(async () => await _service.DeleteReferenceAsync(userId, referenceId));
+
     private async Task<IActionResult> ServeAsync<T>(Func<Task<(ResponseStatus, T)>> callAsync)
     {
         var (status, response) = await callAsync();

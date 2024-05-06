@@ -6,8 +6,8 @@ namespace AmeriCorps.Users.Api.Services;
 public interface IRequestMapper
 {
     User Map(UserRequestModel requestModel);
-
     SavedSearch Map(SavedSearchRequestModel requestModel);
+    Reference Map(ReferenceRequestModel requestModel);
 }
 public sealed class RequestMapper : IRequestMapper
 {
@@ -111,15 +111,51 @@ public sealed class RequestMapper : IRequestMapper
                             Type = cm.Type,
                             Value = cm.Value,
                             IsPreferred = cm.IsPreferred
+                        }),
+        References = MapperUtils.MapList<ReferenceRequestModel, Reference>(
+                        requestModel.References, r =>
+                        new Reference
+                        {
+                            TypeId = r.TypeId,
+                            Relationship = r.Relationship,
+                            RelationshipLength = r.RelationshipLength,
+                            ContactName = r.ContactName,
+                            Email = r.Email,
+                            Phone = r.Phone,
+                            Address = r.Address,
+                            Company = r.Company,
+                            Position = r.Position,
+                            Notes = r.Notes,
+                            CanContact = r.CanContact,
+                            Contacted = r.Contacted,
+                            DateContacted = r.DateContacted
                         })
 
     };
 
     public SavedSearch Map(SavedSearchRequestModel requestModel) => new()
     {
+        Id = requestModel.Id,
         UserId = requestModel.UserId,
         Name = requestModel.Name,
         Filters = requestModel.Filters,
         NotificationsOn = requestModel.NotificationsOn
+    };
+
+    public Reference Map(ReferenceRequestModel requestModel) => new()
+    {
+        TypeId = requestModel.TypeId,
+        Relationship = requestModel.Relationship,
+        RelationshipLength = requestModel.RelationshipLength,
+        ContactName = requestModel.ContactName,
+        Email = requestModel.Email,
+        Phone = requestModel.Phone,
+        Address = requestModel.Address,
+        Company = requestModel.Company,
+        Position = requestModel.Position,
+        Notes = requestModel.Notes,
+        CanContact = requestModel.CanContact,
+        Contacted = requestModel.Contacted,
+        DateContacted = requestModel.DateContacted
     };
 }

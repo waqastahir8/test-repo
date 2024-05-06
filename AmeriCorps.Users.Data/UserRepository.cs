@@ -3,6 +3,7 @@ using AmeriCorps.Users.Data.Core;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace AmeriCorps.Users.Data;
 
@@ -12,10 +13,10 @@ public interface IUserRepository
 
     Task<User?> GetByExternalAcctId(string ExternalAccountId);
     Task<List<SavedSearch>?> GetUserSearchesAsync(int id);
-    Task<bool> ExistsAsync(int id);
-    Task<User> SaveAsync(User user);
-    Task<SavedSearch> SaveAsync(SavedSearch search);
-    Task DeleteSearchAsync(int id);
+    Task<List<Reference>?> GetUserReferencesAsync(int id);
+    Task<bool> ExistsAsync<T>(Expression<Func<T, bool>> predicate = null) where T : Entity;
+    Task<T> SaveAsync<T>(T entity) where T : Entity;
+    Task DeleteAsync<T>(int id) where T : Entity;
 }
 public sealed class UserRepository(
     ILogger<UserRepository> logger,
@@ -47,62 +48,64 @@ public sealed class UserRepository(
                                 .Include(u => u.Relatives)
                                 .Include(u => u.CommunicationMethods)
                                 .FirstOrDefaultAsync(x => x.ExternalAccountId == externalAccountId));
+
     public async Task<List<SavedSearch>?> GetUserSearchesAsync(int id)
     {
         var user = await ExecuteAsync(async context => await context.Users
                                                     .Include(u => u.SavedSearches)
-                                                    .FirstOrDefaultAsync(x => x.Id == id));
+                                                    .FirstOrDefaultAsync(u => u.Id == id));
 
         return user != null ? user.SavedSearches : null;
     }
-    public async Task<bool> ExistsAsync(int id) =>
-            await ExecuteAsync(async context =>
-                    await context.Users.AnyAsync(u => u.Id == id));
-    public async Task<User> SaveAsync(User user) =>
+    public async Task<List<Reference>?> GetUserReferencesAsync(int id)
+    {
+        var user = await ExecuteAsync(async context => await context.Users
+                                                    .Include(u => u.References)
+                                                    .FirstOrDefaultAsync(u => u.Id == id));
+
+        return user != null ? user.References : null;
+    }
+
+    public async Task<bool> ExistsAsync<T>(
+            Expression<Func<T, bool>> predicate = null) where T : Entity =>
+                await ExecuteAsync(async context =>
+                {
+                    IQueryable<T> data = context.Set<T>();
+                    return await data.AnyAsync(predicate);
+                });
+
+    public async Task<T> SaveAsync<T>(T entity) where T : Entity =>
         await ExecuteAsync(async context =>
         {
-            User u;
-            if (user.Id == default)
+            var entry = context.Entry(entity);
+
+            entry.State = entity.Id == 0 ?
+                                EntityState.Detached :
+                                EntityState.Modified;
+
+            if (entity.Id == 0)
             {
-                u = (await context.Users.AddAsync(user)).Entity;
+                entry.State = EntityState.Detached;
+                await context.Set<T>().AddAsync(entity);
             }
             else
             {
-                context.Update(user);
-                u = user;
+                entry.State = EntityState.Modified;
+                context.Set<T>().Update(entity);
             }
 
             await context.SaveChangesAsync();
-            return u;
+            return entity;
         });
 
-
-    public async Task<SavedSearch> SaveAsync(SavedSearch search) =>
+    public async Task DeleteAsync<T>(int id) where T : Entity =>
         await ExecuteAsync(async context =>
         {
-            SavedSearch s;
-            if (search.Id == default)
-            {
-                s = (await context.SavedSearch.AddAsync(search)).Entity;
-            }
-            else
-            {
-                context.Update(search);
-                s = search;
-            }
+            T e = await context.Set<T>().FindAsync(id);
 
-            await context.SaveChangesAsync();
-            return s;
-        });
-
-    public async Task DeleteSearchAsync(int id) =>
-        await ExecuteAsync(async context =>
-        {
-            SavedSearch? s = await context.SavedSearch.FindAsync(id);
-
-            if (s != null)
+            if (e != null)
             {
-                context.Remove(s);
+                context.Set<T>().Remove(e);
                 await context.SaveChangesAsync();
                 return true;
             }

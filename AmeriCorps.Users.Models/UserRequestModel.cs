@@ -21,4 +21,5 @@ public class UserRequestModel
     public List<SavedSearchRequestModel> SavedSearches { get; set; } = new List<SavedSearchRequestModel>();
     public List<RelativeRequestModel> Relatives { get; set; } = new List<RelativeRequestModel>();
     public List<CommunicationMethodRequestModel> CommunicationMethods { get; set; } = new List<CommunicationMethodRequestModel>();
+    public List<ReferenceRequestModel> References { get; set; } = new List<ReferenceRequestModel>();
 }

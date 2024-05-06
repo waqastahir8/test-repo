@@ -1,7 +1,7 @@
 ﻿namespace AmeriCorps.Users.Data.Core;
 
-public sealed class Skill
+public sealed class Skill : Entity
 {
-    public int Id { get; set; }
+    public int UserId { get; set; }
     public required string PickListId { get; set; }
 }

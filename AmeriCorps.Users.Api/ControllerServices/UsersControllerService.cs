@@ -3,8 +3,6 @@ using AmeriCorps.Users.Data;
 using AmeriCorps.Users.Models;
 using AmeriCorps.Users.Api.Services;
 
-
-
 namespace AmeriCorps.Users.Api;
 
 public interface IUsersControllerService
@@ -12,10 +10,14 @@ public interface IUsersControllerService
     Task<(ResponseStatus Status, UserResponse? Response)> GetAsync(int id);
     Task<(ResponseStatus Status, UserResponse? Response)> GetByExternalAccountId(string externalAccountId);
     Task<(ResponseStatus Status, UserResponse? Response)> CreateOrPatchAsync(UserRequestModel? userRequest);
-    Task<(ResponseStatus Status, UserSearchListResponseModel? Response)> GetUserSearchesAsync(int userId);
+    Task<(ResponseStatus Status, UserSearchesResponseModel? Response)> GetUserSearchesAsync(int userId);
     Task<(ResponseStatus Status, SavedSearchResponseModel? Response)> CreateSearchAsync(int userId, SavedSearchRequestModel? searchRequest);
     Task<(ResponseStatus Status, SavedSearchResponseModel? Response)> UpdateSearchAsync(int userId, int searchId, SavedSearchRequestModel? searchRequest);
     Task<(ResponseStatus Status, bool Response)> DeleteSearchAsync(int userId, int searchId);
+    Task<(ResponseStatus Status, UserReferencesResponseModel? Response)> GetReferencesAsync(int userId);
+    Task<(ResponseStatus Status, ReferenceResponseModel? Response)> CreateReferenceAsync(int userId, ReferenceRequestModel? referenceRequest);
+    Task<(ResponseStatus Status, ReferenceResponseModel? Response)> UpdateReferenceAsync(int userId, int referenceId, ReferenceRequestModel? referenceRequest);
+    Task<(ResponseStatus Status, bool Response)> DeleteReferenceAsync(int userId, int referenceId);
 }
 public sealed class UsersControllerService(
     ILogger<UsersControllerService> logger,
@@ -79,7 +81,7 @@ public sealed class UsersControllerService(
         return (ResponseStatus.Successful, response);
     }
 
-    public async Task<(ResponseStatus Status, UserSearchListResponseModel? Response)>
+    public async Task<(ResponseStatus Status, UserSearchesResponseModel? Response)>
                                                         GetUserSearchesAsync(int userId)
     {
 
@@ -100,15 +102,43 @@ public sealed class UsersControllerService(
             return (ResponseStatus.MissingInformation, null);
         }
 
-        var response = new UserSearchListResponseModel
+        var response = new UserSearchesResponseModel
         {
             UserId = userId,
             Searches = _respMapper.Map(searches)
         };
 
         return (ResponseStatus.Successful, response);
+    }
 
+    public async Task<(ResponseStatus Status, UserReferencesResponseModel? Response)>
+                                                    GetReferencesAsync(int userId)
+    {
 
+        List<Reference>? references;
+
+        try
+        {
+            references = await _repository.GetUserReferencesAsync(userId);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Could not retrieve references for user with id {userId}.");
+            references = null;
+        }
+
+        if (references == null)
+        {
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        var response = new UserReferencesResponseModel
+        {
+            UserId = userId,
+            References = _respMapper.Map(references)
+        };
+
+        return (ResponseStatus.Successful, response);
     }
 
     public async Task<(ResponseStatus Status, UserResponse? Response)>
@@ -156,13 +186,50 @@ public sealed class UsersControllerService(
         return (ResponseStatus.Successful, response);
     }
 
+    public async Task<(ResponseStatus Status, ReferenceResponseModel? Response)>
+            CreateReferenceAsync(int userId, ReferenceRequestModel? referenceRequest)
+    {
+        bool userExists = false;
+        try
+        {
+            userExists = await _repository.ExistsAsync<User>(u => u.Id == userId);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Unable to check if user {userId} exists.");
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        if (referenceRequest == null || !_validator.Validate(referenceRequest) || !userExists)
+        {
+            return (ResponseStatus.MissingInformation, null);
+        }
+
+        Reference reference = _reqMapper.Map(referenceRequest);
+        reference.UserId = userId;
+
+        try
+        {
+            reference = await _repository.SaveAsync<Reference>(reference);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Unable to save reference for user {userId}.");
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        var response = _respMapper.Map(reference);
+
+        return (ResponseStatus.Successful, response);
+    }
+
     public async Task<(ResponseStatus Status, SavedSearchResponseModel? Response)>
               CreateSearchAsync(int userId, SavedSearchRequestModel? searchRequest)
     {
         bool userExists = false;
         try
         {
-            userExists = await _repository.ExistsAsync(userId);
+            userExists = await _repository.ExistsAsync<User>(u => u.Id == userId);
         }
         catch (Exception e)
         {
@@ -177,16 +244,30 @@ public sealed class UsersControllerService(
 
         SavedSearch search = _reqMapper.Map(searchRequest);
         search.UserId = userId;
-        return await SaveSearchAsync(search);
+
+        try
+        {
+            search = await _repository.SaveAsync<SavedSearch>(search);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Unable to save search {searchRequest?.Name}.");
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        var response = _respMapper.Map(search);
+
+        return (ResponseStatus.Successful, response);
     }
 
     public async Task<(ResponseStatus Status, SavedSearchResponseModel? Response)>
                 UpdateSearchAsync(int userId, int searchId, SavedSearchRequestModel? searchRequest)
     {
         bool userExists = false;
+
         try
         {
-            userExists = await _repository.ExistsAsync(userId);
+            userExists = await _repository.ExistsAsync<User>(u => u.Id == userId);
         }
         catch (Exception e)
         {
@@ -194,7 +275,19 @@ public sealed class UsersControllerService(
             return (ResponseStatus.UnknownError, null);
         }
 
-        if (searchRequest == null || !_validator.Validate(searchRequest) || !userExists)
+        bool searchExists = false;
+        try
+        {
+            searchExists = await _repository.ExistsAsync<SavedSearch>(s => s.UserId == userId &&
+                                                                     s.Id == searchId);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Unable to check if search {searchId} exists.");
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        if (searchRequest == null || !_validator.Validate(searchRequest) || !userExists || !searchExists)
         {
             return (ResponseStatus.MissingInformation, null);
         }
@@ -206,6 +299,58 @@ public sealed class UsersControllerService(
         return await SaveSearchAsync(search);
 
     }
+
+    public async Task<(ResponseStatus Status, ReferenceResponseModel? Response)> UpdateReferenceAsync(int userId, int referenceId, ReferenceRequestModel? referenceRequest)
+    {
+
+        bool userExists = false;
+
+        try
+        {
+            userExists = await _repository.ExistsAsync<User>(u => u.Id == userId);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Unable to check if user {userId} exists.");
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        bool referenceExists = false;
+        try
+        {
+            referenceExists = await _repository.ExistsAsync<Reference>(r => r.UserId == userId &&
+                                                                     r.Id == referenceId);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Unable to check if search {referenceId} exists.");
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        if (referenceRequest == null || !_validator.Validate(referenceRequest) || !userExists || !referenceExists)
+        {
+            return (ResponseStatus.MissingInformation, null);
+        }
+
+        Reference reference = _reqMapper.Map(referenceRequest);
+        reference.Id = referenceId;
+        reference.UserId = userId;
+
+        try
+        {
+            reference = await _repository.SaveAsync<Reference>(reference);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Unable to save reference {referenceId}.");
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        var response = _respMapper.Map(reference);
+
+        return (ResponseStatus.Successful, response);
+    }
+
 
     public async Task<(ResponseStatus Status, bool Response)> DeleteSearchAsync(int userId, int searchId)
     {
@@ -225,7 +370,7 @@ public sealed class UsersControllerService(
         bool deleted = true;
         try
         {
-            await _repository.DeleteSearchAsync(searchId);
+            await _repository.DeleteAsync<SavedSearch>(searchId);
         }
         catch (Exception e)
         {
@@ -241,23 +386,51 @@ public sealed class UsersControllerService(
         return (ResponseStatus.Successful, deleted);
     }
 
+    public async Task<(ResponseStatus Status, bool Response)> DeleteReferenceAsync(int userId, int referenceId)
+    {
+
+        var references = await _repository.GetUserReferencesAsync(userId);
+
+        if (references == null)
+        {
+            return (ResponseStatus.MissingInformation, false);
+        }
+        if (!references.Any(s => s.Id == referenceId))
+        {
+            _logger.LogInformation($"User with id {userId} does not contain a reference with id {referenceId}.");
+            return (ResponseStatus.MissingInformation, false);
+        }
+
+        bool deleted = true;
+        try
+        {
+            await _repository.DeleteAsync<Reference>(referenceId);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Unable to delete reference with id {referenceId}.");
+            deleted = false;
+        }
+
+        if (!deleted)
+        {
+            return (ResponseStatus.UnknownError, deleted);
+        }
+
+        return (ResponseStatus.Successful, deleted);
+    }
+
     private async Task<(ResponseStatus Status, SavedSearchResponseModel? Response)>
               SaveSearchAsync(SavedSearch saveRequest)
     {
-
         SavedSearch? search;
         try
         {
-            search = await _repository.SaveAsync(saveRequest);
+            search = await _repository.SaveAsync<SavedSearch>(saveRequest);
         }
         catch (Exception e)
         {
             _logger.LogError(e, $"Unable to save search {saveRequest?.Name}.");
-            search = null;
-        }
-
-        if (search == null)
-        {
             return (ResponseStatus.UnknownError, null);
         }
 

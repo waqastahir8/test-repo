@@ -3,9 +3,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace AmeriCorps.Users.Data.Core;
 
-public sealed class User
+public sealed class User : Entity
 {
-    public int Id { get; set; }
     public bool Searchable { get; set; }
     public string UserName { get; set; } = string.Empty;
     public string ExternalAccountId { get; set; } = string.Empty;
@@ -24,4 +23,5 @@ public sealed class User
     public List<SavedSearch> SavedSearches { get; set; } = new List<SavedSearch>();
     public List<Relative> Relatives { get; set; } = new List<Relative>();
     public List<CommunicationMethod> CommunicationMethods { get; set; } = new List<CommunicationMethod>();
+    public List<Reference> References { get; set; } = new List<Reference>();
 }

@@ -1,6 +1,7 @@
 ﻿using Xunit;
 using AmeriCorps.Users.Models;
 using AmeriCorps.Users.Api.Services;
+using System.Linq;
 
 namespace AmeriCorps.Users.Api.Tests;
 
@@ -110,6 +111,28 @@ public sealed class RequestMapperTests : BaseTests<RequestMapper>
                 Assert.Equal(pair.source.Name, pair.mapped.Name);
                 Assert.Equal(pair.source.Filters, pair.mapped.Filters);
                 Assert.Equal(pair.source.NotificationsOn, pair.mapped.NotificationsOn);
+            });
+
+        //Assert References
+        Assert.Equal(model.References.Count, result.References.Count);
+
+        Assert.All(result.References.Zip(model.References, (mapped, source) => (mapped, source)),
+            pair =>
+            {
+                Assert.Equal(pair.source.TypeId, pair.mapped.TypeId);
+                Assert.Equal(pair.source.Relationship, pair.mapped.Relationship);
+                Assert.Equal(pair.source.RelationshipLength, pair.mapped.RelationshipLength);
+                Assert.Equal(pair.source.ContactName, pair.mapped.ContactName);
+                Assert.Equal(pair.source.Email, pair.mapped.Email);
+                Assert.Equal(pair.source.Phone, pair.mapped.Phone);
+                Assert.Equal(pair.source.Address, pair.mapped.Address);
+                Assert.Equal(pair.source.Company, pair.mapped.Company);
+                Assert.Equal(pair.source.Position, pair.mapped.Position);
+                Assert.Equal(pair.source.Notes, pair.mapped.Notes);
+                Assert.Equal(pair.source.CanContact, pair.mapped.CanContact);
+                Assert.Equal(pair.source.Contacted, pair.mapped.Contacted);
+                Assert.Equal(pair.source.DateContacted, pair.mapped.DateContacted);
+
             });
 
         //Assert Relatives

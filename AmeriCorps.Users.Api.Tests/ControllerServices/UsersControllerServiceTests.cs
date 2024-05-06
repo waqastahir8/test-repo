@@ -32,7 +32,7 @@ public sealed class UsersControllerServiceTests : BaseTests<UsersControllerServi
         Assert.Equal(ResponseStatus.MissingInformation, status);
     }
 
-        [Fact]
+    [Fact]
     public async Task GetByExternalAccountId_NonExistent_InformationMissing_Status()
     {
         // Arrange
@@ -174,6 +174,7 @@ public sealed class UsersControllerServiceTests : BaseTests<UsersControllerServi
         Assert.Equal(actual, expected);
     }
 
+    //SavedSearch Test Cases
     [Fact]
     public async Task CreateAsync_NullSearch_MissingInformationStatus()
     {
@@ -205,7 +206,7 @@ public sealed class UsersControllerServiceTests : BaseTests<UsersControllerServi
     }
 
     [Fact]
-    public async Task CreateAsync_InvalidUserId_MissingInformationStatus()
+    public async Task CreateSearchAsync_InvalidUserId_MissingInformationStatus()
     {
         //Arrange
         var sut = Setup();
@@ -214,7 +215,7 @@ public sealed class UsersControllerServiceTests : BaseTests<UsersControllerServi
             .Setup(x => x.Validate(model))
             .Returns(true);
         _repositoryMock?
-            .Setup(x => x.ExistsAsync(Fixture.Create<int>()))
+            .Setup(x => x.ExistsAsync<User>(u => u.Id == Fixture.Create<int>()))
             .ReturnsAsync(false);
 
         //Act
@@ -262,7 +263,7 @@ public sealed class UsersControllerServiceTests : BaseTests<UsersControllerServi
             .Setup(x => x.Map(model))
             .Returns(search);
         _repositoryMock!
-            .Setup(x => x.ExistsAsync(userId))
+            .Setup(x => x.ExistsAsync<User>(u => u.Id == userId))
             .ThrowsAsync(new Exception());
         _repositoryMock!
             .Setup(x => x.SaveAsync(search))
@@ -295,7 +296,7 @@ public sealed class UsersControllerServiceTests : BaseTests<UsersControllerServi
             .Setup(x => x.Map(model))
             .Returns(search);
         _repositoryMock!
-            .Setup(x => x.ExistsAsync(userId))
+            .Setup(x => x.ExistsAsync<User>(u => u.Id == userId))
             .ReturnsAsync(true);
         _repositoryMock!
             .Setup(x => x.SaveAsync(search))
@@ -334,7 +335,7 @@ public sealed class UsersControllerServiceTests : BaseTests<UsersControllerServi
             .Setup(x => x.Map(search))
             .Returns(expected);
         _repositoryMock!
-            .Setup(x => x.ExistsAsync(userId))
+            .Setup(x => x.ExistsAsync<User>(u => u.Id == userId))
             .ReturnsAsync(true);
         _repositoryMock!
             .Setup(x => x.SaveAsync(search))
@@ -346,6 +347,166 @@ public sealed class UsersControllerServiceTests : BaseTests<UsersControllerServi
         // Assert
         Assert.Equal(actual, expected);
     }
+
+    //End SavedSearch Test Cases
+
+    //References TestCases
+    [Fact]
+    public async Task CreateAsync_NullReference_MissingInformationStatus()
+    {
+        //Arrange
+        var sut = Setup();
+
+        //Act
+        var (status, _) = await sut.CreateReferenceAsync(Fixture.Create<int>(), null);
+
+        //Assert
+        Assert.Equal(ResponseStatus.MissingInformation, status);
+    }
+
+    [Fact]
+    public async Task CreateAsync_InvalidReference_MissingInformationStatus()
+    {
+        //Arrange
+        var sut = Setup();
+        var model = Fixture.Create<ReferenceRequestModel>();
+        _validatorMock!
+            .Setup(x => x.Validate(model))
+            .Returns(false);
+
+        //Act
+        var (status, _) = await sut.CreateReferenceAsync(Fixture.Create<int>(), model);
+
+        //Assert
+        Assert.Equal(ResponseStatus.MissingInformation, status);
+    }
+
+    [Fact]
+    public async Task CreateReferenceAsync_InvalidUserId_MissingInformationStatus()
+    {
+        //Arrange
+        var sut = Setup();
+        var model = Fixture.Create<ReferenceRequestModel>();
+        _validatorMock!
+            .Setup(x => x.Validate(model))
+            .Returns(true);
+        _repositoryMock?
+            .Setup(x => x.ExistsAsync<User>(u => u.Id == Fixture.Create<int>()))
+            .ReturnsAsync(false);
+
+        //Act
+        var (status, _) = await sut.CreateReferenceAsync(Fixture.Create<int>(), model);
+
+        //Assert
+        Assert.Equal(ResponseStatus.MissingInformation, status);
+    }
+
+    [Fact]
+    public async Task CreateReferenceAsync_RepositoryThrowsException_UnknownErrorStatus()
+    {
+        // Arrange
+        var sut = Setup();
+        var model =
+            Fixture
+            .Create<ReferenceRequestModel>();
+        var userId = Fixture.Create<int>();
+        var reference =
+            Fixture
+            .Build<Reference>()
+            .Create();
+        _validatorMock!
+            .Setup(x => x.Validate(model))
+            .Returns(true);
+        _reqMapperMock!
+            .Setup(x => x.Map(model))
+            .Returns(reference);
+        _repositoryMock!
+            .Setup(x => x.ExistsAsync<User>(u => u.Id == userId))
+            .ThrowsAsync(new Exception());
+        _repositoryMock!
+            .Setup(x => x.SaveAsync(reference))
+            .ThrowsAsync(new Exception());
+
+        // Act
+        var (status, _) = await sut.CreateReferenceAsync(userId, model);
+
+        // Assert
+        Assert.Equal(ResponseStatus.UnknownError, status);
+    }
+
+    [Fact]
+    public async Task CreateAsync_Reference_SuccessfulStatus()
+    {
+        // Arrange
+        var sut = Setup();
+        var model =
+            Fixture
+            .Create<ReferenceRequestModel>();
+        var userId = Fixture.Create<int>();
+        var reference =
+            Fixture
+            .Build<Reference>()
+            .Create();
+        _validatorMock!
+            .Setup(x => x.Validate(model))
+            .Returns(true);
+        _reqMapperMock!
+            .Setup(x => x.Map(model))
+            .Returns(reference);
+        _repositoryMock!
+            .Setup(x => x.ExistsAsync<User>(u => u.Id == userId))
+            .ReturnsAsync(true);
+        _repositoryMock!
+            .Setup(x => x.SaveAsync(reference))
+            .ReturnsAsync(reference);
+
+        // Act
+        var (status, _) = await sut.CreateReferenceAsync(userId, model);
+
+        // Assert
+        Assert.Equal(ResponseStatus.Successful, status);
+    }
+
+    [Fact]
+    public async Task CreateAsync_Reference_ReturnsMappedObject()
+    {
+        // Arrange
+        var sut = Setup();
+        var model =
+            Fixture
+            .Create<ReferenceRequestModel>();
+        var userId = Fixture.Create<int>();
+        var reference =
+            Fixture
+            .Build<Reference>()
+            .Create();
+        var expected =
+            Fixture
+            .Create<ReferenceResponseModel>();
+        _validatorMock!
+            .Setup(x => x.Validate(model))
+            .Returns(true);
+        _reqMapperMock!
+            .Setup(x => x.Map(model))
+            .Returns(reference);
+        _respMapperMock!
+            .Setup(x => x.Map(reference))
+            .Returns(expected);
+        _repositoryMock!
+            .Setup(x => x.ExistsAsync<User>(u => u.Id == userId))
+            .ReturnsAsync(true);
+        _repositoryMock!
+            .Setup(x => x.SaveAsync(reference))
+            .ReturnsAsync(reference);
+
+        // Act
+        var (_, actual) = await sut.CreateReferenceAsync(userId, model);
+
+        // Assert
+        Assert.Equal(actual, expected);
+    }
+    //End Reference Test Cases
+
     protected override UsersControllerService Setup()
     {
         _repositoryMock = new();

@@ -1,0 +1,11 @@
+{
+    "profiles": {
+      "AmeriCorps.Users.Data.Migrations": {
+        "commandName": "Project",
+        "environmentVariables": {
+          "ASPNETCORE_ENVIRONMENT": "Development"
+        }
+      }
+    }
+  }
+  

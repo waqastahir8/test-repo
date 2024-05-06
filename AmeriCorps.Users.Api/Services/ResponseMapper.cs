@@ -6,16 +6,17 @@ namespace AmeriCorps.Users.Api.Services;
 public interface IResponseMapper
 {
     UserResponse Map(User user);
-
     SavedSearchResponseModel Map(SavedSearch search);
-
+    ReferenceResponseModel Map(Reference reference);
     List<SavedSearchResponseModel> Map(List<SavedSearch> searches);
+    List<ReferenceResponseModel> Map(List<Reference> references);
 }
 public sealed class ResponseMapper : IResponseMapper
 {
     public SavedSearchResponseModel Map(SavedSearch search) => new()
     {
         Id = search.Id,
+        UserId = search.UserId,
         Name = search.Name,
         Filters = search.Filters,
         NotificationsOn = search.NotificationsOn
@@ -32,6 +33,47 @@ public sealed class ResponseMapper : IResponseMapper
                                 Filters = a.Filters,
                                 NotificationsOn = a.NotificationsOn
                             });
+
+    public List<ReferenceResponseModel> Map(List<Reference> references) =>
+        MapperUtils.MapList<AmeriCorps.Users.Data.Core.Reference, ReferenceResponseModel>(
+                            references,
+                            r => new ReferenceResponseModel
+                            {
+                                Id = r.Id,
+                                UserId = r.UserId,
+                                TypeId = r.TypeId,
+                                Relationship = r.Relationship,
+                                RelationshipLength = r.RelationshipLength,
+                                ContactName = r.ContactName,
+                                Email = r.Email,
+                                Phone = r.Phone,
+                                Address = r.Address,
+                                Company = r.Company,
+                                Position = r.Position,
+                                Notes = r.Notes,
+                                CanContact = r.CanContact,
+                                Contacted = r.Contacted,
+                                DateContacted = r.DateContacted
+                            });
+
+    public ReferenceResponseModel Map(Reference reference) => new()
+    {
+        Id = reference.Id,
+        UserId = reference.UserId,
+        TypeId = reference.TypeId,
+        Relationship = reference.Relationship,
+        RelationshipLength = reference.RelationshipLength,
+        ContactName = reference.ContactName,
+        Email = reference.Email,
+        Phone = reference.Phone,
+        Address = reference.Address,
+        Company = reference.Company,
+        Position = reference.Position,
+        Notes = reference.Notes,
+        CanContact = reference.CanContact,
+        Contacted = reference.Contacted,
+        DateContacted = reference.DateContacted
+    };
     public UserResponse Map(User user) => new()
     {
         Id = user.Id,

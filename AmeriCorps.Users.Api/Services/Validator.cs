@@ -6,6 +6,7 @@ public interface IValidator
 {
     bool Validate(UserRequestModel model);
     bool Validate(SavedSearchRequestModel model);
+    bool Validate(ReferenceRequestModel model);
 }
 
 public sealed class Validator : IValidator
@@ -20,6 +21,14 @@ public sealed class Validator : IValidator
     public bool Validate(SavedSearchRequestModel model) =>
         !string.IsNullOrWhiteSpace(model.Name) &&
         !string.IsNullOrWhiteSpace(model.Filters);
+
+
+    public bool Validate(ReferenceRequestModel model) =>
+        !string.IsNullOrWhiteSpace(model.TypeId) &&
+        !string.IsNullOrWhiteSpace(model.ContactName) &&
+        !string.IsNullOrWhiteSpace(model.Email) &&
+        !string.IsNullOrWhiteSpace(model.Phone);
+
     private bool IsOver18(DateOnly dateOfBirth)
     {
         var startDate = dateOfBirth;

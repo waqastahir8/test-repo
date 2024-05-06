@@ -483,3 +483,6 @@ $RECYCLE.BIN/
 # Vim temporary swap files
 *.swp
 appsettings.local.json
+publish-func
+local.settings.json
+AmeriCorps.Users.Data.Deployment.Orig

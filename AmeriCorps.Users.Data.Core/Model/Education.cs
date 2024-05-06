@@ -1,8 +1,8 @@
 ﻿namespace AmeriCorps.Users.Data.Core;
 
-public sealed class Education
+public sealed class Education : Entity
 {
-    public int Id { get; set; }
+    public int UserId { get; set; }
     public string Level { get; set; } = string.Empty;
     public string MajorAreaOfStudy { get; set; } = string.Empty;
     public string Institution { get; set; } = string.Empty;
