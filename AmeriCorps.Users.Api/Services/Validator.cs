@@ -1,3 +1,4 @@
+using AmeriCorps.Users.Api.Helpers.Collection;
 using AmeriCorps.Users.Models;
 
 namespace AmeriCorps.Users.Api;
@@ -7,6 +8,10 @@ public interface IValidator
     bool Validate(UserRequestModel model);
     bool Validate(SavedSearchRequestModel model);
     bool Validate(ReferenceRequestModel model);
+
+    ValidationResponse? Validate(CollectionRequestModel model);
+
+    // bool Validate(CollectionRequestModel model);
 }
 
 public sealed class Validator : IValidator
@@ -29,6 +34,22 @@ public sealed class Validator : IValidator
         !string.IsNullOrWhiteSpace(model.Email) &&
         !string.IsNullOrWhiteSpace(model.Phone);
 
+
+    public ValidationResponse? Validate(CollectionRequestModel model)
+    {
+        var validationResponse = new ValidationResponse();
+        var isValidType = CollectionHelpers.ContainsType(model.Type);
+        if (!isValidType)
+        {
+            validationResponse.IsValid = false;
+            validationResponse.ValidationMessage = "Invalid collection type";
+        }
+           
+
+        return validationResponse;
+
+    }
+    
     private bool IsOver18(DateOnly dateOfBirth)
     {
         var startDate = dateOfBirth;
@@ -42,4 +63,12 @@ public sealed class Validator : IValidator
         }
         return years >= 18;
     }
+}
+
+public class ValidationResponse
+{
+    public bool IsValid { get; set; } = true;
+
+    public string ValidationMessage { get; set; } = string.Empty;
+
 }

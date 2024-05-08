@@ -26,4 +26,13 @@
     <ProjectReference Include="..\AmeriCorps.Users.Data\AmeriCorps.Users.Data.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="Controllers\UserContollerCollectionsTests.cs">
+      <DependentUpon>UsersControllerTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="ControllerServices\UserCollectionServiceTests.cs">
+      <DependentUpon>UsersControllerServiceTests.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
 </Project>

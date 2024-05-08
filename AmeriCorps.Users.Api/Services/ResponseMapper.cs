@@ -9,6 +9,10 @@ public interface IResponseMapper
     SavedSearchResponseModel Map(SavedSearch search);
     ReferenceResponseModel Map(Reference reference);
     List<SavedSearchResponseModel> Map(List<SavedSearch> searches);
+
+    CollectionResponseModel Map(Collection collection);
+
+    CollectionListResponseModel Map(List<Collection>? collection);
     List<ReferenceResponseModel> Map(List<Reference> references);
 }
 public sealed class ResponseMapper : IResponseMapper
@@ -33,6 +37,36 @@ public sealed class ResponseMapper : IResponseMapper
                                 Filters = a.Filters,
                                 NotificationsOn = a.NotificationsOn
                             });
+
+
+    public CollectionResponseModel Map(Collection collection)
+    {
+        return new CollectionResponseModel()
+        {
+            Id = collection.Id,
+            ListingId = collection.ListingId,
+            UserId = collection.UserId,
+            Type = collection.Type
+    
+        };
+    }
+
+    public CollectionListResponseModel Map(List<Collection>? collection)
+    {
+        
+        var collectionResponseList = new CollectionListResponseModel();
+        if (collection==null || collection.Count == 0)
+            return collectionResponseList;
+
+        var collectionItem = collection.First();
+        collectionResponseList.Type = collectionItem.Type;
+        collectionResponseList.UserId = collectionItem.UserId;
+
+        collectionResponseList.Listings = collection.Select(c => c.ListingId).ToList();
+        return collectionResponseList;
+
+    }
+
 
     public List<ReferenceResponseModel> Map(List<Reference> references) =>
         MapperUtils.MapList<AmeriCorps.Users.Data.Core.Reference, ReferenceResponseModel>(
@@ -183,6 +217,11 @@ public sealed class ResponseMapper : IResponseMapper
                             Type = cm.Type,
                             Value = cm.Value,
                             IsPreferred = cm.IsPreferred
-                        })
+                        }),
+       
+
+        
     };
+    
+    
 }

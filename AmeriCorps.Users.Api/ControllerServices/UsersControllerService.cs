@@ -14,6 +14,11 @@ public interface IUsersControllerService
     Task<(ResponseStatus Status, SavedSearchResponseModel? Response)> CreateSearchAsync(int userId, SavedSearchRequestModel? searchRequest);
     Task<(ResponseStatus Status, SavedSearchResponseModel? Response)> UpdateSearchAsync(int userId, int searchId, SavedSearchRequestModel? searchRequest);
     Task<(ResponseStatus Status, bool Response)> DeleteSearchAsync(int userId, int searchId);
+    Task<(ResponseStatus Status, CollectionResponseModel? Response)> CreateCollectionAsync(CollectionRequestModel? collectionRequest);
+
+    Task<(ResponseStatus Status,CollectionListResponseModel? Response)> GetCollectionAsync(int userId, string? type);
+    
+    Task<(ResponseStatus Status,bool Response)> DeleteCollectionAsync(CollectionListRequestModel? collectionListRequestModel);
     Task<(ResponseStatus Status, UserReferencesResponseModel? Response)> GetReferencesAsync(int userId);
     Task<(ResponseStatus Status, ReferenceResponseModel? Response)> CreateReferenceAsync(int userId, ReferenceRequestModel? referenceRequest);
     Task<(ResponseStatus Status, ReferenceResponseModel? Response)> UpdateReferenceAsync(int userId, int referenceId, ReferenceRequestModel? referenceRequest);
@@ -386,6 +391,89 @@ public sealed class UsersControllerService(
         return (ResponseStatus.Successful, deleted);
     }
 
+    public async Task<(ResponseStatus Status, CollectionResponseModel? Response)> CreateCollectionAsync(CollectionRequestModel? collectionRequest)
+    {
+        var  (isValidRequest, response) =  await IsValidCollectionRequest(collectionRequest);
+        if (!isValidRequest)
+            return (response, null);
+        var collection = _reqMapper.Map(collectionRequest!);
+
+        return await SaveCollectionAsync(collection);
+
+    }
+
+    public async Task<(ResponseStatus Status, CollectionListResponseModel? Response)> GetCollectionAsync(int userId, string? type)
+    {
+      
+        var collectionRequest = new CollectionRequestModel()
+        {
+            Type = type,
+            UserId = userId
+        };
+      
+        var  (isValidRequest, response) =  await IsValidCollectionRequest(collectionRequest);
+        if (!isValidRequest)
+            return (response, null);
+
+        var collection = _reqMapper.Map(collectionRequest);
+
+        var userCollections = await _repository.GetCollectionAsync(collection);
+
+
+        var collectionResponse = _respMapper.Map(userCollections);
+        
+        return (ResponseStatus.Successful, collectionResponse);
+
+    }
+
+    public async Task<(ResponseStatus Status, bool Response)> DeleteCollectionAsync(
+        CollectionListRequestModel? collectionListRequestModel)
+    {
+        if (collectionListRequestModel == null)
+        {
+            logger.LogError($"The request is invalid.");
+            return (ResponseStatus.MissingInformation, false);
+        }
+
+        var collectionRequest = new CollectionRequestModel()
+        {
+            UserId = collectionListRequestModel.UserId,
+            Type = collectionListRequestModel.Type
+
+        };
+        var  (isValidRequest, response) =  await IsValidCollectionRequest(collectionRequest);
+        if (!isValidRequest)
+            return (response, false);
+      
+        var collection = _reqMapper.Map(collectionListRequestModel);
+        var isDeletedSuccessful = await _repository.DeleteCollectionAsync(collection);
+        if (!isDeletedSuccessful)
+        {
+            _logger.LogError("Unable to delete listings from user collections");
+         
+            return (ResponseStatus.UnknownError, false);
+        }
+        return (ResponseStatus.Successful, true);
+
+        
+    }
+
+    private async Task<bool> UserExists(int userID)
+    {
+        var userExists = false;
+        try
+        {
+            userExists = await _repository.ExistsAsync<User>(user=> user.Id == userID);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Unable to check if user {userID} exists.");
+            
+        }
+
+        return userExists;
+    }
+
     public async Task<(ResponseStatus Status, bool Response)> DeleteReferenceAsync(int userId, int referenceId)
     {
 
@@ -438,6 +526,31 @@ public sealed class UsersControllerService(
 
         return (ResponseStatus.Successful, response);
     }
+    
+    private async Task<(ResponseStatus Status, CollectionResponseModel? Response)>
+        SaveCollectionAsync(Collection collectionRequest)
+    {
+
+        Collection? collection;
+        try
+        {
+            collection = await _repository.SaveAsync(collectionRequest);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Unable to save collection {collectionRequest?.ListingId}.");
+            collection = null;
+        }
+
+        if (collection == null)
+        {
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        var response = _respMapper.Map(collection);
+
+        return (ResponseStatus.Successful, response);
+    }
 
     private User PatchExistingUser(User existingUser, User updatedUser)
     {
@@ -456,5 +569,27 @@ public sealed class UsersControllerService(
         }
 
         return existingUser;
+    }
+
+    private async Task<(bool,ResponseStatus)> IsValidCollectionRequest(CollectionRequestModel? collectionRequest)
+    {
+        var isValid = false;
+        const ResponseStatus responseStatus = ResponseStatus.Successful;
+        if (collectionRequest == null)
+            return (isValid,ResponseStatus.MissingInformation);
+        
+        
+        if (!await UserExists(collectionRequest.UserId))
+            return (isValid,ResponseStatus.UnknownError);
+                
+        var validationResponse = validator.Validate(collectionRequest);
+        if (!validationResponse?.IsValid ?? false)
+        {
+            _logger.LogError(validationResponse.ValidationMessage);
+            return (isValid,ResponseStatus.UnknownError);
+        }
+        
+        isValid = true;
+        return (isValid,responseStatus);
     }
 }

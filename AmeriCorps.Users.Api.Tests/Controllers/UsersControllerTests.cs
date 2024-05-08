@@ -1,10 +1,11 @@
 ﻿using AmeriCorps.Users.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using AmeriCorps.Users.Data.Core;
 
 namespace AmeriCorps.Users.Api.Tests;
 
-public sealed class UsersControllerTests : BaseTests<UsersController>
+public sealed partial class UsersControllerTests : BaseTests<UsersController>
 {
     private Mock<IUsersControllerService>? _serviceMock;
 
@@ -105,6 +106,7 @@ public sealed class UsersControllerTests : BaseTests<UsersController>
         // Assert
         var response = actual as OkObjectResult;
         Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.OK,response.StatusCode);
     }
 
     [Fact]
@@ -133,4 +135,7 @@ public sealed class UsersControllerTests : BaseTests<UsersController>
         Fixture.Customize<DateOnly>(x => x.FromFactory<DateTime>(DateOnly.FromDateTime));
         return new(_serviceMock.Object);
     }
+    
+    
+    
 }

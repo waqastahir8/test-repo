@@ -1,6 +1,7 @@
 ﻿using Xunit;
 using AmeriCorps.Users.Models;
 using AmeriCorps.Users.Api.Services;
+using AmeriCorps.Users.Data.Core;
 using System.Linq;
 
 namespace AmeriCorps.Users.Api.Tests;
@@ -155,6 +156,22 @@ public sealed class RequestMapperTests : BaseTests<RequestMapper>
                 Assert.Equal(pair.source.Type, pair.mapped.Type);
                 Assert.Equal(pair.source.Value, pair.mapped.Value);
                 Assert.Equal(pair.source.IsPreferred, pair.mapped.IsPreferred);
+            });
+
+       
+       TestUserCollectionRequestMapper(result,model);
+
+    }
+
+    private void TestUserCollectionRequestMapper(User result,UserRequestModel model)
+    {
+        Assert.Equal(model.Collection.Count, result.Collection.Count);
+        Assert.All(result.Collection.Zip(model.Collection, (mapped, source) => (mapped, source)),
+            pair =>
+            {
+                Assert.Equal(pair.source.Type.ToUpper(), pair.mapped.Type);
+                Assert.Equal(pair.source.UserId, pair.mapped.UserId);
+                Assert.Equal(pair.source.ListingId, pair.mapped.ListingId);
             });
     }
 

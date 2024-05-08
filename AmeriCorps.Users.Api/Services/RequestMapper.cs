@@ -7,6 +7,11 @@ public interface IRequestMapper
 {
     User Map(UserRequestModel requestModel);
     SavedSearch Map(SavedSearchRequestModel requestModel);
+
+    Collection Map(CollectionRequestModel requestModel);
+
+    List<Collection> Map(CollectionListRequestModel requestModel);
+
     Reference Map(ReferenceRequestModel requestModel);
 }
 public sealed class RequestMapper : IRequestMapper
@@ -112,6 +117,17 @@ public sealed class RequestMapper : IRequestMapper
                             Value = cm.Value,
                             IsPreferred = cm.IsPreferred
                         }),
+      
+        Collection = MapperUtils.MapList<CollectionRequestModel, Collection>(
+            requestModel.Collection, c =>
+                new Collection()
+                {
+                    UserId = c.UserId,
+                    Type = c.Type,
+                    ListingId = c.ListingId,
+                                    }),
+
+                        
         References = MapperUtils.MapList<ReferenceRequestModel, Reference>(
                         requestModel.References, r =>
                         new Reference
@@ -141,6 +157,31 @@ public sealed class RequestMapper : IRequestMapper
         Filters = requestModel.Filters,
         NotificationsOn = requestModel.NotificationsOn
     };
+
+    public Collection Map(CollectionRequestModel requestModel) => new()
+    {
+        UserId = requestModel.UserId,
+        ListingId = requestModel.ListingId,
+        Type = requestModel.Type
+    };
+
+    public List<Collection> Map(CollectionListRequestModel requestModel)
+    {
+
+        var collection = new List<Collection>();
+        foreach (var listingId in requestModel.Listings)
+        {
+            collection.Add(new Collection()
+            {
+                UserId = requestModel.UserId,
+                ListingId = listingId,
+                Type = requestModel.Type
+            });
+            
+        }
+
+        return collection;
+    }
 
     public Reference Map(ReferenceRequestModel requestModel) => new()
     {

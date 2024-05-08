@@ -24,4 +24,5 @@ public sealed class User : Entity
     public List<Relative> Relatives { get; set; } = new List<Relative>();
     public List<CommunicationMethod> CommunicationMethods { get; set; } = new List<CommunicationMethod>();
     public List<Reference> References { get; set; } = new List<Reference>();
+    public List<Collection> Collection { get; set; } = new();
 }

@@ -7,18 +7,8 @@ using System.Linq.Expressions;
 
 namespace AmeriCorps.Users.Data;
 
-public interface IUserRepository
-{
-    Task<User?> GetAsync(int id);
 
-    Task<User?> GetByExternalAcctId(string ExternalAccountId);
-    Task<List<SavedSearch>?> GetUserSearchesAsync(int id);
-    Task<List<Reference>?> GetUserReferencesAsync(int id);
-    Task<bool> ExistsAsync<T>(Expression<Func<T, bool>> predicate = null) where T : Entity;
-    Task<T> SaveAsync<T>(T entity) where T : Entity;
-    Task DeleteAsync<T>(int id) where T : Entity;
-}
-public sealed class UserRepository(
+public sealed partial class UserRepository(
     ILogger<UserRepository> logger,
     IContextFactory contextFactory,
     IOptions<UserContextOptions> options

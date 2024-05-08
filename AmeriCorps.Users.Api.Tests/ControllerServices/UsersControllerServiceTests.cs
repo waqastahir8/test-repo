@@ -6,7 +6,7 @@ using AmeriCorps.Users.Api.Services;
 
 namespace AmeriCorps.Users.Api.Tests;
 
-public sealed class UsersControllerServiceTests : BaseTests<UsersControllerService>
+public sealed partial class UsersControllerServiceTests : BaseTests<UsersControllerService>
 {
     private Mock<IUserRepository>? _repositoryMock;
     private Mock<IRequestMapper>? _reqMapperMock;

@@ -13,6 +13,8 @@ public abstract class NpgsqlContext : ContextBase
     public DbSet<User> Users { get; set; }
 
     public DbSet<SavedSearch> SavedSearch { get; set; }
+    
+    public DbSet<Collection> Collection { get; set; }
     public static string Schema => "users";
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -48,6 +50,7 @@ public abstract class NpgsqlContext : ContextBase
         var user = Create<User>("user");
         user.Property(p => p.DateOfBirth).HasColumnType("date");
 
+        var collection = Create<Collection>("collection");
 
 
         EntityTypeBuilder<T> Create<T>(string tableName) where T : Entity

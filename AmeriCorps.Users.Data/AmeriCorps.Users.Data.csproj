@@ -15,4 +15,10 @@
     <ProjectReference Include="..\AmeriCorps.Users.Data.Core\AmeriCorps.Users.Data.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="UserCollection.cs">
+      <DependentUpon>UserRepository.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
 </Project>
