@@ -16,7 +16,7 @@ env:
   NUGET_PROJECT_FILE: ./AmeriCorps.Users.Models/AmeriCorps.Users.Models.csproj
   FUNCTIONAPP_PROJECT: ./AmeriCorps.Users.Data.Deployment
   GITHUB_NUGET: https://nuget.pkg.github.com/free-alliance/index.json
-  AZURE_FUNCTIONAPP_URI: https://func-usersdbupdater-dev.azurewebsites.net/api/DatabaseUpdater
+  AZURE_FUNCTIONAPP_URI: https://func-usersdbupdater-dev.azurewebsites.net/api/DatabaseUpdate
   BUILD_CONFIGURATION: Release
 
 jobs:

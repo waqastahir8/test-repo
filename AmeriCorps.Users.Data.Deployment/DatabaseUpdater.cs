@@ -25,7 +25,7 @@ public class DatabaseUpdater
         _options = options?.Value ?? new();
     }
 
-    [Function("DatabaseUpdater")]
+    [Function("DatabaseUpdate")]
 #pragma warning disable IDE0060 // Remove unused parameter
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest request)
 #pragma warning restore IDE0060 // Remove unused parameter
