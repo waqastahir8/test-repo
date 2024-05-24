@@ -12,9 +12,11 @@ public interface IUserRepository
     Task<List<Reference>?> GetUserReferencesAsync(int id);
     Task<bool> ExistsAsync<T>(Expression<Func<T, bool>> predicate = null) where T : Entity;
     Task<T> SaveAsync<T>(T entity) where T : Entity;
+
+    Task<User> UpdateUserAsync(User entity);
     Task DeleteAsync<T>(int id) where T : Entity;
     Task<Collection?> SaveAsync(Collection collection);
-   
+
 
     Task<List<Collection>?> GetCollectionAsync(Collection collection);
 

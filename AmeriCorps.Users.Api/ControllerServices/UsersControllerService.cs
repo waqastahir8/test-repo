@@ -17,7 +17,7 @@ public interface IUsersControllerService
     Task<(ResponseStatus Status, CollectionResponseModel? Response)> CreateCollectionAsync(CollectionRequestModel? collectionRequest);
 
     Task<(ResponseStatus Status,CollectionListResponseModel? Response)> GetCollectionAsync(int userId, string? type);
-    
+
     Task<(ResponseStatus Status,bool Response)> DeleteCollectionAsync(CollectionListRequestModel? collectionListRequestModel);
     Task<(ResponseStatus Status, UserReferencesResponseModel? Response)> GetReferencesAsync(int userId);
     Task<(ResponseStatus Status, ReferenceResponseModel? Response)> CreateReferenceAsync(int userId, ReferenceRequestModel? referenceRequest);
@@ -171,13 +171,13 @@ public sealed class UsersControllerService(
         try
         {
             if (existingUser == null)
-            {   // create user
+            {
                 user = await _repository.SaveAsync(user);
             }
             else
-            {   //patch partial user
-                existingUser = PatchExistingUser(existingUser, user);
-                user = await _repository.SaveAsync(existingUser);
+            {
+                var updateUser= PersistB2cValues(existingUser, user);
+                user = await _repository.UpdateUserAsync(updateUser);
             }
         }
         catch (Exception e)
@@ -404,13 +404,13 @@ public sealed class UsersControllerService(
 
     public async Task<(ResponseStatus Status, CollectionListResponseModel? Response)> GetCollectionAsync(int userId, string? type)
     {
-      
+
         var collectionRequest = new CollectionRequestModel()
         {
             Type = type,
             UserId = userId
         };
-      
+
         var  (isValidRequest, response) =  await IsValidCollectionRequest(collectionRequest);
         if (!isValidRequest)
             return (response, null);
@@ -421,7 +421,7 @@ public sealed class UsersControllerService(
 
 
         var collectionResponse = _respMapper.Map(userCollections);
-        
+
         return (ResponseStatus.Successful, collectionResponse);
 
     }
@@ -444,18 +444,18 @@ public sealed class UsersControllerService(
         var  (isValidRequest, response) =  await IsValidCollectionRequest(collectionRequest);
         if (!isValidRequest)
             return (response, false);
-      
+
         var collection = _reqMapper.Map(collectionListRequestModel);
         var isDeletedSuccessful = await _repository.DeleteCollectionAsync(collection);
         if (!isDeletedSuccessful)
         {
             _logger.LogError("Unable to delete listings from user collections");
-         
+
             return (ResponseStatus.UnknownError, false);
         }
         return (ResponseStatus.Successful, true);
 
-        
+
     }
 
     private async Task<bool> UserExists(int userID)
@@ -468,7 +468,7 @@ public sealed class UsersControllerService(
         catch (Exception e)
         {
             _logger.LogError(e, $"Unable to check if user {userID} exists.");
-            
+
         }
 
         return userExists;
@@ -526,7 +526,7 @@ public sealed class UsersControllerService(
 
         return (ResponseStatus.Successful, response);
     }
-    
+
     private async Task<(ResponseStatus Status, CollectionResponseModel? Response)>
         SaveCollectionAsync(Collection collectionRequest)
     {
@@ -552,23 +552,16 @@ public sealed class UsersControllerService(
         return (ResponseStatus.Successful, response);
     }
 
-    private User PatchExistingUser(User existingUser, User updatedUser)
+    private User PersistB2cValues(User existingUser, User updatedUser)
     {
-        existingUser.FirstName = updatedUser.FirstName;
-        existingUser.LastName = updatedUser.LastName;
-        existingUser.UserName = updatedUser.UserName;
-        existingUser.ExternalAccountId = updatedUser.ExternalAccountId;
 
-        //NOTE: this logic assumes that a user only has 1 email address
-        var updatedEmail = updatedUser.CommunicationMethods.FirstOrDefault(c => c.Type == "email");
+        updatedUser.FirstName = existingUser.FirstName;
+        updatedUser.LastName = existingUser.LastName;
+        updatedUser.MiddleName = existingUser.MiddleName;
+        updatedUser.ExternalAccountId = existingUser.ExternalAccountId;
+        updatedUser.Id = existingUser.Id;
+        return updatedUser;
 
-        if (updatedEmail != null)
-        {
-            existingUser.CommunicationMethods.RemoveAll(c => c.Type == "email");
-            existingUser.CommunicationMethods.Add(updatedEmail);
-        }
-
-        return existingUser;
     }
 
     private async Task<(bool,ResponseStatus)> IsValidCollectionRequest(CollectionRequestModel? collectionRequest)
@@ -577,18 +570,18 @@ public sealed class UsersControllerService(
         const ResponseStatus responseStatus = ResponseStatus.Successful;
         if (collectionRequest == null)
             return (isValid,ResponseStatus.MissingInformation);
-        
-        
+
+
         if (!await UserExists(collectionRequest.UserId))
             return (isValid,ResponseStatus.UnknownError);
-                
+
         var validationResponse = validator.Validate(collectionRequest);
         if (!validationResponse?.IsValid ?? false)
         {
             _logger.LogError(validationResponse.ValidationMessage);
             return (isValid,ResponseStatus.UnknownError);
         }
-        
+
         isValid = true;
         return (isValid,responseStatus);
     }

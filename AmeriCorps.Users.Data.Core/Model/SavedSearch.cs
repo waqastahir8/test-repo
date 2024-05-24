@@ -1,8 +1,7 @@
 ﻿namespace AmeriCorps.Users.Data.Core;
 
-public sealed class SavedSearch : Entity
+public sealed class SavedSearch : EntityWithUserId
 {
-    public int UserId { get; set; }
     public required string Name { get; set; } = string.Empty;
     public required string Filters { get; set; } = string.Empty;
     public bool NotificationsOn { get; set; }

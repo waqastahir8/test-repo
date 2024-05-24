@@ -1,8 +1,7 @@
 ﻿namespace AmeriCorps.Users.Data.Core;
 
-public sealed class Reference : Entity
+public sealed class Reference : EntityWithUserId
 {
-    public int UserId { get; set; }
     public required string TypeId { get; set; }
     public required string Relationship { get; set; }
     public required int RelationshipLength { get; set; }

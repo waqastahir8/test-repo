@@ -1,7 +1,6 @@
 ﻿namespace AmeriCorps.Users.Data.Core;
 
-public sealed class MilitaryService : Entity
+public sealed class MilitaryService : EntityWithUserId
 {
-    public int UserId { get; set; }
     public required string PickListId { get; set; }
 }

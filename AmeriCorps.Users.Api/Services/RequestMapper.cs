@@ -14,10 +14,12 @@ public interface IRequestMapper
 
     Reference Map(ReferenceRequestModel requestModel);
 }
+
 public sealed class RequestMapper : IRequestMapper
 {
     public User Map(UserRequestModel requestModel) => new()
     {
+
         FirstName = requestModel.FirstName,
         LastName = requestModel.LastName,
         MiddleName = requestModel.MiddleName,
@@ -26,73 +28,82 @@ public sealed class RequestMapper : IRequestMapper
         ExternalAccountId = requestModel.ExternalAccountId,
         DateOfBirth = requestModel.DateOfBirth,
 
+
         Attributes = MapperUtils.MapList<AttributeRequestModel, AmeriCorps.Users.Data.Core.Attribute>(
-                        requestModel.Attributes,
-                        a => new AmeriCorps.Users.Data.Core.Attribute
-                        {
-                            Type = a.Type,
-                            Value = a.Value
-                        }),
+            requestModel.Attributes,
+            a => new AmeriCorps.Users.Data.Core.Attribute
+            {
+                Id = a.Id,
+                Type = a.Type,
+                Value = a.Value,
+
+            }),
 
 
         Languages = MapperUtils.MapList<LanguageRequestModel, Language>(
-                        requestModel.Languages, l =>
-                        new Language
-                        {
-                            PickListId = l.PickListId,
-                            IsPrimary = l.IsPrimary,
-                            SpeakingAbility = l.SpeakingAbility,
-                            WritingAbility = l.WritingAbility
-                        }),
+            requestModel.Languages, l =>
+                new Language
+                {
+                    Id =l.Id,
+                    PickListId = l.PickListId,
+                    IsPrimary = l.IsPrimary,
+                    SpeakingAbility = l.SpeakingAbility,
+                    WritingAbility = l.WritingAbility
+                }),
 
         Addresses = MapperUtils.MapList<AddressRequestModel, Address>(
-                        requestModel.Addresses, a =>
-                        new Address
-                        {
-                            IsForeign = a.IsForeign,
-                            Type = a.Type,
-                            Street1 = a.Street1,
-                            Street2 = a.Street2,
-                            City = a.City,
-                            State = a.State,
-                            Country = a.Country,
-                            ZipCode = a.ZipCode,
-                            MovingWithinSixMonths = a.MovingWithinSixMonths
-                        }),
+            requestModel.Addresses, a =>
+                new Address
+                {
+                    Id = a.Id,
+                    IsForeign = a.IsForeign,
+                    Type = a.Type,
+                    Street1 = a.Street1,
+                    Street2 = a.Street2,
+                    City = a.City,
+                    State = a.State,
+                    Country = a.Country,
+                    ZipCode = a.ZipCode,
+                    MovingWithinSixMonths = a.MovingWithinSixMonths
+                }),
 
         Education = MapperUtils.MapList<EducationRequestModel, Education>(
-                        requestModel.Education, e =>
-                        new Education
-                        {
-                            Level = e.Level,
-                            MajorAreaOfStudy = e.MajorAreaOfStudy,
-                            Institution = e.Institution,
-                            City = e.City,
-                            State = e.State,
-                            DateAttendedFrom = e.DateAttendedFrom,
-                            DateAttendedTo = e.DateAttendedTo,
-                            DegreeTypePursued = e.DegreeTypePursued,
-                            DegreeCompleted = e.DegreeCompleted
-                        }),
+            requestModel.Education, e =>
+                new Education
+                {
+                    Id = e.Id,
+                    Level = e.Level,
+                    MajorAreaOfStudy = e.MajorAreaOfStudy,
+                    Institution = e.Institution,
+                    City = e.City,
+                    State = e.State,
+                    DateAttendedFrom = e.DateAttendedFrom,
+                    DateAttendedTo = e.DateAttendedTo,
+                    DegreeTypePursued = e.DegreeTypePursued,
+                    DegreeCompleted = e.DegreeCompleted,
+                }),
 
         Skills = MapperUtils.MapList<SkillRequestModel, Skill>(
-                        requestModel.Skills, s =>
-                        new Skill
-                        {
-                            PickListId = s.PickListId
-                        }),
+            requestModel.Skills, s =>
+                new Skill
+                {
+                    Id = s.Id,
+                    PickListId = s.PickListId
+                }),
 
         MilitaryService = MapperUtils.MapList<MilitaryServiceRequestModel, MilitaryService>(
-                        requestModel.MilitaryService, s =>
-                        new MilitaryService
-                        {
-                            PickListId = s.PickListId
-                        }),
+            requestModel.MilitaryService, s =>
+                new MilitaryService
+                {
+                    Id = s.Id,
+                    PickListId = s.PickListId
+                }),
 
         SavedSearches = MapperUtils.MapList<SavedSearchRequestModel, SavedSearch>(
-                requestModel.SavedSearches, s =>
+            requestModel.SavedSearches, s =>
                 new SavedSearch
                 {
+                    Id= s.Id,
                     UserId = s.UserId,
                     Name = s.Name,
                     Filters = s.Filters,
@@ -100,53 +111,56 @@ public sealed class RequestMapper : IRequestMapper
                 }),
 
         Relatives = MapperUtils.MapList<RelativeRequestModel, Relative>(
-                        requestModel.Relatives, r =>
-                        new Relative
-                        {
-                            Relationship = r.Relationship,
-                            HighestEducationLevel = r.HighestEducationLevel,
-                            AnnualIncome = r.AnnualIncome
-                        }),
+            requestModel.Relatives, r =>
+                new Relative
+                {
+                    Id =r.Id,
+                    Relationship = r.Relationship,
+                    HighestEducationLevel = r.HighestEducationLevel,
+                    AnnualIncome = r.AnnualIncome
+                }),
 
         CommunicationMethods = MapperUtils.MapList<CommunicationMethodRequestModel,
-                                        CommunicationMethod>(
-                        requestModel.CommunicationMethods, cm =>
-                        new CommunicationMethod
-                        {
-                            Type = cm.Type,
-                            Value = cm.Value,
-                            IsPreferred = cm.IsPreferred
-                        }),
-      
+            CommunicationMethod>(
+            requestModel.CommunicationMethods, cm =>
+                new CommunicationMethod
+                {
+                    Id = cm.Id,
+                    Type = cm.Type,
+                    Value = cm.Value,
+                    IsPreferred = cm.IsPreferred
+                }),
+
         Collection = MapperUtils.MapList<CollectionRequestModel, Collection>(
             requestModel.Collection, c =>
                 new Collection()
                 {
+
                     UserId = c.UserId,
                     Type = c.Type,
                     ListingId = c.ListingId,
-                                    }),
+                }),
 
-                        
+
         References = MapperUtils.MapList<ReferenceRequestModel, Reference>(
-                        requestModel.References, r =>
-                        new Reference
-                        {
-                            TypeId = r.TypeId,
-                            Relationship = r.Relationship,
-                            RelationshipLength = r.RelationshipLength,
-                            ContactName = r.ContactName,
-                            Email = r.Email,
-                            Phone = r.Phone,
-                            Address = r.Address,
-                            Company = r.Company,
-                            Position = r.Position,
-                            Notes = r.Notes,
-                            CanContact = r.CanContact,
-                            Contacted = r.Contacted,
-                            DateContacted = r.DateContacted
-                        })
+            requestModel.References, r =>
+                new Reference
+                {
 
+                    TypeId = r.TypeId,
+                    Relationship = r.Relationship,
+                    RelationshipLength = r.RelationshipLength,
+                    ContactName = r.ContactName,
+                    Email = r.Email,
+                    Phone = r.Phone,
+                    Address = r.Address,
+                    Company = r.Company,
+                    Position = r.Position,
+                    Notes = r.Notes,
+                    CanContact = r.CanContact,
+                    Contacted = r.Contacted,
+                    DateContacted = r.DateContacted
+                }),
     };
 
     public SavedSearch Map(SavedSearchRequestModel requestModel) => new()
@@ -167,7 +181,6 @@ public sealed class RequestMapper : IRequestMapper
 
     public List<Collection> Map(CollectionListRequestModel requestModel)
     {
-
         var collection = new List<Collection>();
         foreach (var listingId in requestModel.Listings)
         {
@@ -177,7 +190,6 @@ public sealed class RequestMapper : IRequestMapper
                 ListingId = listingId,
                 Type = requestModel.Type
             });
-            
         }
 
         return collection;

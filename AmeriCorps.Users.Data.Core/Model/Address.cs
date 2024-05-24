@@ -1,9 +1,8 @@
 ﻿namespace AmeriCorps.Users.Data.Core;
 
 
-public sealed class Address : Entity
+public sealed class Address : EntityWithUserId
 {
-    public int UserId { get; set; }
     public bool IsForeign { get; set; }
     public string Type { get; set; } = string.Empty;
     public required string Street1 { get; set; }

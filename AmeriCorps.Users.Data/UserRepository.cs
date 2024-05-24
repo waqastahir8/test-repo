@@ -69,9 +69,7 @@ public sealed partial class UserRepository(
         {
             var entry = context.Entry(entity);
 
-            entry.State = entity.Id == 0 ?
-                                EntityState.Detached :
-                                EntityState.Modified;
+            entry.State = entity.Id == 0 ? EntityState.Detached : EntityState.Modified;
 
             if (entity.Id == 0)
             {
@@ -87,6 +85,71 @@ public sealed partial class UserRepository(
             await context.SaveChangesAsync();
             return entity;
         });
+
+    public async Task<User?> UpdateUserAsync(User user)
+    {
+        User? upatedUser = null;
+        await ExecuteAsync(async context =>
+        {
+            await using var transaction = await context.Database.BeginTransactionAsync();
+            try
+            {
+                context.Attach(user);
+                context.Entry(user).State = EntityState.Modified;
+                upatedUser = await UpdateUser(user, context);
+                await transaction.CommitAsync();
+                await context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+            }
+        });
+
+        return upatedUser;
+    }
+
+    private async Task<User?> UpdateUser(User user, RepositoryContext context)
+
+
+    {
+         // Refactor this later
+        var userId = user.Id;
+        UpdateEntities(user.Education, context,userId);
+        UpdateEntities(user.Addresses, context,userId);
+        UpdateEntities(user.Attributes, context,userId);
+        UpdateEntities(user.CommunicationMethods, context,userId);
+        UpdateEntities(user.MilitaryService, context,userId);
+        UpdateEntities(user.Relatives, context,userId);
+        UpdateEntities(user.Languages, context,userId);
+        UpdateEntities(user.Skills, context,userId);
+
+        return user;
+    }
+
+    private void UpdateEntities<T>(List<T> entities, DbContext context,int userId) where T : EntityWithUserId
+    {
+        var entityIds = new HashSet<int>(entities.Select(e => e.Id));
+
+        entities.ForEach(item =>
+        {
+            context.Entry(item).State = item.Id switch
+            {
+                0 => EntityState.Added,
+                > 0 => EntityState.Modified,
+                _ => EntityState.Unchanged
+            };
+        });
+
+        var entitiesToDelete = context.Set<T>()
+            .Where(e => e.UserId == userId && !entityIds.Contains(e.Id));
+
+        foreach (var entity in entitiesToDelete)
+        {
+            context.Entry(entity).State = EntityState.Deleted;
+        }
+    }
+
 
     public async Task DeleteAsync<T>(int id) where T : Entity =>
         await ExecuteAsync(async context =>
