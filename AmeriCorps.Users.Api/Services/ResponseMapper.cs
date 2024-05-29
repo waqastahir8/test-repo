@@ -47,13 +47,13 @@ public sealed class ResponseMapper : IResponseMapper
             ListingId = collection.ListingId,
             UserId = collection.UserId,
             Type = collection.Type
-    
+
         };
     }
 
     public CollectionListResponseModel Map(List<Collection>? collection)
     {
-        
+
         var collectionResponseList = new CollectionListResponseModel();
         if (collection==null || collection.Count == 0)
             return collectionResponseList;
@@ -118,7 +118,7 @@ public sealed class ResponseMapper : IResponseMapper
         UserName = user.UserName,
         ExternalAccountId = user.ExternalAccountId,
         DateOfBirth = user.DateOfBirth,
-
+        Pronouns = user.Pronouns,
         Attributes = MapperUtils.MapList<AmeriCorps.Users.Data.Core.Attribute, AttributeRequestModel>(
                         user.Attributes,
                         a => new AttributeRequestModel
@@ -218,10 +218,10 @@ public sealed class ResponseMapper : IResponseMapper
                             Value = cm.Value,
                             IsPreferred = cm.IsPreferred
                         }),
-       
 
-        
+
+
     };
-    
-    
+
+
 }

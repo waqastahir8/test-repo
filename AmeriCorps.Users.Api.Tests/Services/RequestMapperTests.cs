@@ -29,6 +29,7 @@ public sealed class RequestMapperTests : BaseTests<RequestMapper>
         Assert.Equal(model.PreferredName, result.PreferredName);
         Assert.Equal(model.UserName, result.UserName);
         Assert.Equal(model.DateOfBirth, result.DateOfBirth);
+        Assert.Equal(model.Pronouns,result.Pronouns);
 
         //Assert attributes
         Assert.Equal(model.Attributes.Count, result.Attributes.Count);
@@ -158,7 +159,7 @@ public sealed class RequestMapperTests : BaseTests<RequestMapper>
                 Assert.Equal(pair.source.IsPreferred, pair.mapped.IsPreferred);
             });
 
-       
+
        TestUserCollectionRequestMapper(result,model);
 
     }

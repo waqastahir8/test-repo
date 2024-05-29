@@ -1,6 +1,6 @@
 name: Release Dev
 
-on: 
+on:
   workflow_dispatch:
   push:
     branches:
@@ -43,7 +43,7 @@ jobs:
 
       - name: .net publish
         run: dotnet publish ${{ env.API_PROJECT }} --configuration Release --no-restore --output '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}'
-    
+
       - name: publish nuget package
         run: |
           dotnet pack ${{ env.NUGET_PROJECT_FILE }} --configuration ${{ env.BUILD_CONFIGURATION }} --artifacts-path ./nuget
@@ -52,7 +52,7 @@ jobs:
 
       - name: build Azure Function
         run: dotnet build ${{ env.FUNCTIONAPP_PROJECT }} --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore --output '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
-     
+
       - name: publish Azure Function
         uses: Azure/functions-action@v1
         with:

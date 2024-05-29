@@ -14,6 +14,8 @@ public sealed class User : Entity
     public string MiddleName { get; set; } = string.Empty;
     public string PreferredName { get; set; } = string.Empty;
     public DateOnly DateOfBirth { get; set; }
+
+    public string Pronouns { get; set; } = string.Empty;
     public List<Attribute> Attributes { get; set; } = new List<Attribute>();
     public List<Language> Languages { get; set; } = new List<Language>();
     public List<Address> Addresses { get; set; } = new List<Address>();
