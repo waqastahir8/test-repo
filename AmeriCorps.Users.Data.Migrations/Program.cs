@@ -7,21 +7,34 @@ var keyVaultUri = builder.Configuration["KeyVaultOptions:KeyVaultUri"]!;
 var tenantId = builder.Configuration["KeyVaultOptions:TenantId"];
 var clientId = builder.Configuration["KeyVaultOptions:ClientId"];
 var clientSecret = builder.Configuration["KeyVaultOptions:ClientSecret"];
+ 
+if (!string.IsNullOrEmpty(keyVaultUri) &&
+    !string.IsNullOrEmpty(tenantId) &&
+    !string.IsNullOrEmpty(clientId) &&
+    !string.IsNullOrEmpty(clientSecret))
+{
+     builder.Configuration
+     .AddAzureKeyVault(new Uri(keyVaultUri),
+                         new ClientSecretCredential(
+                             tenantId,
+                             clientId,
+                             clientSecret));
+    }
 
-var Configuration = builder.Configuration
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile("appsettings.{env.EnvironmentName}.json", optional: true)
-                .AddAzureKeyVault(new Uri(keyVaultUri),
-                     new ClientSecretCredential(
-                            tenantId,
-                            clientId,
-                            clientSecret))
-               .AddJsonFile("appsettings.local.json", optional: true, reloadOnChange: true);
+var configuration = 
+     builder.Configuration
+     .AddJsonFile("appsettings.json", optional: false)
+     .AddJsonFile("appsettings.{env.EnvironmentName}.json", optional: true)
+     .AddJsonFile("appsettings.local.json", optional: true)
+     .Build();
 
-var usersDbConnectionStr = builder.Configuration["UserContextOptions:DefaultConnectionString"];
+var connectionString = builder.Configuration["UserContextOptions:DefaultConnectionString"];
 
-builder.Services.AddDbContext<UserDbContext>(options =>
-                options.UseNpgsql(usersDbConnectionStr, x => x.MigrationsHistoryTable("__EFMigrationsHistory", NpgsqlContext.Schema)));
+builder.Services.AddDbContext<UserDbContext>(
+               options => options
+               .UseNpgsql(connectionString, x => x.MigrationsHistoryTable("__EFMigrationsHistory", NpgsqlContext.Schema))
+               .ReplaceService<IHistoryRepository, CamelCaseHistoryContext>()
+               .UseSnakeCaseNamingConvention());
 
 var app = builder.Build();
 await app.RunAsync();
