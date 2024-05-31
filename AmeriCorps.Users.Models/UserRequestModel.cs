@@ -11,6 +11,8 @@ public class UserRequestModel
     public string UserName {get; set; } = string.Empty;
     public string ExternalAccountId { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
+    public string? Prefix { get; set; } = string.Empty;
+    public string? Suffix { get; set; } = string.Empty;
     public DateOnly DateOfBirth { get; set; }
     public string Pronouns { get; set; } = string.Empty;
     public List<AttributeRequestModel> Attributes { get; set; } = new List<AttributeRequestModel>();

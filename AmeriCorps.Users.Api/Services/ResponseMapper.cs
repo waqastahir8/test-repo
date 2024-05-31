@@ -119,6 +119,8 @@ public sealed class ResponseMapper : IResponseMapper
         ExternalAccountId = user.ExternalAccountId,
         DateOfBirth = user.DateOfBirth,
         Pronouns = user.Pronouns,
+        Suffix = user.Suffix,
+        Prefix = user.Prefix,
         Attributes = MapperUtils.MapList<AmeriCorps.Users.Data.Core.Attribute, AttributeRequestModel>(
                         user.Attributes,
                         a => new AttributeRequestModel
