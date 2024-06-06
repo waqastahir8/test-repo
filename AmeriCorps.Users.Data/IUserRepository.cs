@@ -8,6 +8,7 @@ public interface IUserRepository
     Task<User?> GetAsync(int id);
 
     Task<User?> GetByExternalAcctId(string ExternalAccountId);
+    Task<int> GetUserIdByExternalAcctId(string externalAccountId);
     Task<List<SavedSearch>?> GetUserSearchesAsync(int id);
     Task<List<Reference>?> GetUserReferencesAsync(int id);
     Task<bool> ExistsAsync<T>(Expression<Func<T, bool>> predicate = null) where T : Entity;

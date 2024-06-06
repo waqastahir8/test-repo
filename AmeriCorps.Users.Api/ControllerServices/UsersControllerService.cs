@@ -155,12 +155,12 @@ public sealed class UsersControllerService(
             return (ResponseStatus.MissingInformation, null);
         }
 
-        User user = _reqMapper.Map(userRequest);
-        User? existingUser = null;
+        var user = _reqMapper.Map(userRequest);
+        int userId;
 
         try
         {
-            existingUser = await _repository.GetByExternalAcctId(user.ExternalAccountId);
+            userId = await _repository.GetUserIdByExternalAcctId(user.ExternalAccountId);
         }
         catch (Exception e)
         {
@@ -170,14 +170,15 @@ public sealed class UsersControllerService(
 
         try
         {
-            if (existingUser == null)
+            if (userId <=0)
             {
+                user.Id = 0;
                 user = await _repository.SaveAsync(user);
             }
             else
             {
-                var updateUser= PersistB2cValues(existingUser, user);
-                user = await _repository.UpdateUserAsync(updateUser);
+                user.Id = userId;
+                user = await _repository.UpdateUserAsync(user);
             }
         }
         catch (Exception e)
@@ -552,17 +553,7 @@ public sealed class UsersControllerService(
         return (ResponseStatus.Successful, response);
     }
 
-    private User PersistB2cValues(User existingUser, User updatedUser)
-    {
 
-        updatedUser.FirstName = existingUser.FirstName;
-        updatedUser.LastName = existingUser.LastName;
-        updatedUser.MiddleName = existingUser.MiddleName;
-        updatedUser.ExternalAccountId = existingUser.ExternalAccountId;
-        updatedUser.Id = existingUser.Id;
-        return updatedUser;
-
-    }
 
     private async Task<(bool,ResponseStatus)> IsValidCollectionRequest(CollectionRequestModel? collectionRequest)
     {

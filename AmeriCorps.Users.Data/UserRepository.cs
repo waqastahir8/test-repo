@@ -39,6 +39,20 @@ public sealed partial class UserRepository(
                                 .Include(u => u.CommunicationMethods)
                                 .FirstOrDefaultAsync(x => x.ExternalAccountId == externalAccountId));
 
+    public async Task<int> GetUserIdByExternalAcctId(string externalAccountId)
+    {
+        return await ExecuteAsync(async context =>
+        {
+            var userId = await context.Users
+                .AsNoTracking()
+                .Where(x => x.ExternalAccountId == externalAccountId)
+                .Select(u => u.Id)
+                .FirstOrDefaultAsync();
+
+            return userId;
+        });
+    }
+
     public async Task<List<SavedSearch>?> GetUserSearchesAsync(int id)
     {
         var user = await ExecuteAsync(async context => await context.Users
