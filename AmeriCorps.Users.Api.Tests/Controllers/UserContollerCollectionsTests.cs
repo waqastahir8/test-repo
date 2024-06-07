@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AmeriCorps.Users.Api.Tests;
 
-public sealed partial class UsersControllerTests 
+public sealed partial class UsersControllerTests
 {
     [Fact]
     private async Task GetUserCollectionAsync_NonExistent_UnprocessableEntity_422StatusCode()
@@ -19,7 +19,7 @@ public sealed partial class UsersControllerTests
             _serviceMock!
                 .Setup(x => x.GetCollectionAsync(userId, collectionType))
                 .ReturnsAsync((ResponseStatus.MissingInformation, null));
-    
+
             // Act
             var actual = await sut.GetUserCollectionsAsync(userId, collectionType);
 
@@ -28,11 +28,11 @@ public sealed partial class UsersControllerTests
             Assert.NotNull(response);
             Assert.Equal((int)HttpStatusCode.UnprocessableEntity, response.StatusCode);
         }
-        
-        
+
+
     }
-    
-    
+
+
     [Fact]
     private async Task GetUserCollectionAsync_Invalid_Collection_Type_UnknownError_500StatusCode()
     {
@@ -40,24 +40,24 @@ public sealed partial class UsersControllerTests
         var sut = Setup();
         var userId = Fixture.Create<int>();
         var collectionType = Fixture.Create<string>();
-       
-            _serviceMock!
-                .Setup(x => x.GetCollectionAsync(userId, collectionType))
-                .ReturnsAsync((ResponseStatus.MissingInformation, null));
-    
-            // Act
-            var actual = await sut.GetUserCollectionsAsync(userId, collectionType);
 
-            // Assert
-            var response = actual as StatusCodeResult;
-            Assert.NotNull(response);
-            Assert.Equal((int)HttpStatusCode.UnprocessableEntity, response.StatusCode);
-        
-        
+        _serviceMock!
+            .Setup(x => x.GetCollectionAsync(userId, collectionType))
+            .ReturnsAsync((ResponseStatus.MissingInformation, null));
+
+        // Act
+        var actual = await sut.GetUserCollectionsAsync(userId, collectionType);
+
+        // Assert
+        var response = actual as StatusCodeResult;
+        Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.UnprocessableEntity, response.StatusCode);
+
+
     }
 
     [Fact]
-    
+
     public async Task CreateUserCollectionAsync_UnknownError_500StatusCode()
     {
 
@@ -70,7 +70,7 @@ public sealed partial class UsersControllerTests
             _serviceMock!
                 .Setup(controller => controller.CreateCollectionAsync(model))
                 .ReturnsAsync((ResponseStatus.UnknownError, null));
-            
+
             //Act
             var actual = await sut.CreateCollectionAsync(model);
 
@@ -118,7 +118,7 @@ public sealed partial class UsersControllerTests
             _serviceMock!
                 .Setup(controller => controller.DeleteCollectionAsync(model))
                 .ReturnsAsync((ResponseStatus.UnknownError, false));
-            
+
             //Act
             var actual = await sut.DeleteUserCollectionsAsync(model);
 
@@ -128,8 +128,4 @@ public sealed partial class UsersControllerTests
             Assert.Equal((int)HttpStatusCode.InternalServerError, response.StatusCode);
         }
     }
-    
-
-
-
 }

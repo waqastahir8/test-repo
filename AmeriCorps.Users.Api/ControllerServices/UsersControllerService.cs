@@ -16,9 +16,9 @@ public interface IUsersControllerService
     Task<(ResponseStatus Status, bool Response)> DeleteSearchAsync(int userId, int searchId);
     Task<(ResponseStatus Status, CollectionResponseModel? Response)> CreateCollectionAsync(CollectionRequestModel? collectionRequest);
 
-    Task<(ResponseStatus Status,CollectionListResponseModel? Response)> GetCollectionAsync(int userId, string? type);
+    Task<(ResponseStatus Status, CollectionListResponseModel? Response)> GetCollectionAsync(int userId, string? type);
 
-    Task<(ResponseStatus Status,bool Response)> DeleteCollectionAsync(CollectionListRequestModel? collectionListRequestModel);
+    Task<(ResponseStatus Status, bool Response)> DeleteCollectionAsync(CollectionListRequestModel? collectionListRequestModel);
     Task<(ResponseStatus Status, UserReferencesResponseModel? Response)> GetReferencesAsync(int userId);
     Task<(ResponseStatus Status, ReferenceResponseModel? Response)> CreateReferenceAsync(int userId, ReferenceRequestModel? referenceRequest);
     Task<(ResponseStatus Status, ReferenceResponseModel? Response)> UpdateReferenceAsync(int userId, int referenceId, ReferenceRequestModel? referenceRequest);
@@ -257,7 +257,7 @@ public sealed class UsersControllerService(
         }
         catch (Exception e)
         {
-            _logger.LogError(e, $"Unable to save search {searchRequest?.Name}.");
+            _logger.LogError(e, $"Unable to save search {searchRequest}.");
             return (ResponseStatus.UnknownError, null);
         }
 
@@ -361,13 +361,10 @@ public sealed class UsersControllerService(
     public async Task<(ResponseStatus Status, bool Response)> DeleteSearchAsync(int userId, int searchId)
     {
 
-        var searches = await _repository.GetUserSearchesAsync(userId);
+        var searchExists = await _repository.ExistsAsync<SavedSearch>(s => s.UserId == userId &&
+                                                   s.Id == searchId);
 
-        if (searches == null)
-        {
-            return (ResponseStatus.MissingInformation, false);
-        }
-        if (!searches.Any(s => s.Id == searchId))
+        if (!searchExists)
         {
             _logger.LogInformation($"User with id {userId} does not contain a search with id {searchId}.");
             return (ResponseStatus.MissingInformation, false);
@@ -376,16 +373,11 @@ public sealed class UsersControllerService(
         bool deleted = true;
         try
         {
-            await _repository.DeleteAsync<SavedSearch>(searchId);
+            deleted = await _repository.DeleteAsync<SavedSearch>(searchId);
         }
         catch (Exception e)
         {
             _logger.LogError(e, $"Unable to delete search with id {searchId}.");
-            deleted = false;
-        }
-
-        if (!deleted)
-        {
             return (ResponseStatus.UnknownError, deleted);
         }
 
@@ -394,7 +386,7 @@ public sealed class UsersControllerService(
 
     public async Task<(ResponseStatus Status, CollectionResponseModel? Response)> CreateCollectionAsync(CollectionRequestModel? collectionRequest)
     {
-        var  (isValidRequest, response) =  await IsValidCollectionRequest(collectionRequest);
+        var (isValidRequest, response) = await IsValidCollectionRequest(collectionRequest);
         if (!isValidRequest)
             return (response, null);
         var collection = _reqMapper.Map(collectionRequest!);
@@ -412,7 +404,7 @@ public sealed class UsersControllerService(
             UserId = userId
         };
 
-        var  (isValidRequest, response) =  await IsValidCollectionRequest(collectionRequest);
+        var (isValidRequest, response) = await IsValidCollectionRequest(collectionRequest);
         if (!isValidRequest)
             return (response, null);
 
@@ -442,7 +434,7 @@ public sealed class UsersControllerService(
             Type = collectionListRequestModel.Type
 
         };
-        var  (isValidRequest, response) =  await IsValidCollectionRequest(collectionRequest);
+        var (isValidRequest, response) = await IsValidCollectionRequest(collectionRequest);
         if (!isValidRequest)
             return (response, false);
 
@@ -451,7 +443,6 @@ public sealed class UsersControllerService(
         if (!isDeletedSuccessful)
         {
             _logger.LogError("Unable to delete listings from user collections");
-
             return (ResponseStatus.UnknownError, false);
         }
         return (ResponseStatus.Successful, true);
@@ -464,7 +455,7 @@ public sealed class UsersControllerService(
         var userExists = false;
         try
         {
-            userExists = await _repository.ExistsAsync<User>(user=> user.Id == userID);
+            userExists = await _repository.ExistsAsync<User>(user => user.Id == userID);
         }
         catch (Exception e)
         {
@@ -478,13 +469,10 @@ public sealed class UsersControllerService(
     public async Task<(ResponseStatus Status, bool Response)> DeleteReferenceAsync(int userId, int referenceId)
     {
 
-        var references = await _repository.GetUserReferencesAsync(userId);
+        var referenceExists = await _repository.ExistsAsync<Reference>(r => r.UserId == userId &&
+                                                   r.Id == referenceId);
 
-        if (references == null)
-        {
-            return (ResponseStatus.MissingInformation, false);
-        }
-        if (!references.Any(s => s.Id == referenceId))
+        if (!referenceExists)
         {
             _logger.LogInformation($"User with id {userId} does not contain a reference with id {referenceId}.");
             return (ResponseStatus.MissingInformation, false);
@@ -493,16 +481,11 @@ public sealed class UsersControllerService(
         bool deleted = true;
         try
         {
-            await _repository.DeleteAsync<Reference>(referenceId);
+            deleted = await _repository.DeleteAsync<Reference>(referenceId);
         }
         catch (Exception e)
         {
             _logger.LogError(e, $"Unable to delete reference with id {referenceId}.");
-            deleted = false;
-        }
-
-        if (!deleted)
-        {
             return (ResponseStatus.UnknownError, deleted);
         }
 
@@ -555,25 +538,26 @@ public sealed class UsersControllerService(
 
 
 
-    private async Task<(bool,ResponseStatus)> IsValidCollectionRequest(CollectionRequestModel? collectionRequest)
+    private async Task<(bool, ResponseStatus)> IsValidCollectionRequest(CollectionRequestModel? collectionRequest)
     {
         var isValid = false;
         const ResponseStatus responseStatus = ResponseStatus.Successful;
         if (collectionRequest == null)
-            return (isValid,ResponseStatus.MissingInformation);
+            return (isValid, ResponseStatus.MissingInformation);
 
 
         if (!await UserExists(collectionRequest.UserId))
-            return (isValid,ResponseStatus.UnknownError);
+            return (isValid, ResponseStatus.UnknownError);
+
 
         var validationResponse = validator.Validate(collectionRequest);
         if (!validationResponse?.IsValid ?? false)
         {
             _logger.LogError(validationResponse.ValidationMessage);
-            return (isValid,ResponseStatus.UnknownError);
+            return (isValid, ResponseStatus.UnknownError);
         }
 
         isValid = true;
-        return (isValid,responseStatus);
+        return (isValid, responseStatus);
     }
 }

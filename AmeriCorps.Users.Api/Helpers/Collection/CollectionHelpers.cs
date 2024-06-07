@@ -9,7 +9,7 @@ public static class CollectionHelpers
     {
         if (string.IsNullOrEmpty(type) || string.IsNullOrWhiteSpace(type))
             return false;
-        
+
         return CollectionTypes.Types.Contains(type.ToUpper());
     }
 }

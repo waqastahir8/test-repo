@@ -9,9 +9,7 @@ public interface IResponseMapper
     SavedSearchResponseModel Map(SavedSearch search);
     ReferenceResponseModel Map(Reference reference);
     List<SavedSearchResponseModel> Map(List<SavedSearch> searches);
-
     CollectionResponseModel Map(Collection collection);
-
     CollectionListResponseModel Map(List<Collection>? collection);
     List<ReferenceResponseModel> Map(List<Reference> references);
 }
@@ -55,7 +53,7 @@ public sealed class ResponseMapper : IResponseMapper
     {
 
         var collectionResponseList = new CollectionListResponseModel();
-        if (collection==null || collection.Count == 0)
+        if (collection == null || collection.Count == 0)
             return collectionResponseList;
 
         var collectionItem = collection.First();
@@ -200,6 +198,24 @@ public sealed class ResponseMapper : IResponseMapper
                                 NotificationsOn = s.NotificationsOn
                             }),
 
+        References = MapperUtils.MapList<Reference, ReferenceRequestModel>(
+                    user.References, r => new ReferenceRequestModel
+                    {
+                        TypeId = r.TypeId,
+                        Relationship = r.Relationship,
+                        RelationshipLength = r.RelationshipLength,
+                        ContactName = r.ContactName,
+                        Email = r.Email,
+                        Phone = r.Phone,
+                        Address = r.Address,
+                        Company = r.Company,
+                        Position = r.Position,
+                        Notes = r.Notes,
+                        CanContact = r.CanContact,
+                        Contacted = r.Contacted,
+                        DateContacted = r.DateContacted
+                    }),
+
         Relatives = MapperUtils.MapList<Relative, RelativeRequestModel>(
                         user.Relatives, r =>
                         new RelativeRequestModel
@@ -221,7 +237,14 @@ public sealed class ResponseMapper : IResponseMapper
                             IsPreferred = cm.IsPreferred
                         }),
 
-
+        Collection = MapperUtils.MapList<Collection, CollectionRequestModel>(
+            user.Collection, c =>
+                new CollectionRequestModel()
+                {
+                    UserId = c.UserId,
+                    Type = c.Type,
+                    ListingId = c.ListingId,
+                })
 
     };
 

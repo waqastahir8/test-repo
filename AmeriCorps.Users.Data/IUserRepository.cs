@@ -15,7 +15,7 @@ public interface IUserRepository
     Task<T> SaveAsync<T>(T entity) where T : Entity;
 
     Task<User> UpdateUserAsync(User entity);
-    Task DeleteAsync<T>(int id) where T : Entity;
+    Task<bool> DeleteAsync<T>(int id) where T : Entity;
     Task<Collection?> SaveAsync(Collection collection);
 
 

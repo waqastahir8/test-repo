@@ -15,7 +15,6 @@ env:
   API_PROJECT: ./AmeriCorps.Users.Api
   NUGET_PROJECT_FILE: ./AmeriCorps.Users.Models/AmeriCorps.Users.Models.csproj
   FUNCTIONAPP_PROJECT: ./AmeriCorps.Users.Data.Deployment
-  GITHUB_NUGET: https://nuget.pkg.github.com/free-alliance/index.json
   AZURE_FUNCTIONAPP_URI: https://func-usersdbupdater-dev.azurewebsites.net/api/DatabaseUpdate
   BUILD_CONFIGURATION: Release
 
@@ -39,8 +38,20 @@ jobs:
           dotnet restore ${{ env.SOLUTION_FILE }}
 
       - name: .net test
-        run: dotnet test ${{ env.SOLUTION_FILE }} --no-restore
+        run: dotnet test ${{ env.SOLUTION_FILE }} --no-restore --collect:"XPlat Code Coverage" --settings coverlet.runsettings
 
+      - name: generate code coverage report
+        run: |
+          dotnet tool install -g dotnet-reportgenerator-globaltool
+          reportgenerator -reports:"*.Tests/TestResults/*/coverage.cobertura.xml" -targetdir:"coveragereport" -reporttypes:TextSummary
+          more coveragereport/Summary.txt
+
+      - name: upload code coverage report
+        uses: actions/upload-artifact@v3
+        with:
+          name: CodeCoverageReport
+          path: coveragereport/Summary.txt
+          
       - name: .net publish
         run: dotnet publish ${{ env.API_PROJECT }} --configuration Release --no-restore --output '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}'
 

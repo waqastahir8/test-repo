@@ -6,16 +6,16 @@ using System.Linq;
 
 namespace AmeriCorps.Users.Api.Tests;
 
-public sealed class RequestMapperTests : RequestMapperSetup
+public sealed class ResponseMapperTests : ResponseMapperSetup
 {
     [Fact]
     public void Map_CorrectlyMapsProperties()
     {
         // Arrange
         var sut = Setup();
-        var model = Fixture.Create<UserRequestModel>();
+        var model = Fixture.Create<User>();
 
-        IRequestMapper mapper = new RequestMapper();
+        IResponseMapper mapper = new ResponseMapper();
 
         // Act
         var result = mapper.Map(model);
@@ -30,6 +30,7 @@ public sealed class RequestMapperTests : RequestMapperSetup
         Assert.Equal(model.UserName, result.UserName);
         Assert.Equal(model.DateOfBirth, result.DateOfBirth);
         Assert.Equal(model.Pronouns, result.Pronouns);
+
 
         //Assert attributes
         Assert.Equal(model.Attributes.Count, result.Attributes.Count);
@@ -160,11 +161,10 @@ public sealed class RequestMapperTests : RequestMapperSetup
             });
 
 
-        TestUserCollectionRequestMapper(result, model);
-
+        TestUserCollectionResponseMapper(result, model);
     }
 
-    private void TestUserCollectionRequestMapper(User result, UserRequestModel model)
+    private void TestUserCollectionResponseMapper(UserResponse result, User model)
     {
         Assert.Equal(model.Collection.Count, result.Collection.Count);
         Assert.All(result.Collection.Zip(model.Collection, (mapped, source) => (mapped, source)),

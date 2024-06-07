@@ -127,21 +127,21 @@ public sealed partial class UserRepository(
 
 
     {
-         // Refactor this later
+        // Refactor this later
         var userId = user.Id;
-        UpdateEntities(user.Education, context,userId);
-        UpdateEntities(user.Addresses, context,userId);
-        UpdateEntities(user.Attributes, context,userId);
-        UpdateEntities(user.CommunicationMethods, context,userId);
-        UpdateEntities(user.MilitaryService, context,userId);
-        UpdateEntities(user.Relatives, context,userId);
-        UpdateEntities(user.Languages, context,userId);
-        UpdateEntities(user.Skills, context,userId);
+        UpdateEntities(user.Education, context, userId);
+        UpdateEntities(user.Addresses, context, userId);
+        UpdateEntities(user.Attributes, context, userId);
+        UpdateEntities(user.CommunicationMethods, context, userId);
+        UpdateEntities(user.MilitaryService, context, userId);
+        UpdateEntities(user.Relatives, context, userId);
+        UpdateEntities(user.Languages, context, userId);
+        UpdateEntities(user.Skills, context, userId);
 
         return user;
     }
 
-    private void UpdateEntities<T>(List<T> entities, DbContext context,int userId) where T : EntityWithUserId
+    private void UpdateEntities<T>(List<T> entities, DbContext context, int userId) where T : EntityWithUserId
     {
         var entityIds = new HashSet<int>(entities.Select(e => e.Id));
 
@@ -165,7 +165,7 @@ public sealed partial class UserRepository(
     }
 
 
-    public async Task DeleteAsync<T>(int id) where T : Entity =>
+    public async Task<bool> DeleteAsync<T>(int id) where T : Entity =>
         await ExecuteAsync(async context =>
         {
             T e = await context.Set<T>().FindAsync(id);

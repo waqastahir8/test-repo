@@ -73,14 +73,14 @@ public sealed class UsersController(IUsersControllerService service) : Controlle
         };
     }
 
-   
+
     [HttpPost("Collection")]
     public async Task<IActionResult> CreateCollectionAsync([FromBody] CollectionRequestModel collectionRequest) =>
         await ServeAsync(async () => await _service.CreateCollectionAsync(collectionRequest));
-    
+
     [HttpGet("Collection/{userId}/{type}")]
-    public async Task<IActionResult> GetUserCollectionsAsync(int userId,string? type) =>
-        await ServeAsync(async () => await _service.GetCollectionAsync(userId,type));
+    public async Task<IActionResult> GetUserCollectionsAsync(int userId, string? type) =>
+        await ServeAsync(async () => await _service.GetCollectionAsync(userId, type));
 
     [HttpDelete("Collection")]
     public async Task<IActionResult> DeleteUserCollectionsAsync([FromBody] CollectionListRequestModel? requestModel) =>

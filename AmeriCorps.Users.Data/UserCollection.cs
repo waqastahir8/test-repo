@@ -57,7 +57,7 @@ public partial class UserRepository
                 foreach (var collection in collections)
                 {
                     var collectionToDelete = await context.Collection.FirstOrDefaultAsync(c => c.UserId == collection.UserId
-                        && c.ListingId ==collection.ListingId && c.Type == collection.Type
+                        && c.ListingId == collection.ListingId && c.Type == collection.Type
                     );
                     if (collectionToDelete == null)
                     {

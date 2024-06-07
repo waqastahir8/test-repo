@@ -1,7 +1,9 @@
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
+[ExcludeFromCodeCoverage]
 public class DateOnlyJsonConverter : JsonConverter<DateOnly>
 {
     private const string Format = "yyyy-MM-dd";

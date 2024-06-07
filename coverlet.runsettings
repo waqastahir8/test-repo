@@ -1,0 +1,15 @@
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat Code Coverage">
+         <Configuration>
+            <Exclude>
+            [AmeriCorps.Users.Api]*Program,
+            [AmeriCorps.Users.Data]*UserRepository,
+            [AmeriCorps.Users.Data.Core]*NpgsqlContext
+            </Exclude>
+          </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>

@@ -44,12 +44,10 @@ public sealed class Validator : IValidator
             validationResponse.IsValid = false;
             validationResponse.ValidationMessage = "Invalid collection type";
         }
-           
 
         return validationResponse;
-
     }
-    
+
     private bool IsOver18(DateOnly dateOfBirth)
     {
         var startDate = dateOfBirth;

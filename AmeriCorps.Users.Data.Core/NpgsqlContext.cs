@@ -13,7 +13,7 @@ public abstract class NpgsqlContext : ContextBase
     public DbSet<User> Users { get; set; }
 
     public DbSet<SavedSearch> SavedSearch { get; set; }
-    
+
     public DbSet<Collection> Collection { get; set; }
     public static string Schema => "users";
     protected override void OnModelCreating(ModelBuilder modelBuilder)

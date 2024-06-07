@@ -46,7 +46,7 @@ public sealed class RequestMapper : IRequestMapper
             requestModel.Languages, l =>
                 new Language
                 {
-                    Id =l.Id,
+                    Id = l.Id,
                     PickListId = l.PickListId,
                     IsPrimary = l.IsPrimary,
                     SpeakingAbility = l.SpeakingAbility,
@@ -105,7 +105,7 @@ public sealed class RequestMapper : IRequestMapper
             requestModel.SavedSearches, s =>
                 new SavedSearch
                 {
-                    Id= s.Id,
+                    Id = s.Id,
                     UserId = s.UserId,
                     Name = s.Name,
                     Filters = s.Filters,
@@ -116,7 +116,7 @@ public sealed class RequestMapper : IRequestMapper
             requestModel.Relatives, r =>
                 new Relative
                 {
-                    Id =r.Id,
+                    Id = r.Id,
                     Relationship = r.Relationship,
                     HighestEducationLevel = r.HighestEducationLevel,
                     AnnualIncome = r.AnnualIncome

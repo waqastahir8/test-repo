@@ -7,21 +7,21 @@ var keyVaultUri = builder.Configuration["KeyVaultOptions:KeyVaultUri"]!;
 var tenantId = builder.Configuration["KeyVaultOptions:TenantId"];
 var clientId = builder.Configuration["KeyVaultOptions:ClientId"];
 var clientSecret = builder.Configuration["KeyVaultOptions:ClientSecret"];
- 
+
 if (!string.IsNullOrEmpty(keyVaultUri) &&
     !string.IsNullOrEmpty(tenantId) &&
     !string.IsNullOrEmpty(clientId) &&
     !string.IsNullOrEmpty(clientSecret))
 {
-     builder.Configuration
-     .AddAzureKeyVault(new Uri(keyVaultUri),
-                         new ClientSecretCredential(
-                             tenantId,
-                             clientId,
-                             clientSecret));
-    }
+    builder.Configuration
+    .AddAzureKeyVault(new Uri(keyVaultUri),
+                        new ClientSecretCredential(
+                            tenantId,
+                            clientId,
+                            clientSecret));
+}
 
-var configuration = 
+var configuration =
      builder.Configuration
      .AddJsonFile("appsettings.json", optional: false)
      .AddJsonFile("appsettings.{env.EnvironmentName}.json", optional: true)
