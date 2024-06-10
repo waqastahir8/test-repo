@@ -75,6 +75,7 @@ public partial class UserRepository
         }
         catch (Exception ex)
         {
+            logger.LogError($"Could not delete collection '{ex}'.");
             isDeleted = false;
         }
 

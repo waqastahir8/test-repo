@@ -5,7 +5,7 @@ namespace AmeriCorps.Users.Api.Services;
 
 public interface IResponseMapper
 {
-    UserResponse Map(User user);
+    UserResponse? Map(User? user);
     SavedSearchResponseModel Map(SavedSearch search);
     ReferenceResponseModel Map(Reference reference);
     List<SavedSearchResponseModel> Map(List<SavedSearch> searches);
@@ -106,7 +106,7 @@ public sealed class ResponseMapper : IResponseMapper
         Contacted = reference.Contacted,
         DateContacted = reference.DateContacted
     };
-    public UserResponse Map(User user) => new()
+    public UserResponse? Map(User? user) =>  user == null ? null : new()
     {
         Id = user.Id,
         FirstName = user.FirstName,

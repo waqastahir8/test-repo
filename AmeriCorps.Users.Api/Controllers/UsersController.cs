@@ -34,11 +34,11 @@ public sealed class UsersController(IUsersControllerService service) : Controlle
         await ServeAsync(async () => await _service.GetUserSearchesAsync(userId));
 
     [HttpPost("{userId}/Searches")]
-    public async Task<IActionResult> CreateSearchAsync(int userId, [FromBody] SavedSearchRequestModel searchRequest) =>
+    public async Task<IActionResult> CreateSearchAsync(int userId, [FromBody] SavedSearchRequestModel? searchRequest) =>
         await ServeAsync(async () => await _service.CreateSearchAsync(userId, searchRequest));
 
     [HttpPut("{userId}/Searches/{searchId}")]
-    public async Task<IActionResult> UpdateSearchAsync(int userId, int searchId, [FromBody] SavedSearchRequestModel searchRequest) =>
+    public async Task<IActionResult> UpdateSearchAsync(int userId, int searchId, [FromBody] SavedSearchRequestModel? searchRequest) =>
        await ServeAsync(async () => await _service.UpdateSearchAsync(userId, searchId, searchRequest));
 
     [HttpDelete("{userId}/Searches/{searchId}")]
@@ -50,11 +50,11 @@ public sealed class UsersController(IUsersControllerService service) : Controlle
         await ServeAsync(async () => await _service.GetReferencesAsync(userId));
 
     [HttpPost("{userId}/References")]
-    public async Task<IActionResult> CreateReferenceAsync(int userId, [FromBody] ReferenceRequestModel referenceRequest) =>
+    public async Task<IActionResult> CreateReferenceAsync(int userId, [FromBody] ReferenceRequestModel? referenceRequest) =>
         await ServeAsync(async () => await _service.CreateReferenceAsync(userId, referenceRequest));
 
     [HttpPut("{userId}/References/{referenceId}")]
-    public async Task<IActionResult> UpdateReferenceAsync(int userId, int referenceId, [FromBody] ReferenceRequestModel referenceRequest) =>
+    public async Task<IActionResult> UpdateReferenceAsync(int userId, int referenceId, [FromBody] ReferenceRequestModel? referenceRequest) =>
        await ServeAsync(async () => await _service.UpdateReferenceAsync(userId, referenceId, referenceRequest));
 
     [HttpDelete("{userId}/References/{referenceId}")]

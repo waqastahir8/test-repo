@@ -24,20 +24,27 @@ public interface IUsersControllerService
     Task<(ResponseStatus Status, ReferenceResponseModel? Response)> UpdateReferenceAsync(int userId, int referenceId, ReferenceRequestModel? referenceRequest);
     Task<(ResponseStatus Status, bool Response)> DeleteReferenceAsync(int userId, int referenceId);
 }
-public sealed class UsersControllerService(
+public sealed class UsersControllerService : IUsersControllerService
+{
+    private readonly ILogger<UsersControllerService> _logger;
+
+    private readonly IRequestMapper _reqMapper;
+    private readonly IResponseMapper _respMapper;
+    private readonly IValidator _validator;
+    private readonly IUserRepository _repository;
+
+    public UsersControllerService(
     ILogger<UsersControllerService> logger,
     IRequestMapper reqMapper,
     IResponseMapper respMapper,
     IValidator validator,
-    IUserRepository repository)
-    : IUsersControllerService
-{
-    private readonly ILogger<UsersControllerService> _logger = logger;
-
-    private readonly IRequestMapper _reqMapper = reqMapper;
-    private readonly IResponseMapper _respMapper = respMapper;
-    private readonly IValidator _validator = validator;
-    private readonly IUserRepository _repository = repository;
+    IUserRepository repository) {
+        _logger = logger;
+        _reqMapper = reqMapper;
+        _respMapper = respMapper;
+        _validator = validator;
+        _repository = repository;
+    }
     public async Task<(ResponseStatus Status, UserResponse? Response)> GetAsync(int id)
     {
         User? user;
@@ -397,6 +404,10 @@ public sealed class UsersControllerService(
 
     public async Task<(ResponseStatus Status, CollectionListResponseModel? Response)> GetCollectionAsync(int userId, string? type)
     {
+        if(type == null) {
+            _logger.LogInformation("Collection type is null.");
+            return (ResponseStatus.MissingInformation, null);
+        }
 
         var collectionRequest = new CollectionRequestModel()
         {
@@ -424,7 +435,7 @@ public sealed class UsersControllerService(
     {
         if (collectionListRequestModel == null)
         {
-            logger.LogError($"The request is invalid.");
+            _logger.LogError($"The request is invalid.");
             return (ResponseStatus.MissingInformation, false);
         }
 
@@ -550,10 +561,10 @@ public sealed class UsersControllerService(
             return (isValid, ResponseStatus.UnknownError);
 
 
-        var validationResponse = validator.Validate(collectionRequest);
+        var validationResponse = _validator.Validate(collectionRequest);
         if (!validationResponse?.IsValid ?? false)
         {
-            _logger.LogError(validationResponse.ValidationMessage);
+            _logger.LogError(validationResponse?.ValidationMessage);
             return (isValid, ResponseStatus.UnknownError);
         }
 

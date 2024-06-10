@@ -75,7 +75,6 @@ public sealed class ValidatorTests : BaseTests<Validator>
     }
 
     [Theory]
-    [InlineData(null, false)]
     [InlineData("", false)]
     [InlineData("   ", false)]
     [InlineData("cart", true)]
@@ -86,7 +85,7 @@ public sealed class ValidatorTests : BaseTests<Validator>
     [InlineData("Favourite", true)]
     [InlineData("unknown", false)]
     [InlineData("TYPE", false)]
-    public void Validate_ValidCollectionType_ReturnsValidResponse(string? type, bool expected)
+    public void Validate_ValidCollectionType_ReturnsValidResponse(string type, bool expected)
     {
         // Arrange
         var sut = Setup();

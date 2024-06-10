@@ -21,6 +21,12 @@ public sealed class ResponseMapperTests : ResponseMapperSetup
         var result = mapper.Map(model);
 
         // Assert
+        if(model == null) {
+            Assert.Null(result);
+            return;
+        }
+
+        Assert.NotNull(result);
         Assert.Equal(model.FirstName, result.FirstName);
         Assert.Equal(model.LastName, result.LastName);
         Assert.Equal(model.MiddleName, result.MiddleName);
