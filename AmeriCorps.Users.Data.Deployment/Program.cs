@@ -16,7 +16,7 @@ var host = new HostBuilder()
 
         var config = builder.Build();
 
-        var keyVaultUri = config["KeyVault_Uri"]!;
+        var keyVaultUri = config["KeyVault_Uri_Test"]!;
         var tenantId = config["KeyVault_TenantId"];
         var clientId = config["KeyVault_ClientId"];
         var clientSecret = config["KeyVault_ClientSecret"];
