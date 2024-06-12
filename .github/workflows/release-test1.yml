@@ -25,24 +25,7 @@ jobs:
     steps:
       - name: checkout code
         uses: actions/checkout@v4
-      - name: Set committer info
-        run: |
-          git config user.email "${{ github.actor }}@users.noreply.github.com"
-          git config user.name "${{ github.actor }}"
-      - name: Fetch dev branch
-        run: git fetch origin dev
 
-      - name: Checkout test-env branch
-        run: git checkout test-env
-
-      - name: Configure pull rebase
-        run: git config pull.rebase false
-
-      - name: Pull changes from dev branch
-        run: git pull origin dev --allow-unrelated-histories
-
-      - name: Push changes to test-env branch
-        run: git push origin test-env --force
       - name: setup .NET
         uses: actions/setup-dotnet@v4
         with:
