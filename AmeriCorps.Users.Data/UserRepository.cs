@@ -71,7 +71,7 @@ public sealed partial class UserRepository(
     }
 
     public async Task<bool> ExistsAsync<T>(
-            Expression<Func<T, bool>> predicate = null) where T : Entity =>
+            Expression<Func<T, bool>> predicate) where T : Entity =>
                 await ExecuteAsync(async context =>
                 {
                     IQueryable<T> data = context.Set<T>();
@@ -110,12 +110,13 @@ public sealed partial class UserRepository(
             {
                 context.Attach(user);
                 context.Entry(user).State = EntityState.Modified;
-                upatedUser = await UpdateUser(user, context);
+                upatedUser = UpdateUser(user, context);
                 await transaction.CommitAsync();
                 await context.SaveChangesAsync();
             }
             catch (Exception ex)
             {
+                logger.LogWarning($"Could not save changes to repo: {ex}.  Rolling back.");
                 await transaction.RollbackAsync();
             }
         });
@@ -123,7 +124,7 @@ public sealed partial class UserRepository(
         return upatedUser;
     }
 
-    private async Task<User?> UpdateUser(User user, RepositoryContext context)
+    private User? UpdateUser(User user, RepositoryContext context)
 
 
     {
@@ -168,7 +169,7 @@ public sealed partial class UserRepository(
     public async Task<bool> DeleteAsync<T>(int id) where T : Entity =>
         await ExecuteAsync(async context =>
         {
-            T e = await context.Set<T>().FindAsync(id);
+            T? e = await context.Set<T>().FindAsync(id);
 
             if (e != null)
             {

@@ -182,7 +182,7 @@ public partial class UsersControllerServiceTests
         // Arrange
         var sut = Setup();
         var userId = Fixture.Create<int>();
-        CollectionListRequestModel model = null;
+        CollectionListRequestModel? model = null;
 
         // Act
         var (status, _) = await sut.DeleteCollectionAsync(model);

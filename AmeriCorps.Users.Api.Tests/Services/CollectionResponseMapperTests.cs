@@ -67,7 +67,7 @@ public sealed partial class CollectionResponseMapperTests : ResponseMapperSetup
     {
         // Arrange
         var sut = Setup();
-        List<Collection> model = null;
+        List<Collection>? model = null;
 
         IResponseMapper mapper = new ResponseMapper();
 
