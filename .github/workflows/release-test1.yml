@@ -25,7 +25,20 @@ jobs:
     steps:
       - name: checkout code
         uses: actions/checkout@v4
+      - name: Fetch dev branch
+        run: git fetch origin dev
 
+      - name: Checkout test-env branch
+        run: git checkout test-env
+
+      - name: Configure pull rebase
+        run: git config pull.rebase false
+
+      - name: Pull changes from dev branch
+        run: git pull origin dev --allow-unrelated-histories
+
+      - name: Push changes to test-env branch
+        run: git push origin test-env --force
       - name: setup .NET
         uses: actions/setup-dotnet@v4
         with:
