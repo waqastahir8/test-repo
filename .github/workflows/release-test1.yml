@@ -25,6 +25,10 @@ jobs:
     steps:
       - name: checkout code
         uses: actions/checkout@v4
+      - name: Set committer info
+        run: |
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+          git config user.name "${{ github.actor }}"
       - name: Fetch dev branch
         run: git fetch origin dev
 
