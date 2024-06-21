@@ -13,6 +13,9 @@ public sealed class UsersController(IUsersControllerService service) : Controlle
 {
     private readonly IUsersControllerService _service = service;
 
+    [HttpGet("test/{id}")]
+    public async Task<IActionResult> TestUserAsync(int id) =>
+        await ServeAsync(async () => await _service.GetAsync(id));
     [HttpGet("{id}")]
     public async Task<IActionResult> GetUserAsync(int id) =>
         await ServeAsync(async () => await _service.GetAsync(id));
