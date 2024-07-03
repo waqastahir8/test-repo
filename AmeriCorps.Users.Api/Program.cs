@@ -7,7 +7,7 @@ builder.Services.AddControllers().AddJsonOptions(options =>
     options.JsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter());
 });
 builder.Services.AddApiVersioning();
-
+builder.Services.AddApplicationInsightsTelemetry();
 builder.Services
     .AddSingleton<IValidator, Validator>()
     .AddScoped<IContextFactory, DefaultContextFactory>()
@@ -21,18 +21,33 @@ var tenantId = builder.Configuration["KeyVaultOptions:TenantId"];
 var clientId = builder.Configuration["KeyVaultOptions:ClientId"];
 var clientSecret = builder.Configuration["KeyVaultOptions:ClientSecret"];
 
-var configuration =
-    builder.Configuration
-    .AddJsonFile("appsettings.json", optional: false)
-    .AddJsonFile("appsettings.{env.EnvironmentName}.json", optional: true)
-    .AddAzureKeyVault(new Uri(keyVaultUri),
-                    new ClientSecretCredential(
-                        tenantId,
-                        clientId,
-                        clientSecret))
-    .AddJsonFile("appsettings.local.json", optional: true)
-    .Build();
 
+builder.Configuration
+    .AddJsonFile("appsettings.local.json", optional: true)
+    .AddJsonFile("appsettings.json", optional: false)
+    .AddJsonFile("appsettings.{env.EnvironmentName}.json", optional: true);
+
+
+if (!string.IsNullOrEmpty(keyVaultUri) &&
+    !string.IsNullOrEmpty(tenantId) &&
+    !string.IsNullOrEmpty(clientId) &&
+    !string.IsNullOrEmpty(clientSecret))
+{
+    builder.Configuration
+        .AddAzureKeyVault(new Uri(keyVaultUri),
+            new ClientSecretCredential(
+                tenantId,
+                clientId,
+                clientSecret));
+}
+else if (!string.IsNullOrEmpty(keyVaultUri))
+{
+    builder.Configuration
+        .AddAzureKeyVault(new Uri(keyVaultUri),
+            new DefaultAzureCredential());
+}
+
+var configuration = builder.Configuration;
 builder.Services.Configure<UserContextOptions>(
     configuration.GetSection(nameof(UserContextOptions)));
 
