@@ -57,7 +57,7 @@ public sealed partial class UsersControllerTests : BaseTests<UsersController>
         var userResponse = Fixture.Create<UserResponse>();
 
         _serviceMock!
-            .Setup(x => x.GetByExternalAccountId(externalAccountId))
+            .Setup(x => x.GetByExternalAccountIdAsync(externalAccountId))
             .ReturnsAsync((ResponseStatus.Successful, userResponse));
 
         //Act
@@ -77,7 +77,7 @@ public sealed partial class UsersControllerTests : BaseTests<UsersController>
         var externalAccountId = Fixture.Create<string>();
 
         _serviceMock!
-            .Setup(x => x.GetByExternalAccountId(externalAccountId))
+            .Setup(x => x.GetByExternalAccountIdAsync(externalAccountId))
             .ReturnsAsync((ResponseStatus.MissingInformation, null));
         //Act
         var actual = await sut.GetUserByExternalAccountId(externalAccountId);

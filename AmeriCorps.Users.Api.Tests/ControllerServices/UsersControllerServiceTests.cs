@@ -1,26 +1,26 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using AmeriCorps.Users.Api.Services;
 using AmeriCorps.Users.Data;
 using AmeriCorps.Users.Data.Core;
-using AmeriCorps.Users.Api.Services;
-
+using Microsoft.Extensions.Logging;
 
 namespace AmeriCorps.Users.Api.Tests;
 
 public sealed partial class UsersControllerServiceTests : BaseTests<UsersControllerService>
 {
     private Mock<IUserRepository>? _repositoryMock;
-    private Mock<IRequestMapper>? _reqMapperMock;
-    private Mock<IResponseMapper>? _respMapperMock;
+    private Mock<IRequestMapper>? _requestMapperMock;
+    private Mock<IResponseMapper>? _responseMapperMock;
     private Mock<IValidator>? _validatorMock;
 
-    [Fact]
-    public async Task GetUserAsync_Successful_Status()
+    [Theory]
+    [InlineData(5)]
+    [InlineData(15)]
+    [InlineData(52)]
+    [InlineData(35)]
+    public async Task GetUserAsync_Successful_Status(int userId)
     {
         // Arrange
         var sut = Setup();
-        var userId =
-            Fixture
-            .Create<int>();
         _repositoryMock!
             .Setup(x => x.GetAsync(userId))
             .ReturnsAsync(() => Fixture.Create<User>());
@@ -31,14 +31,16 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         // Assert
         Assert.Equal(ResponseStatus.Successful, status);
     }
-    [Fact]
-    public async Task GetUserAsync_NonExistent_InformationMissing_Status()
+
+    [Theory]
+    [InlineData(5)]
+    [InlineData(15)]
+    [InlineData(52)]
+    [InlineData(35)]
+    public async Task GetUserAsync_NonExistent_InformationMissing_Status(int userId)
     {
         // Arrange
         var sut = Setup();
-        var userId =
-            Fixture
-            .Create<int>();
         _repositoryMock!
             .Setup(x => x.GetAsync(userId))
             .ReturnsAsync(() => null);
@@ -59,11 +61,11 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             Fixture
             .Create<string>();
         _repositoryMock!
-            .Setup(x => x.GetByExternalAcctId(externalAccountId))
+            .Setup(x => x.GetByExternalAccountIdAsync(externalAccountId))
             .ReturnsAsync(() => Fixture.Create<User>());
 
         // Act
-        var (status, _) = await sut.GetByExternalAccountId(externalAccountId);
+        var (status, _) = await sut.GetByExternalAccountIdAsync(externalAccountId);
 
         // Assert
         Assert.Equal(ResponseStatus.Successful, status);
@@ -78,11 +80,11 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             Fixture
             .Create<string>();
         _repositoryMock!
-            .Setup(x => x.GetByExternalAcctId(externalAccountId))
+            .Setup(x => x.GetByExternalAccountIdAsync(externalAccountId))
             .ReturnsAsync(() => null);
 
         // Act
-        var (status, _) = await sut.GetByExternalAccountId(externalAccountId);
+        var (status, _) = await sut.GetByExternalAccountIdAsync(externalAccountId);
 
         // Assert
         Assert.Equal(ResponseStatus.MissingInformation, status);
@@ -133,7 +135,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         _validatorMock!
             .Setup(x => x.Validate(model))
             .Returns(true);
-        _reqMapperMock!
+        _requestMapperMock!
             .Setup(x => x.Map(model))
             .Returns(user);
         _repositoryMock!
@@ -162,7 +164,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         _validatorMock!
             .Setup(x => x.Validate(model))
             .Returns(true);
-        _reqMapperMock!
+        _requestMapperMock!
             .Setup(x => x.Map(model))
             .Returns(user);
         _repositoryMock!
@@ -194,10 +196,10 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         _validatorMock!
             .Setup(x => x.Validate(model))
             .Returns(true);
-        _reqMapperMock!
+        _requestMapperMock!
             .Setup(x => x.Map(model))
             .Returns(user);
-        _respMapperMock!
+        _responseMapperMock!
             .Setup(x => x.Map(user))
             .Returns(expected);
         _repositoryMock!
@@ -261,15 +263,18 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         Assert.Equal(ResponseStatus.MissingInformation, status);
     }
 
-    [Fact]
-    public async Task CreateSearchAsync_UserRepositoryThrowsException_UnknownErrorStatus()
+    [Theory]
+    [InlineData(5)]
+    [InlineData(15)]
+    [InlineData(52)]
+    [InlineData(35)]
+    public async Task CreateSearchAsync_UserRepositoryThrowsException_UnknownErrorStatus(int userId)
     {
         // Arrange
         var sut = Setup();
         var model =
             Fixture
             .Create<SavedSearchRequestModel>();
-        var userId = Fixture.Create<int>();
         var search =
             Fixture
             .Build<SavedSearch>()
@@ -277,7 +282,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         _validatorMock!
             .Setup(x => x.Validate(model))
             .Returns(true);
-        _reqMapperMock!
+        _requestMapperMock!
             .Setup(x => x.Map(model))
             .Returns(search);
         _repositoryMock!
@@ -290,15 +295,19 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         // Assert
         Assert.Equal(ResponseStatus.UnknownError, status);
     }
-    [Fact]
-    public async Task CreateSearchAsync_SearchRepositoryThrowsException_UnknownErrorStatus()
+
+    [Theory]
+    [InlineData(5)]
+    [InlineData(15)]
+    [InlineData(52)]
+    [InlineData(35)]
+    public async Task CreateSearchAsync_SearchRepositoryThrowsException_UnknownErrorStatus(int userId)
     {
         // Arrange
         var sut = Setup();
         var model =
             Fixture
             .Create<SavedSearchRequestModel>();
-        var userId = Fixture.Create<int>();
         var search =
             Fixture
             .Build<SavedSearch>()
@@ -306,7 +315,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         _validatorMock!
             .Setup(x => x.Validate(model))
             .Returns(true);
-        _reqMapperMock!
+        _requestMapperMock!
             .Setup(x => x.Map(model))
             .Returns(search);
         _repositoryMock!
@@ -323,15 +332,18 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         Assert.Equal(ResponseStatus.UnknownError, status);
     }
 
-    [Fact]
-    public async Task CreateAsync_SearchSaved_SuccessfulStatus()
+    [Theory]
+    [InlineData(5)]
+    [InlineData(15)]
+    [InlineData(52)]
+    [InlineData(35)]
+    public async Task CreateAsync_SearchSaved_SuccessfulStatus(int userId)
     {
         // Arrange
         var sut = Setup();
         var model =
             Fixture
             .Create<SavedSearchRequestModel>();
-        var userId = Fixture.Create<int>();
         var search =
             Fixture
             .Build<SavedSearch>()
@@ -339,7 +351,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         _validatorMock!
             .Setup(x => x.Validate(model))
             .Returns(true);
-        _reqMapperMock!
+        _requestMapperMock!
             .Setup(x => x.Map(model))
             .Returns(search);
         _repositoryMock!
@@ -356,15 +368,18 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         Assert.Equal(ResponseStatus.Successful, status);
     }
 
-    [Fact]
-    public async Task CreateAsync_SearchSaved_ReturnsMappedObject()
+    [Theory]
+    [InlineData(5)]
+    [InlineData(15)]
+    [InlineData(52)]
+    [InlineData(35)]
+    public async Task CreateAsync_SearchSaved_ReturnsMappedObject(int userId)
     {
         // Arrange
         var sut = Setup();
         var model =
             Fixture
             .Create<SavedSearchRequestModel>();
-        var userId = Fixture.Create<int>();
         var search =
             Fixture
             .Build<SavedSearch>()
@@ -375,10 +390,10 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         _validatorMock!
             .Setup(x => x.Validate(model))
             .Returns(true);
-        _reqMapperMock!
+        _requestMapperMock!
             .Setup(x => x.Map(model))
             .Returns(search);
-        _respMapperMock!
+        _responseMapperMock!
             .Setup(x => x.Map(search))
             .Returns(expected);
         _repositoryMock!
@@ -395,14 +410,15 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         Assert.Equal(actual, expected);
     }
 
-    [Fact]
-    public async Task GetUserSearchesAsync_Successful_Status()
+    [Theory]
+    [InlineData(5)]
+    [InlineData(15)]
+    [InlineData(52)]
+    [InlineData(35)]
+    public async Task GetUserSearchesAsync_Successful_Status(int userId)
     {
         // Arrange
         var sut = Setup();
-        var userId =
-            Fixture
-            .Create<int>();
         _repositoryMock!
             .Setup(x => x.GetUserSearchesAsync(userId))
             .ReturnsAsync(() => Fixture.Create<List<SavedSearch>>());
@@ -413,14 +429,16 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         // Assert
         Assert.Equal(ResponseStatus.Successful, status);
     }
-    [Fact]
-    public async Task GetUserSearchesAsync_NonExistent_InformationMissing_Status()
+
+    [Theory]
+    [InlineData(5)]
+    [InlineData(15)]
+    [InlineData(52)]
+    [InlineData(35)]
+    public async Task GetUserSearchesAsync_NonExistent_InformationMissing_Status(int userId)
     {
         // Arrange
         var sut = Setup();
-        var userId =
-            Fixture
-            .Create<int>();
         _repositoryMock!
             .Setup(x => x.GetUserSearchesAsync(userId))
             .ReturnsAsync(() => null);
@@ -505,7 +523,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         _validatorMock!
             .Setup(x => x.Validate(model))
             .Returns(true);
-        _reqMapperMock!
+        _requestMapperMock!
             .Setup(x => x.Map(model))
             .Returns(search);
         _repositoryMock!
@@ -539,7 +557,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         _validatorMock!
             .Setup(x => x.Validate(model))
             .Returns(true);
-        _reqMapperMock!
+        _requestMapperMock!
             .Setup(x => x.Map(model))
             .Returns(search);
         _repositoryMock!
@@ -580,10 +598,10 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         _validatorMock!
             .Setup(x => x.Validate(model))
             .Returns(true);
-        _reqMapperMock!
+        _requestMapperMock!
             .Setup(x => x.Map(model))
             .Returns(search);
-        _respMapperMock!
+        _responseMapperMock!
             .Setup(x => x.Map(search))
             .Returns(expected);
         _repositoryMock!
@@ -746,7 +764,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         _validatorMock!
             .Setup(x => x.Validate(model))
             .Returns(true);
-        _reqMapperMock!
+        _requestMapperMock!
             .Setup(x => x.Map(model))
             .Returns(reference);
         _repositoryMock!
@@ -779,7 +797,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         _validatorMock!
             .Setup(x => x.Validate(model))
             .Returns(true);
-        _reqMapperMock!
+        _requestMapperMock!
             .Setup(x => x.Map(model))
             .Returns(reference);
         _repositoryMock!
@@ -812,7 +830,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         _validatorMock!
             .Setup(x => x.Validate(model))
             .Returns(true);
-        _reqMapperMock!
+        _requestMapperMock!
             .Setup(x => x.Map(model))
             .Returns(reference);
         _repositoryMock!
@@ -848,10 +866,10 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         _validatorMock!
             .Setup(x => x.Validate(model))
             .Returns(true);
-        _reqMapperMock!
+        _requestMapperMock!
             .Setup(x => x.Map(model))
             .Returns(reference);
-        _respMapperMock!
+        _responseMapperMock!
             .Setup(x => x.Map(reference))
             .Returns(expected);
         _repositoryMock!
@@ -886,6 +904,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         // Assert
         Assert.Equal(ResponseStatus.Successful, status);
     }
+
     [Fact]
     public async Task GetUserReferencesAsync_NonExistent_InformationMissing_Status()
     {
@@ -978,7 +997,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         _validatorMock!
             .Setup(x => x.Validate(model))
             .Returns(true);
-        _reqMapperMock!
+        _requestMapperMock!
             .Setup(x => x.Map(model))
             .Returns(reference);
         _repositoryMock!
@@ -1009,7 +1028,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         _validatorMock!
             .Setup(x => x.Validate(model))
             .Returns(true);
-        _reqMapperMock!
+        _requestMapperMock!
             .Setup(x => x.Map(model))
             .Returns(reference);
         _repositoryMock!
@@ -1043,7 +1062,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         _validatorMock!
             .Setup(x => x.Validate(model))
             .Returns(true);
-        _reqMapperMock!
+        _requestMapperMock!
             .Setup(x => x.Map(model))
             .Returns(reference);
         _repositoryMock!
@@ -1064,15 +1083,18 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         Assert.Equal(ResponseStatus.Successful, status);
     }
 
-    [Fact]
-    public async Task UpdateReference_ReferenceSaved_ReturnsMappedObject()
+    [Theory]
+    [InlineData(5)]
+    [InlineData(15)]
+    [InlineData(52)]
+    [InlineData(35)]
+    public async Task UpdateReference_ReferenceSaved_ReturnsMappedObject(int userId)
     {
         // Arrange
         var sut = Setup();
         var model =
             Fixture
             .Create<ReferenceRequestModel>();
-        var userId = Fixture.Create<int>();
         var referenceId = Fixture.Create<int>();
         var reference =
             Fixture
@@ -1084,10 +1106,10 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         _validatorMock!
             .Setup(x => x.Validate(model))
             .Returns(true);
-        _reqMapperMock!
+        _requestMapperMock!
             .Setup(x => x.Map(model))
             .Returns(reference);
-        _respMapperMock!
+        _responseMapperMock!
             .Setup(x => x.Map(reference))
             .Returns(expected);
         _repositoryMock!
@@ -1098,7 +1120,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
                                                    r.Id == referenceId))
             .ReturnsAsync(true);
         _repositoryMock!
-            .Setup(x => x.SaveAsync<Reference>(reference))
+            .Setup(x => x.SaveAsync(reference))
             .ReturnsAsync(reference);
 
         // Act
@@ -1125,7 +1147,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         _validatorMock!
             .Setup(x => x.Validate(model))
             .Returns(true);
-        _reqMapperMock!
+        _requestMapperMock!
             .Setup(x => x.Map(model))
             .Returns(reference);
         _repositoryMock!
@@ -1156,7 +1178,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         _validatorMock!
             .Setup(x => x.Validate(model))
             .Returns(true);
-        _reqMapperMock!
+        _requestMapperMock!
             .Setup(x => x.Map(model))
             .Returns(reference);
         _repositoryMock!
@@ -1250,19 +1272,136 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         Assert.Equal(ResponseStatus.UnknownError, status);
     }
 
+    [Theory]
+    [InlineData("  ")]
+    [InlineData("")]
+    [InlineData("\n\t")]
+    [InlineData(null)]
+    public async Task GetAsync_NoAttributeType_MissingInformationResponseStatus(string? value)
+    {
+        // Arrange
+        var attributeValue = Fixture.Create<string>();
+        var sut = Setup();
+
+        // Act
+        var (actual, _) = await sut.GetAsync(value!, attributeValue);
+
+        // Assert
+        Assert.Equal(ResponseStatus.MissingInformation, actual);
+    }
+
+    [Theory]
+    [InlineData("  ")]
+    [InlineData("")]
+    [InlineData("\n\t")]
+    [InlineData(null)]
+    public async Task GetAsync_NoAttributeValue_MissingInformationResponseStatus(string? value)
+    {
+        // Arrange
+        var attributeType = Fixture.Create<string>();
+        var sut = Setup();
+
+        // Act
+        var (actual, _) = await sut.GetAsync(attributeType, value!);
+
+        // Assert
+        Assert.Equal(ResponseStatus.MissingInformation, actual);
+    }
+
+    [Fact]
+    public async Task GetAsync_RaisedException_UnknownErrorResponseStatus()
+    {
+        // Arrange
+        var sut = Setup();
+        _repositoryMock!
+            .Setup(x => x.GetByAttributeAsync(It.IsAny<string>(), It.IsAny<string>()))
+            .ThrowsAsync(new Exception());
+
+        // Act
+        var (actual, _) = await sut.GetAsync(Fixture.Create<string>(), Fixture.Create<string>());
+
+        // Assert
+        Assert.Equal(ResponseStatus.UnknownError, actual);
+    }
+
+    [Fact]
+    public async Task GetAsync_NullFromRepository_UnknownErrorResponseStatus()
+    {
+        // Arrange
+        var sut = Setup();
+        _repositoryMock!
+            .Setup(x => x.GetByAttributeAsync(It.IsAny<string>(), It.IsAny<string>()))
+            .ReturnsAsync(null as IEnumerable<User>);
+
+        // Act
+        var (actual, _) = await sut.GetAsync(Fixture.Create<string>(), Fixture.Create<string>());
+
+        // Assert
+        Assert.Equal(ResponseStatus.UnknownError, actual);
+    }
+
+    [Theory]
+    [InlineData(5)]
+    [InlineData(15)]
+    [InlineData(3)]
+    [InlineData(156)]
+    public async Task GetAsync_SuccessfulCallToRepository_MapsEveryUser(int amount)
+    {
+        // Arrange
+        var sut = Setup();
+        var users =
+            Fixture
+            .Build<User>()
+            .CreateMany(amount);
+
+        _repositoryMock!
+            .Setup(x => x.GetByAttributeAsync(It.IsAny<string>(), It.IsAny<string>()))
+            .ReturnsAsync(users);
+
+        // Act
+        var (_, response) = await sut.GetAsync(Fixture.Create<string>(), Fixture.Create<string>());
+        _ = response.ToList(); // To force enumeration
+
+        // Assert
+        users
+            .ToList()
+            .ForEach(x => _responseMapperMock!.Verify(y => y.Map(x), Times.Once));
+    }
+
+    [Fact]
+    public async Task GetAsync_SuccessfulCallToRepository_SuccessResponseStatus()
+    {
+        // Arrange
+        var sut = Setup();
+        var users =
+            Fixture
+            .Build<User>()
+            .CreateMany(10);
+
+        _repositoryMock!
+            .Setup(x => x.GetByAttributeAsync(It.IsAny<string>(), It.IsAny<string>()))
+            .ReturnsAsync(users);
+
+        // Act
+        var (actual, _) = await sut.GetAsync(Fixture.Create<string>(), Fixture.Create<string>());
+
+        // Assert
+        Assert.Equal(ResponseStatus.Successful, actual);
+    }
+
     protected override UsersControllerService Setup()
     {
         _repositoryMock = new();
-        _reqMapperMock = new();
-        _respMapperMock = new();
+        _requestMapperMock = new();
+        _responseMapperMock = new();
         _validatorMock = new();
 
         Fixture = new Fixture();
         Fixture.Customize<DateOnly>(x => x.FromFactory<DateTime>(DateOnly.FromDateTime));
         return new(
             Mock.Of<ILogger<UsersControllerService>>(),
-            _reqMapperMock.Object,
-            _respMapperMock.Object,
+            _requestMapperMock.Object,
+            _responseMapperMock.Object,
             _validatorMock.Object,
             _repositoryMock.Object);
     }

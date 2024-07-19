@@ -16,17 +16,16 @@ builder.Services
     .AddScoped<IResponseMapper, ResponseMapper>()
     .AddScoped<IUsersControllerService, UsersControllerService>();
 
-var keyVaultUri = builder.Configuration["KeyVaultOptions:KeyVaultUri"]!;
-var tenantId = builder.Configuration["KeyVaultOptions:TenantId"];
-var clientId = builder.Configuration["KeyVaultOptions:ClientId"];
-var clientSecret = builder.Configuration["KeyVaultOptions:ClientSecret"];
-
 
 builder.Configuration
     .AddJsonFile("appsettings.local.json", optional: true)
     .AddJsonFile("appsettings.json", optional: false)
     .AddJsonFile("appsettings.{env.EnvironmentName}.json", optional: true);
 
+var keyVaultUri = builder.Configuration["KeyVaultOptions:KeyVaultUri"]!;
+var tenantId = builder.Configuration["KeyVaultOptions:TenantId"];
+var clientId = builder.Configuration["KeyVaultOptions:ClientId"];
+var clientSecret = builder.Configuration["KeyVaultOptions:ClientSecret"];
 
 if (!string.IsNullOrEmpty(keyVaultUri) &&
     !string.IsNullOrEmpty(tenantId) &&
@@ -47,9 +46,11 @@ else if (!string.IsNullOrEmpty(keyVaultUri))
             new DefaultAzureCredential());
 }
 
-var configuration = builder.Configuration;
+builder.Configuration
+    .AddJsonFile("appsettings.local.json", optional: true);
+
 builder.Services.Configure<UserContextOptions>(
-    configuration.GetSection(nameof(UserContextOptions)));
+    builder.Configuration.GetSection(nameof(UserContextOptions)));
 
 var app = builder.Build();
 

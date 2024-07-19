@@ -1,50 +1,66 @@
 ﻿using AmeriCorps.Users.Data.Core;
-using AmeriCorps.Users.Data;
-using AmeriCorps.Users.Models;
-using AmeriCorps.Users.Api.Services;
 
 namespace AmeriCorps.Users.Api;
 
 public interface IUsersControllerService
 {
     Task<(ResponseStatus Status, UserResponse? Response)> GetAsync(int id);
-    Task<(ResponseStatus Status, UserResponse? Response)> GetByExternalAccountId(string externalAccountId);
+
+    Task<(ResponseStatus Status, IEnumerable<UserResponse> Response)> GetAsync(string attributeType, string attributeValue);
+
+    Task<(ResponseStatus Status, UserResponse? Response)> GetByExternalAccountIdAsync(string externalAccountId);
+
     Task<(ResponseStatus Status, UserResponse? Response)> CreateOrPatchAsync(UserRequestModel? userRequest);
+
     Task<(ResponseStatus Status, UserSearchesResponseModel? Response)> GetUserSearchesAsync(int userId);
+
     Task<(ResponseStatus Status, SavedSearchResponseModel? Response)> CreateSearchAsync(int userId, SavedSearchRequestModel? searchRequest);
+
     Task<(ResponseStatus Status, SavedSearchResponseModel? Response)> UpdateSearchAsync(int userId, int searchId, SavedSearchRequestModel? searchRequest);
+
     Task<(ResponseStatus Status, bool Response)> DeleteSearchAsync(int userId, int searchId);
+
     Task<(ResponseStatus Status, CollectionResponseModel? Response)> CreateCollectionAsync(CollectionRequestModel? collectionRequest);
 
     Task<(ResponseStatus Status, CollectionListResponseModel? Response)> GetCollectionAsync(int userId, string? type);
 
     Task<(ResponseStatus Status, bool Response)> DeleteCollectionAsync(CollectionListRequestModel? collectionListRequestModel);
+
     Task<(ResponseStatus Status, UserReferencesResponseModel? Response)> GetReferencesAsync(int userId);
+
     Task<(ResponseStatus Status, ReferenceResponseModel? Response)> CreateReferenceAsync(int userId, ReferenceRequestModel? referenceRequest);
+
     Task<(ResponseStatus Status, ReferenceResponseModel? Response)> UpdateReferenceAsync(int userId, int referenceId, ReferenceRequestModel? referenceRequest);
+
     Task<(ResponseStatus Status, bool Response)> DeleteReferenceAsync(int userId, int referenceId);
 }
+
 public sealed class UsersControllerService : IUsersControllerService
 {
-    private readonly ILogger<UsersControllerService> _logger;
+    private readonly ILogger _logger;
 
-    private readonly IRequestMapper _reqMapper;
-    private readonly IResponseMapper _respMapper;
+    private readonly IRequestMapper _requestMapper;
+
+    private readonly IResponseMapper _responseMapper;
+
     private readonly IValidator _validator;
+
     private readonly IUserRepository _repository;
 
     public UsersControllerService(
     ILogger<UsersControllerService> logger,
-    IRequestMapper reqMapper,
-    IResponseMapper respMapper,
+    IRequestMapper requestMapper,
+    IResponseMapper responseMapper,
     IValidator validator,
-    IUserRepository repository) {
+    IUserRepository repository)
+    {
         _logger = logger;
-        _reqMapper = reqMapper;
-        _respMapper = respMapper;
+        _requestMapper = requestMapper;
+        _responseMapper = responseMapper;
         _validator = validator;
         _repository = repository;
     }
+
     public async Task<(ResponseStatus Status, UserResponse? Response)> GetAsync(int id)
     {
         User? user;
@@ -64,18 +80,49 @@ public sealed class UsersControllerService : IUsersControllerService
             return (ResponseStatus.MissingInformation, null);
         }
 
-        var response = _respMapper.Map(user);
+        var response = _responseMapper.Map(user);
 
         return (ResponseStatus.Successful, response);
     }
 
-    public async Task<(ResponseStatus Status, UserResponse? Response)> GetByExternalAccountId(string externalAccountId)
+    public async Task<(ResponseStatus Status, IEnumerable<UserResponse> Response)> GetAsync(
+        string attributeType,
+        string attributeValue)
+    {
+        IEnumerable<User>? users;
+
+        if (string.IsNullOrWhiteSpace(attributeType) || string.IsNullOrWhiteSpace(attributeValue))
+        {
+            return (ResponseStatus.MissingInformation, []);
+        }
+
+        try
+        {
+            users = await _repository.GetByAttributeAsync(attributeType, attributeValue);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Could not retrieve users with attribute {attributeType} = {attributeValue}");
+            return (ResponseStatus.UnknownError, []);
+        }
+
+        if (users == null)
+        {
+            return (ResponseStatus.UnknownError, []);
+        }
+
+        var response = users.Select(x => _responseMapper.Map(x)!);
+
+        return (ResponseStatus.Successful, response);
+    }
+
+    public async Task<(ResponseStatus Status, UserResponse? Response)> GetByExternalAccountIdAsync(string externalAccountId)
     {
         User? user;
 
         try
         {
-            user = await _repository.GetByExternalAcctId(externalAccountId);
+            user = await _repository.GetByExternalAccountIdAsync(externalAccountId);
         }
         catch (Exception e)
         {
@@ -88,15 +135,14 @@ public sealed class UsersControllerService : IUsersControllerService
             return (ResponseStatus.MissingInformation, null);
         }
 
-        var response = _respMapper.Map(user);
+        var response = _responseMapper.Map(user);
 
         return (ResponseStatus.Successful, response);
     }
 
     public async Task<(ResponseStatus Status, UserSearchesResponseModel? Response)>
-                                                        GetUserSearchesAsync(int userId)
+        GetUserSearchesAsync(int userId)
     {
-
         List<SavedSearch>? searches;
 
         try
@@ -117,7 +163,7 @@ public sealed class UsersControllerService : IUsersControllerService
         var response = new UserSearchesResponseModel
         {
             UserId = userId,
-            Searches = _respMapper.Map(searches)
+            Searches = _responseMapper.Map(searches)
         };
 
         return (ResponseStatus.Successful, response);
@@ -126,7 +172,6 @@ public sealed class UsersControllerService : IUsersControllerService
     public async Task<(ResponseStatus Status, UserReferencesResponseModel? Response)>
                                                     GetReferencesAsync(int userId)
     {
-
         List<Reference>? references;
 
         try
@@ -147,7 +192,7 @@ public sealed class UsersControllerService : IUsersControllerService
         var response = new UserReferencesResponseModel
         {
             UserId = userId,
-            References = _respMapper.Map(references)
+            References = _responseMapper.Map(references)
         };
 
         return (ResponseStatus.Successful, response);
@@ -156,18 +201,23 @@ public sealed class UsersControllerService : IUsersControllerService
     public async Task<(ResponseStatus Status, UserResponse? Response)>
         CreateOrPatchAsync(UserRequestModel? userRequest)
     {
-
         if (userRequest == null || !_validator.Validate(userRequest))
         {
             return (ResponseStatus.MissingInformation, null);
         }
 
-        var user = _reqMapper.Map(userRequest);
-        int userId;
+        var user = _requestMapper.Map(userRequest);
 
+        // TODO Fix this, get rid of ExternalAccountId since it is redundant. User username instead.
+        int userId = !string.IsNullOrWhiteSpace(user.ExternalAccountId) && int.TryParse(user.ExternalAccountId, out var id)
+            ? id
+            : 0;
         try
         {
-            userId = await _repository.GetUserIdByExternalAcctId(user.ExternalAccountId);
+            if (userId == 0 && !string.IsNullOrWhiteSpace(user.ExternalAccountId))
+            {
+                await _repository.GetUserIdByExternalAccountIdAsync(user.ExternalAccountId);
+            }
         }
         catch (Exception e)
         {
@@ -177,7 +227,7 @@ public sealed class UsersControllerService : IUsersControllerService
 
         try
         {
-            if (userId <=0)
+            if (userId <= 0)
             {
                 user.Id = 0;
                 user = await _repository.SaveAsync(user);
@@ -194,7 +244,7 @@ public sealed class UsersControllerService : IUsersControllerService
             return (ResponseStatus.UnknownError, null);
         }
 
-        var response = _respMapper.Map(user);
+        var response = _responseMapper.Map(user);
 
         return (ResponseStatus.Successful, response);
     }
@@ -218,7 +268,7 @@ public sealed class UsersControllerService : IUsersControllerService
             return (ResponseStatus.MissingInformation, null);
         }
 
-        Reference reference = _reqMapper.Map(referenceRequest);
+        Reference reference = _requestMapper.Map(referenceRequest);
         reference.UserId = userId;
 
         try
@@ -231,7 +281,7 @@ public sealed class UsersControllerService : IUsersControllerService
             return (ResponseStatus.UnknownError, null);
         }
 
-        var response = _respMapper.Map(reference);
+        var response = _responseMapper.Map(reference);
 
         return (ResponseStatus.Successful, response);
     }
@@ -255,7 +305,7 @@ public sealed class UsersControllerService : IUsersControllerService
             return (ResponseStatus.MissingInformation, null);
         }
 
-        SavedSearch search = _reqMapper.Map(searchRequest);
+        SavedSearch search = _requestMapper.Map(searchRequest);
         search.UserId = userId;
 
         try
@@ -268,7 +318,7 @@ public sealed class UsersControllerService : IUsersControllerService
             return (ResponseStatus.UnknownError, null);
         }
 
-        var response = _respMapper.Map(search);
+        var response = _responseMapper.Map(search);
 
         return (ResponseStatus.Successful, response);
     }
@@ -305,17 +355,15 @@ public sealed class UsersControllerService : IUsersControllerService
             return (ResponseStatus.MissingInformation, null);
         }
 
-        SavedSearch search = _reqMapper.Map(searchRequest);
+        SavedSearch search = _requestMapper.Map(searchRequest);
         search.Id = searchId;
         search.UserId = userId;
 
         return await SaveSearchAsync(search);
-
     }
 
     public async Task<(ResponseStatus Status, ReferenceResponseModel? Response)> UpdateReferenceAsync(int userId, int referenceId, ReferenceRequestModel? referenceRequest)
     {
-
         bool userExists = false;
 
         try
@@ -345,7 +393,7 @@ public sealed class UsersControllerService : IUsersControllerService
             return (ResponseStatus.MissingInformation, null);
         }
 
-        Reference reference = _reqMapper.Map(referenceRequest);
+        Reference reference = _requestMapper.Map(referenceRequest);
         reference.Id = referenceId;
         reference.UserId = userId;
 
@@ -359,17 +407,15 @@ public sealed class UsersControllerService : IUsersControllerService
             return (ResponseStatus.UnknownError, null);
         }
 
-        var response = _respMapper.Map(reference);
+        var response = _responseMapper.Map(reference);
 
         return (ResponseStatus.Successful, response);
     }
 
-
     public async Task<(ResponseStatus Status, bool Response)> DeleteSearchAsync(int userId, int searchId)
     {
-
-        var searchExists = await _repository.ExistsAsync<SavedSearch>(s => s.UserId == userId &&
-                                                   s.Id == searchId);
+        var searchExists =
+            await _repository.ExistsAsync<SavedSearch>(s => s.UserId == userId && s.Id == searchId);
 
         if (!searchExists)
         {
@@ -396,15 +442,15 @@ public sealed class UsersControllerService : IUsersControllerService
         var (isValidRequest, response) = await IsValidCollectionRequest(collectionRequest);
         if (!isValidRequest)
             return (response, null);
-        var collection = _reqMapper.Map(collectionRequest!);
+        var collection = _requestMapper.Map(collectionRequest!);
 
         return await SaveCollectionAsync(collection);
-
     }
 
     public async Task<(ResponseStatus Status, CollectionListResponseModel? Response)> GetCollectionAsync(int userId, string? type)
     {
-        if(type == null) {
+        if (type == null)
+        {
             _logger.LogInformation("Collection type is null.");
             return (ResponseStatus.MissingInformation, null);
         }
@@ -419,15 +465,13 @@ public sealed class UsersControllerService : IUsersControllerService
         if (!isValidRequest)
             return (response, null);
 
-        var collection = _reqMapper.Map(collectionRequest);
+        var collection = _requestMapper.Map(collectionRequest);
 
         var userCollections = await _repository.GetCollectionAsync(collection);
 
-
-        var collectionResponse = _respMapper.Map(userCollections);
+        var collectionResponse = _responseMapper.Map(userCollections);
 
         return (ResponseStatus.Successful, collectionResponse);
-
     }
 
     public async Task<(ResponseStatus Status, bool Response)> DeleteCollectionAsync(
@@ -443,13 +487,12 @@ public sealed class UsersControllerService : IUsersControllerService
         {
             UserId = collectionListRequestModel.UserId,
             Type = collectionListRequestModel.Type
-
         };
         var (isValidRequest, response) = await IsValidCollectionRequest(collectionRequest);
         if (!isValidRequest)
             return (response, false);
 
-        var collection = _reqMapper.Map(collectionListRequestModel);
+        var collection = _requestMapper.Map(collectionListRequestModel);
         var isDeletedSuccessful = await _repository.DeleteCollectionAsync(collection);
         if (!isDeletedSuccessful)
         {
@@ -457,8 +500,6 @@ public sealed class UsersControllerService : IUsersControllerService
             return (ResponseStatus.UnknownError, false);
         }
         return (ResponseStatus.Successful, true);
-
-
     }
 
     private async Task<bool> UserExists(int userID)
@@ -471,7 +512,6 @@ public sealed class UsersControllerService : IUsersControllerService
         catch (Exception e)
         {
             _logger.LogError(e, $"Unable to check if user {userID} exists.");
-
         }
 
         return userExists;
@@ -479,7 +519,6 @@ public sealed class UsersControllerService : IUsersControllerService
 
     public async Task<(ResponseStatus Status, bool Response)> DeleteReferenceAsync(int userId, int referenceId)
     {
-
         var referenceExists = await _repository.ExistsAsync<Reference>(r => r.UserId == userId &&
                                                    r.Id == referenceId);
 
@@ -517,7 +556,7 @@ public sealed class UsersControllerService : IUsersControllerService
             return (ResponseStatus.UnknownError, null);
         }
 
-        var response = _respMapper.Map(search);
+        var response = _responseMapper.Map(search);
 
         return (ResponseStatus.Successful, response);
     }
@@ -525,7 +564,6 @@ public sealed class UsersControllerService : IUsersControllerService
     private async Task<(ResponseStatus Status, CollectionResponseModel? Response)>
         SaveCollectionAsync(Collection collectionRequest)
     {
-
         Collection? collection;
         try
         {
@@ -542,12 +580,10 @@ public sealed class UsersControllerService : IUsersControllerService
             return (ResponseStatus.UnknownError, null);
         }
 
-        var response = _respMapper.Map(collection);
+        var response = _responseMapper.Map(collection);
 
         return (ResponseStatus.Successful, response);
     }
-
-
 
     private async Task<(bool, ResponseStatus)> IsValidCollectionRequest(CollectionRequestModel? collectionRequest)
     {
@@ -556,10 +592,8 @@ public sealed class UsersControllerService : IUsersControllerService
         if (collectionRequest == null)
             return (isValid, ResponseStatus.MissingInformation);
 
-
         if (!await UserExists(collectionRequest.UserId))
             return (isValid, ResponseStatus.UnknownError);
-
 
         var validationResponse = _validator.Validate(collectionRequest);
         if (!validationResponse?.IsValid ?? false)

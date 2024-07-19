@@ -1,0 +1,11 @@
+root = true
+
+# C# files
+[*.cs]
+
+dotnet_diagnostic.VSSpell001.severity=silent
+
+#### Core EditorConfig Options ####
+
+csharp_style_namespace_declarations = file_scoped
+csharp_style_namespace_declarations = file_scoped:error
