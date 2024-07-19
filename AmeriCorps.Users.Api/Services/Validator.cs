@@ -6,6 +6,7 @@ namespace AmeriCorps.Users.Api;
 public interface IValidator
 {
     bool Validate(UserRequestModel model);
+
     bool Validate(SavedSearchRequestModel model);
     bool Validate(ReferenceRequestModel model);
 

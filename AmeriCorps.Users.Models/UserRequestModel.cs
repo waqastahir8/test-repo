@@ -26,4 +26,6 @@ public class UserRequestModel
     public List<CommunicationMethodRequestModel> CommunicationMethods { get; set; } = new List<CommunicationMethodRequestModel>();
     public List<ReferenceRequestModel> References { get; set; } = new List<ReferenceRequestModel>();
     public List<CollectionRequestModel> Collection { get; set; } = new List<CollectionRequestModel>();
+
+    public List<RoleRequestModel> Roles { get; set; } = new List<RoleRequestModel>();
 }

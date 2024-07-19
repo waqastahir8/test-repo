@@ -6,11 +6,11 @@ public sealed class Role : Entity
     /**
      * Role name in the format of NAME1_NAME2
      */
-    public required string RoleName { get; set; }
+    public string RoleName { get; set; } = string.Empty;
     /**
 * Human redeable name for display purposes
 */
-    public required string FucntionalName { get; set; }
+    public string FucntionalName { get; set; } = string.Empty;
     /**
      * Optional summary of what the role means 
      */

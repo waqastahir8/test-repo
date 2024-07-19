@@ -6,6 +6,8 @@ namespace AmeriCorps.Users.Api.Services;
 public interface IResponseMapper
 {
     UserResponse? Map(User? user);
+
+    RoleResponse? Map(Role? role);
     SavedSearchResponseModel Map(SavedSearch search);
     ReferenceResponseModel Map(Reference reference);
     List<SavedSearchResponseModel> Map(List<SavedSearch> searches);
