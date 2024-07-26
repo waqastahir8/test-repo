@@ -25,6 +25,7 @@ public sealed partial class UserRepository(
                                         .Include(u => u.SavedSearches)
                                         .Include(u => u.Relatives)
                                         .Include(u => u.CommunicationMethods)
+                                        .Include(u => u.Roles)
                                         .FirstOrDefaultAsync(x => x.Id == id));
     public async Task<User?> GetByExternalAcctId(string externalAccountId) =>
         await ExecuteAsync(async context => await context.Users
@@ -37,6 +38,7 @@ public sealed partial class UserRepository(
                                 .Include(u => u.SavedSearches)
                                 .Include(u => u.Relatives)
                                 .Include(u => u.CommunicationMethods)
+                                .Include(u => u.Roles)
                                 .FirstOrDefaultAsync(x => x.ExternalAccountId == externalAccountId));
 
     public async Task<int> GetUserIdByExternalAcctId(string externalAccountId)
@@ -125,8 +127,6 @@ public sealed partial class UserRepository(
     }
 
     private User? UpdateUser(User user, RepositoryContext context)
-
-
     {
         // Refactor this later
         var userId = user.Id;
@@ -165,7 +165,6 @@ public sealed partial class UserRepository(
         }
     }
 
-
     public async Task<bool> DeleteAsync<T>(int id) where T : Entity =>
         await ExecuteAsync(async context =>
         {
@@ -180,4 +179,42 @@ public sealed partial class UserRepository(
 
             return false;
         });
+
+    public async Task<Role?> GetRoleAsync(int id) =>
+        await ExecuteAsync(async context => await context.Roles.FindAsync(id));
+
+    //public async Task<Role?> UpdateRoleAsync(Role role)
+    //{
+    //    Role? updateRole = null;
+    //    await ExecuteAsync(async context =>
+    //    {
+    //        await using var transaction = await context.Database.BeginTransactionAsync();
+    //        try
+    //        {
+    //            context.Attach(role);
+    //            context.Entry(role).State = EntityState.Modified;
+    //            updateRole = UpdateRole(role, context);
+    //            await transaction.CommitAsync();
+    //            await context.SaveChangesAsync();
+    //        }
+    //        catch (Exception ex)
+    //        {
+    //            logger.LogWarning($"Could not save changes to repo: {ex}.  Rolling back.");
+    //            await transaction.RollbackAsync();
+    //        }
+    //    });
+
+    //    return updateRole;
+    //}
+
+    private Role? UpdateRole(Role role, RepositoryContext context)
+
+
+    {
+        var roleId = role.Id;
+
+
+
+        return role;
+    }
 }

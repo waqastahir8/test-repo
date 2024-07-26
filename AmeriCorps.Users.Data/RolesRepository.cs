@@ -14,10 +14,8 @@ public sealed partial class RoleRepository(
     IOptions<UserContextOptions> options
 ) : RepositoryBase<RepositoryContext>(logger, contextFactory, options), IRoleRepository
 {
-    public async Task<Role?> GetAsync(int id)
-    {
-        return null;
-    }
+    public async Task<Role?> GetAsync(int id) =>
+        await ExecuteAsync(async context => await context.Roles.FindAsync(id));
 
     public async Task<T> SaveAsync<T>(T entity) where T : Entity =>
        await ExecuteAsync(async context =>
@@ -69,11 +67,12 @@ public sealed partial class RoleRepository(
 
 
     {
-        //update this
+        var roleId = role.Id;
+
+     
 
         return role;
     }
-
 
     public async Task<bool> DeleteAsync<T>(int id) where T : Entity =>
         await ExecuteAsync(async context =>

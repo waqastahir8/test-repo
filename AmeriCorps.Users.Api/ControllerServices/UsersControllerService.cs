@@ -23,6 +23,9 @@ public interface IUsersControllerService
     Task<(ResponseStatus Status, ReferenceResponseModel? Response)> CreateReferenceAsync(int userId, ReferenceRequestModel? referenceRequest);
     Task<(ResponseStatus Status, ReferenceResponseModel? Response)> UpdateReferenceAsync(int userId, int referenceId, ReferenceRequestModel? referenceRequest);
     Task<(ResponseStatus Status, bool Response)> DeleteReferenceAsync(int userId, int referenceId);
+
+    Task<(ResponseStatus Status, UserResponse? Response)> AssociateRoleAsync(int userId, int roleId);
+    Task<(ResponseStatus Status, UserResponse? Response)> AddRoleToUserAsync(int userId, RoleRequestModel roleRequest);
 }
 public sealed class UsersControllerService : IUsersControllerService
 {
@@ -38,7 +41,8 @@ public sealed class UsersControllerService : IUsersControllerService
     IRequestMapper reqMapper,
     IResponseMapper respMapper,
     IValidator validator,
-    IUserRepository repository) {
+    IUserRepository repository) 
+    {
         _logger = logger;
         _reqMapper = reqMapper;
         _respMapper = respMapper;
@@ -570,5 +574,131 @@ public sealed class UsersControllerService : IUsersControllerService
 
         isValid = true;
         return (isValid, responseStatus);
+    }
+
+    public async Task<(ResponseStatus Status, UserResponse? Response)> AssociateRoleAsync(int userId, int roleId)
+    {
+        User? user;
+        try
+        {
+            user = await _repository.GetAsync(userId);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Could not retrieve user with id {userId}.");
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        if (user == null)
+        {
+            return (ResponseStatus.MissingInformation, null);
+        }
+
+        Role? role;
+
+        try
+        {
+            role = await _repository.GetRoleAsync(roleId);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Could not retrieve role with id {roleId}.");
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        if (role == null)
+        {
+            return (ResponseStatus.MissingInformation, null);
+        }
+
+        if (user.Roles.Contains(role))
+        {
+            return (ResponseStatus.Successful, null); 
+        }
+
+        user.Roles.Add(role);
+
+        try
+        {
+            await _repository.UpdateUserAsync(user);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Unable to save user with id {userId}.");
+            return (ResponseStatus.UnknownError, null);
+        }
+        return (ResponseStatus.Successful, _respMapper.Map(user));
+    }
+
+
+    public async Task<(ResponseStatus Status, UserResponse? Response)> AddRoleToUserAsync(int userId, RoleRequestModel roleRequest)
+    {
+        User? user;
+        try
+        {
+            user = await _repository.GetAsync(userId);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Could not retrieve user with id {userId}.");
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        if (user == null)
+        {
+            return (ResponseStatus.MissingInformation, null);
+        }
+        Role? role;
+        role = _reqMapper.Map(roleRequest);
+
+    
+        if (role == null)
+        {
+            return (ResponseStatus.MissingInformation, null);
+        }
+
+        if (user.Roles.Contains(role))
+        {
+            return (ResponseStatus.Successful, null); 
+        }
+
+        user.Roles.Add(role);
+
+        try
+        {
+            await _repository.UpdateUserAsync(user);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Unable to save user with id {userId}.");
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        return (ResponseStatus.Successful, _respMapper.Map(user));
+
+    }
+
+    public async Task<(ResponseStatus Status, RoleResponse? Response)> GetRoleAsync(int id)
+    {
+        Role? role;
+
+        try
+        {
+            role = await _repository.GetRoleAsync(id);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Could not retrieve role with id {id}.");
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        if (role == null)
+        {
+            return (ResponseStatus.MissingInformation, null);
+        }
+
+        var response = _respMapper.Map(role);
+
+        return (ResponseStatus.Successful, response);
     }
 }

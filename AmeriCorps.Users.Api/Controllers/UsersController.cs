@@ -90,7 +90,14 @@ public sealed class UsersController(IUsersControllerService service) : Controlle
         await ServeAsync(async () => await _service.DeleteCollectionAsync(requestModel));
 
 
+    //Associate a role with a user by passing userId and RoleID
+    [HttpPost("append/{userId}/role/{roleId}")]
+    public async Task<IActionResult> AssociateRoleAsync(int userId, int roleId) =>
+        await ServeAsync(async () => await _service.AssociateRoleAsync(userId, roleId));
 
-
+    //Add some roles to a user by passing userId
+    [HttpPost("append/{userId}/roles")]
+    public async Task<IActionResult> AddRoleToUserAsync(int userId, [FromBody] RoleRequestModel roleRequest) =>
+        await ServeAsync(async () => await _service.AddRoleToUserAsync(userId, roleRequest));
 
 }
