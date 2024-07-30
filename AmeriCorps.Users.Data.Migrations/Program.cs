@@ -1,7 +1,11 @@
-﻿using Microsoft.Extensions.Hosting;
-using AmeriCorps.Users.Data.Core;
+﻿using AmeriCorps.Users.Data.Core;
 
 var builder = Host.CreateApplicationBuilder(args);
+
+builder.Configuration
+     .AddJsonFile("appsettings.json", optional: false)
+     .AddJsonFile("appsettings.{env.EnvironmentName}.json", optional: true)
+     .AddJsonFile("appsettings.local.json", optional: true);
 
 var keyVaultUri = builder.Configuration["KeyVaultOptions:KeyVaultUri"]!;
 var tenantId = builder.Configuration["KeyVaultOptions:TenantId"];
@@ -23,8 +27,6 @@ if (!string.IsNullOrEmpty(keyVaultUri) &&
 
 var configuration =
      builder.Configuration
-     .AddJsonFile("appsettings.json", optional: false)
-     .AddJsonFile("appsettings.{env.EnvironmentName}.json", optional: true)
      .AddJsonFile("appsettings.local.json", optional: true)
      .Build();
 

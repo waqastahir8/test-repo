@@ -1,8 +1,6 @@
-﻿using System.Net;
-using Asp.Versioning;
+﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
-using AmeriCorps.Users.Models;
-
+using System.Net;
 
 namespace AmeriCorps.Users.Controllers;
 
@@ -13,16 +11,13 @@ public sealed class UsersController(IUsersControllerService service) : Controlle
 {
     private readonly IUsersControllerService _service = service;
 
-    [HttpGet("test/{id}")]
-    public async Task<IActionResult> TestUserAsync(int id) =>
-        await ServeAsync(async () => await _service.GetAsync(id));
     [HttpGet("{id}")]
     public async Task<IActionResult> GetUserAsync(int id) =>
         await ServeAsync(async () => await _service.GetAsync(id));
 
     [HttpGet]
     public async Task<IActionResult> GetUserByExternalAccountId([FromQuery] string externalAccountId) =>
-        await ServeAsync(async () => await _service.GetByExternalAccountId(externalAccountId));
+        await ServeAsync(async () => await _service.GetByExternalAccountIdAsync(externalAccountId));
 
     [HttpPost]
     public async Task<IActionResult> CreateUserAsync([FromBody] UserRequestModel userRequest) =>
@@ -35,6 +30,10 @@ public sealed class UsersController(IUsersControllerService service) : Controlle
     [HttpGet("{userId}/Searches")]
     public async Task<IActionResult> GetUserSearchesAsync(int userId) =>
         await ServeAsync(async () => await _service.GetUserSearchesAsync(userId));
+
+    [HttpGet("Attributes/{type}/{value}")]
+    public async Task<IActionResult> GetByAttributeAsync(string type, string value) =>
+        await ServeAsync(async () => await _service.GetAsync(attributeType: type, attributeValue: value));
 
     [HttpPost("{userId}/Searches")]
     public async Task<IActionResult> CreateSearchAsync(int userId, [FromBody] SavedSearchRequestModel? searchRequest) =>
@@ -64,19 +63,6 @@ public sealed class UsersController(IUsersControllerService service) : Controlle
     public async Task<IActionResult> DeleteReferenceAsync(int userId, int referenceId) =>
         await ServeAsync(async () => await _service.DeleteReferenceAsync(userId, referenceId));
 
-    private async Task<IActionResult> ServeAsync<T>(Func<Task<(ResponseStatus, T)>> callAsync)
-    {
-        var (status, response) = await callAsync();
-        return status switch
-        {
-            ResponseStatus.MissingInformation => new StatusCodeResult((int)HttpStatusCode.UnprocessableContent),
-            ResponseStatus.UnknownError => new StatusCodeResult((int)HttpStatusCode.InternalServerError),
-            ResponseStatus.Successful => new OkObjectResult(response),
-            _ => Ok()
-        };
-    }
-
-
     [HttpPost("Collection")]
     public async Task<IActionResult> CreateCollectionAsync([FromBody] CollectionRequestModel collectionRequest) =>
         await ServeAsync(async () => await _service.CreateCollectionAsync(collectionRequest));
@@ -100,4 +86,15 @@ public sealed class UsersController(IUsersControllerService service) : Controlle
     public async Task<IActionResult> AddRoleToUserAsync(int userId, [FromBody] RoleRequestModel roleRequest) =>
         await ServeAsync(async () => await _service.AddRoleToUserAsync(userId, roleRequest));
 
+    private async Task<IActionResult> ServeAsync<T>(Func<Task<(ResponseStatus, T)>> callAsync)
+    {
+        var (status, response) = await callAsync();
+        return status switch
+        {
+            ResponseStatus.MissingInformation => new StatusCodeResult((int)HttpStatusCode.UnprocessableContent),
+            ResponseStatus.UnknownError => new StatusCodeResult((int)HttpStatusCode.InternalServerError),
+            ResponseStatus.Successful => new OkObjectResult(response),
+            _ => Ok()
+        };
+    }
 }
