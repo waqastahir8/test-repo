@@ -22,4 +22,5 @@ public interface IUserRepository
     Task<List<Collection>?> GetCollectionAsync(Collection collection);
 
     Task<bool> DeleteCollectionAsync(List<Collection> collections);
+    Task<Role?> GetRoleAsync(int roleId);
 }

@@ -2,7 +2,7 @@
 
 namespace AmeriCorps.Users.Models;
 
-public sealed class RoleRespponse : RoleRequestModel
+public sealed class RoleResponse : RoleRequestModel
 {
     public int Id { get; set; }
 }

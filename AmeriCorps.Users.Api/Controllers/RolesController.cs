@@ -2,7 +2,6 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using AmeriCorps.Users.Models;
-using AmeriCorps.Users.Api.ControllerServices;
 
 
 namespace AmeriCorps.Users.Controllers;
@@ -15,18 +14,18 @@ public sealed class RolesController(IRolesControllerService service) : Controlle
     private readonly IRolesControllerService _service = service;
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetUserAsync(int id) =>
+    public async Task<IActionResult> GetRoleAsync(int id) =>
       await ServeAsync(async () => await _service.GetAsync(id));
 
 
     [HttpPost]
-    public async Task<IActionResult> CreateUserAsync([FromBody] RoleRequestModel userRequest) =>
-        await ServeAsync(async () => await _service.CreateOrPatchAsync(userRequest));
+    public async Task<IActionResult> CreateRoleAsync([FromBody] RoleRequestModel roleRequest) =>
+        await ServeAsync(async () => await _service.CreateOrPatchAsync(roleRequest));
 
 
     [HttpPatch]
-    public async Task<IActionResult> PatchUserAsync([FromBody] UserRequestModel userRequest) =>
-        await ServeAsync(async () => await _service.CreateOrPatchAsync(userRequest));
+    public async Task<IActionResult> PatchUserAsync([FromBody] RoleRequestModel roleRequest) =>
+        await ServeAsync(async () => await _service.CreateOrPatchAsync(roleRequest));
 
 
 

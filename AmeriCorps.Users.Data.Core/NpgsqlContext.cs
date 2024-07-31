@@ -12,6 +12,8 @@ public abstract class NpgsqlContext : ContextBase
 
     public DbSet<User> Users { get; set; }
 
+    public DbSet<Role> Roles { get; set; }
+
     public DbSet<SavedSearch> SavedSearch { get; set; }
 
     public DbSet<Collection> Collection { get; set; }
@@ -49,6 +51,8 @@ public abstract class NpgsqlContext : ContextBase
 
         var user = Create<User>("user");
         user.Property(p => p.DateOfBirth).HasColumnType("date");
+
+        var role = Create<Role>("role");
 
         var collection = Create<Collection>("collection");
 
