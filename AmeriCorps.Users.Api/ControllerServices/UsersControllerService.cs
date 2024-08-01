@@ -660,7 +660,7 @@ public sealed class UsersControllerService : IUsersControllerService
             _logger.LogError(e, $"Unable to save user with id {userId}.");
             return (ResponseStatus.UnknownError, null);
         }
-        return (ResponseStatus.Successful, _respMapper.Map(user));
+        return (ResponseStatus.Successful, _responseMapper.Map(user));
     }
 
 
@@ -682,7 +682,7 @@ public sealed class UsersControllerService : IUsersControllerService
             return (ResponseStatus.MissingInformation, null);
         }
         Role? role;
-        role = _reqMapper.Map(roleRequest);
+        role = _requestMapper.Map(roleRequest);
 
     
         if (role == null)
@@ -707,7 +707,7 @@ public sealed class UsersControllerService : IUsersControllerService
             return (ResponseStatus.UnknownError, null);
         }
 
-        return (ResponseStatus.Successful, _respMapper.Map(user));
+        return (ResponseStatus.Successful, _responseMapper.Map(user));
 
     }
 
@@ -730,7 +730,7 @@ public sealed class UsersControllerService : IUsersControllerService
             return (ResponseStatus.MissingInformation, null);
         }
 
-        var response = _respMapper.Map(role);
+        var response = _responseMapper.Map(role);
 
         return (ResponseStatus.Successful, response);
     }

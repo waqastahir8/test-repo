@@ -40,19 +40,6 @@ public sealed partial class UserRepository(
                                 .Include(u => u.CommunicationMethods)
                                 .Include(u => u.Roles)
                                 .FirstOrDefaultAsync(x => x.ExternalAccountId == externalAccountId));
-        await ExecuteAsync(async context =>
-            await context.Users
-                .AsNoTracking()
-                .Include(u => u.Attributes)
-                .Include(u => u.Languages)
-                .Include(u => u.Addresses)
-                .Include(u => u.Education)
-                .Include(u => u.Skills)
-                .Include(u => u.MilitaryService)
-                .Include(u => u.SavedSearches)
-                .Include(u => u.Relatives)
-                .Include(u => u.CommunicationMethods)
-                .FirstOrDefaultAsync(x => x.Id == id));
 
     public async Task<User?> GetByExternalAccountIdAsync(string externalAccountId) =>
         await ExecuteAsync(async context =>
@@ -170,22 +157,6 @@ public sealed partial class UserRepository(
 
         return upatedUser;
     }
-
-    private User? UpdateUser(User user, RepositoryContext context)
-    public async Task<bool> DeleteAsync<T>(int id) where T : Entity =>
-        await ExecuteAsync(async context =>
-        {
-            T? e = await context.Set<T>().FindAsync(id);
-
-            if (e != null)
-            {
-                context.Set<T>().Remove(e);
-                await context.SaveChangesAsync();
-                return true;
-            }
-
-            return false;
-        });
 
     private static User? UpdateUser(User user, DbContext context)
 
