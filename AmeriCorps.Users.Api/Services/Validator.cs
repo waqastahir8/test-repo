@@ -6,6 +6,9 @@ namespace AmeriCorps.Users.Api;
 public interface IValidator
 {
     bool Validate(UserRequestModel model);
+
+    bool Validate(RoleRequestModel model);
+
     bool Validate(SavedSearchRequestModel model);
     bool Validate(ReferenceRequestModel model);
 
@@ -17,6 +20,11 @@ public sealed class Validator : IValidator
     public bool Validate(UserRequestModel model) =>
         !string.IsNullOrWhiteSpace(model.FirstName) &&
         !string.IsNullOrWhiteSpace(model.LastName);
+
+    public bool Validate(RoleRequestModel model) =>
+        !string.IsNullOrWhiteSpace(model.RoleName) &&
+        !string.IsNullOrWhiteSpace(model.FucntionalName) &&
+        !string.IsNullOrWhiteSpace(model.Description);
 
     public bool Validate(SavedSearchRequestModel model) =>
         !string.IsNullOrWhiteSpace(model.Name) &&

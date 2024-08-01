@@ -12,9 +12,11 @@ builder.Services
     .AddSingleton<IValidator, Validator>()
     .AddScoped<IContextFactory, DefaultContextFactory>()
     .AddScoped<IUserRepository, UserRepository>()
+    .AddScoped<IRoleRepository, RoleRepository>()
     .AddScoped<IRequestMapper, RequestMapper>()
     .AddScoped<IResponseMapper, ResponseMapper>()
-    .AddScoped<IUsersControllerService, UsersControllerService>();
+    .AddScoped<IUsersControllerService, UsersControllerService>()
+    .AddScoped<IRolesControllerService, RolesControllerService>();
 
 
 builder.Configuration
