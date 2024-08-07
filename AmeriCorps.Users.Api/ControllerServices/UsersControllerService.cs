@@ -216,7 +216,7 @@ public sealed class UsersControllerService : IUsersControllerService
         {
             if (userId == 0 && !string.IsNullOrWhiteSpace(user.ExternalAccountId))
             {
-                await _repository.GetUserIdByExternalAccountIdAsync(user.ExternalAccountId);
+                userId = await _repository.GetUserIdByExternalAccountIdAsync(user.ExternalAccountId);
             }
         }
         catch (Exception e)
