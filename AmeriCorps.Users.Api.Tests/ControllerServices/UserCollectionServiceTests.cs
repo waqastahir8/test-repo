@@ -22,7 +22,7 @@ public partial class UsersControllerServiceTests
             .Setup(validator => validator.Validate(model))
             .Returns(new ValidationResponse() { IsValid = true });
 
-        _reqMapperMock!
+        _requestMapperMock!
             .Setup(mapper => mapper.Map(model))
             .Returns(userCollection);
 
@@ -59,7 +59,7 @@ public partial class UsersControllerServiceTests
             .Setup(validator => validator.Validate(model))
             .Returns(new ValidationResponse() { IsValid = true, ValidationMessage = "Valid" });
 
-        _reqMapperMock!
+        _requestMapperMock!
             .Setup(mapper => mapper.Map(model))
             .Returns(userCollection);
         _repositoryMock!
@@ -114,7 +114,7 @@ public partial class UsersControllerServiceTests
             .Setup(validator => validator.Validate(model))
             .Returns(new ValidationResponse() { IsValid = true, ValidationMessage = "Valid" });
 
-        _reqMapperMock!
+        _requestMapperMock!
             .Setup(mapper => mapper.Map(model))
             .Returns(userCollection);
 
@@ -157,7 +157,7 @@ public partial class UsersControllerServiceTests
             .Setup(validator => validator.Validate(collectionReqModel))
             .Returns(new ValidationResponse() { IsValid = true, ValidationMessage = "Valid" });
 
-        _reqMapperMock!
+        _requestMapperMock!
             .Setup(mapper => mapper.Map(model))
             .Returns(userCollection);
 
@@ -239,7 +239,7 @@ public partial class UsersControllerServiceTests
             .Setup(validator => validator.Validate(collectionReqModel))
             .Returns(new ValidationResponse() { IsValid = true, ValidationMessage = "Valid" });
 
-        _reqMapperMock!
+        _requestMapperMock!
             .Setup(mapper => mapper.Map(model))
             .Returns(userCollection);
 

@@ -40,6 +40,12 @@ jobs:
       - name: .net test
         run: dotnet test ${{ env.SOLUTION_FILE }} --no-restore --collect:"XPlat Code Coverage" --settings coverlet.runsettings
 
+      - name: publish nuget package
+        run: |
+          dotnet pack ${{ env.NUGET_PROJECT_FILE }} --configuration ${{ env.BUILD_CONFIGURATION }} --artifacts-path ./nuget
+          dotnet nuget update source github --username USERNAME --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text
+          dotnet nuget push "./nuget/package/release/*.nupkg" --source "github" --skip-duplicate
+          
       - name: generate code coverage report
         run: |
           dotnet tool install -g dotnet-reportgenerator-globaltool
@@ -54,12 +60,6 @@ jobs:
           
       - name: .net publish
         run: dotnet publish ${{ env.API_PROJECT }} --configuration Release --no-restore --output '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}'
-
-      - name: publish nuget package
-        run: |
-          dotnet pack ${{ env.NUGET_PROJECT_FILE }} --configuration ${{ env.BUILD_CONFIGURATION }} --artifacts-path ./nuget
-          dotnet nuget update source github --username USERNAME --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text
-          dotnet nuget push "./nuget/package/release/*.nupkg" --source "github" --skip-duplicate
 
       - name: build Azure Function
         run: dotnet build ${{ env.FUNCTIONAPP_PROJECT }} --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore --output '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'

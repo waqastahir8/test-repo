@@ -7,7 +7,7 @@ builder.Services.AddControllers().AddJsonOptions(options =>
     options.JsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter());
 });
 builder.Services.AddApiVersioning();
-
+builder.Services.AddApplicationInsightsTelemetry();
 builder.Services
     .AddSingleton<IValidator, Validator>()
     .AddScoped<IContextFactory, DefaultContextFactory>()
@@ -16,25 +16,41 @@ builder.Services
     .AddScoped<IResponseMapper, ResponseMapper>()
     .AddScoped<IUsersControllerService, UsersControllerService>();
 
+
+builder.Configuration
+    .AddJsonFile("appsettings.local.json", optional: true)
+    .AddJsonFile("appsettings.json", optional: false)
+    .AddJsonFile("appsettings.{env.EnvironmentName}.json", optional: true);
+
 var keyVaultUri = builder.Configuration["KeyVaultOptions:KeyVaultUri"]!;
 var tenantId = builder.Configuration["KeyVaultOptions:TenantId"];
 var clientId = builder.Configuration["KeyVaultOptions:ClientId"];
 var clientSecret = builder.Configuration["KeyVaultOptions:ClientSecret"];
 
-var configuration =
+if (!string.IsNullOrEmpty(keyVaultUri) &&
+    !string.IsNullOrEmpty(tenantId) &&
+    !string.IsNullOrEmpty(clientId) &&
+    !string.IsNullOrEmpty(clientSecret))
+{
     builder.Configuration
-    .AddJsonFile("appsettings.json", optional: false)
-    .AddJsonFile("appsettings.{env.EnvironmentName}.json", optional: true)
-    .AddAzureKeyVault(new Uri(keyVaultUri),
-                    new ClientSecretCredential(
-                        tenantId,
-                        clientId,
-                        clientSecret))
-    .AddJsonFile("appsettings.local.json", optional: true)
-    .Build();
+        .AddAzureKeyVault(new Uri(keyVaultUri),
+            new ClientSecretCredential(
+                tenantId,
+                clientId,
+                clientSecret));
+}
+else if (!string.IsNullOrEmpty(keyVaultUri))
+{
+    builder.Configuration
+        .AddAzureKeyVault(new Uri(keyVaultUri),
+            new DefaultAzureCredential());
+}
+
+builder.Configuration
+    .AddJsonFile("appsettings.local.json", optional: true);
 
 builder.Services.Configure<UserContextOptions>(
-    configuration.GetSection(nameof(UserContextOptions)));
+    builder.Configuration.GetSection(nameof(UserContextOptions)));
 
 var app = builder.Build();
 
