@@ -6,9 +6,6 @@ namespace AmeriCorps.Users.Api.Services;
 public interface IRequestMapper
 {
     User Map(UserRequestModel requestModel);
-
-    Role Map(RoleRequestModel roleRequestModel);
-
     SavedSearch Map(SavedSearchRequestModel requestModel);
 
     Collection Map(CollectionRequestModel requestModel);
@@ -166,22 +163,6 @@ public sealed class RequestMapper : IRequestMapper
                     Contacted = r.Contacted,
                     DateContacted = r.DateContacted
                 }),
-        Roles = MapperUtils.MapList<RoleRequestModel, Role>(
-            requestModel.Roles, c =>
-                new Role()
-                {
-                    //Id = c.Id,
-                    RoleName = c.RoleName,
-                    FucntionalName = c.FucntionalName,
-                    Description = c.Description,
-                }),
-    };
-    public Role Map(RoleRequestModel roleRequestModel) => new()
-    {
-        //Id = roleRequestModel.Id,
-        RoleName = roleRequestModel.RoleName,
-        FucntionalName = roleRequestModel.FucntionalName,
-        Description = roleRequestModel.Description
     };
 
     public SavedSearch Map(SavedSearchRequestModel requestModel) => new()

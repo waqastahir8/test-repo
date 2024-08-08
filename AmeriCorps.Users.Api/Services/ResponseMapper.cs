@@ -6,15 +6,12 @@ namespace AmeriCorps.Users.Api.Services;
 public interface IResponseMapper
 {
     UserResponse? Map(User? user);
-
-    RoleResponse? Map(Role? role);
     SavedSearchResponseModel Map(SavedSearch search);
     ReferenceResponseModel Map(Reference reference);
     List<SavedSearchResponseModel> Map(List<SavedSearch> searches);
     CollectionResponseModel Map(Collection collection);
     CollectionListResponseModel Map(List<Collection>? collection);
     List<ReferenceResponseModel> Map(List<Reference> references);
-    List<RoleResponse> Map(List<Role> role);
 }
 public sealed class ResponseMapper : IResponseMapper
 {
@@ -26,7 +23,6 @@ public sealed class ResponseMapper : IResponseMapper
         Filters = search.Filters,
         NotificationsOn = search.NotificationsOn
     };
-
 
     public List<SavedSearchResponseModel> Map(List<SavedSearch> searches) =>
         MapperUtils.MapList<AmeriCorps.Users.Data.Core.SavedSearch, SavedSearchResponseModel>(
@@ -59,7 +55,7 @@ public sealed class ResponseMapper : IResponseMapper
         var collectionResponseList = new CollectionListResponseModel();
         if (collection == null || collection.Count == 0)
             return collectionResponseList;
-        
+
         var collectionItem = collection.First();
         collectionResponseList.Type = collectionItem.Type;
         collectionResponseList.UserId = collectionItem.UserId;
@@ -248,39 +244,9 @@ public sealed class ResponseMapper : IResponseMapper
                     UserId = c.UserId,
                     Type = c.Type,
                     ListingId = c.ListingId,
-                }),
-
-        Roles = MapperUtils.MapList<Role, RoleRequestModel>(
-            user.Roles, r =>
-                new RoleRequestModel()
-                {
-                    //Id = r.Id,
-                    RoleName = r.RoleName,
-                    FucntionalName = r.FucntionalName,
-                    Description = r.Description
                 })
 
     };
-
-
-    public RoleResponse? Map(Role? role) => role == null ? null : new()
-    {
-        Id = role.Id,
-        RoleName = role.RoleName,
-        FucntionalName = role.FucntionalName,
-        Description = role.Description
-    };
-
-    public List<RoleResponse> Map(List<Role> role) =>
-       MapperUtils.MapList<AmeriCorps.Users.Data.Core.Role, RoleResponse>(
-                           role,
-                           a => new RoleResponse
-                           {
-                               Id = a.Id,
-                               RoleName = a.RoleName,
-                               FucntionalName = a.FucntionalName,
-                               Description = a.Description
-                           });
 
 
 }
