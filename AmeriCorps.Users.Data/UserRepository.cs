@@ -27,6 +27,7 @@ public sealed partial class UserRepository(
                 .Include(u => u.SavedSearches)
                 .Include(u => u.Relatives)
                 .Include(u => u.CommunicationMethods)
+                .Include(u => u.Roles)
                 .FirstOrDefaultAsync(x => x.Id == id));
 
     public async Task<User?> GetByExternalAccountIdAsync(string externalAccountId) =>
@@ -42,6 +43,7 @@ public sealed partial class UserRepository(
                 .Include(u => u.SavedSearches)
                 .Include(u => u.Relatives)
                 .Include(u => u.CommunicationMethods)
+                .Include(u => u.Roles)
                 .FirstOrDefaultAsync(x => x.ExternalAccountId == externalAccountId));
 
     public async Task<IEnumerable<User>?> GetByAttributeAsync(string type, string value) =>
@@ -199,5 +201,19 @@ public sealed partial class UserRepository(
         {
             context.Entry(entity).State = EntityState.Deleted;
         }
+    }
+
+    public async Task<Role?> GetRoleAsync(int id) =>
+       await ExecuteAsync(async context => await context.Roles.FindAsync(id));
+
+    private Role? UpdateRole(Role role, RepositoryContext context)
+
+
+    {
+        var roleId = role.Id;
+
+
+
+        return role;
     }
 }
