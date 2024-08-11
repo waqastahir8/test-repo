@@ -3,6 +3,7 @@ using AmeriCorps.Users.Models;
 using AmeriCorps.Users.Api.Services;
 using AmeriCorps.Users.Data.Core;
 using System.Linq;
+using AutoFixture;
 
 namespace AmeriCorps.Users.Api.Tests;
 
@@ -11,9 +12,17 @@ public sealed class ResponseMapperTests : ResponseMapperSetup
     [Fact]
     public void Map_CorrectlyMapsProperties()
     {
-        // Arrange
+        // Arrange`
         var sut = Setup();
-        var model = Fixture.Create<User>();
+        
+        var fixture = new Fixture();
+        fixture.Behaviors.OfType<ThrowingRecursionBehavior>().ToList().ForEach(b => fixture.Behaviors.Remove(b));
+        fixture.Behaviors.Add(new OmitOnRecursionBehavior());
+        fixture.Customize<DateOnly>(o => o.FromFactory((DateTime dt) => DateOnly.FromDateTime(dt)));
+        fixture.Customize<TimeOnly>(o => o.FromFactory((DateTime dt) => TimeOnly.FromDateTime(dt)));
+
+        var model = fixture.Create<User>();
+
 
         IResponseMapper mapper = new ResponseMapper();
 

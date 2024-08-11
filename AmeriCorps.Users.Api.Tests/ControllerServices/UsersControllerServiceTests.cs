@@ -21,9 +21,16 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
     {
         // Arrange
         var sut = Setup();
+        
+        var fixture = new Fixture();
+        fixture.Behaviors.OfType<ThrowingRecursionBehavior>().ToList().ForEach(b => fixture.Behaviors.Remove(b));
+        fixture.Behaviors.Add(new OmitOnRecursionBehavior());
+        fixture.Customize<DateOnly>(o => o.FromFactory((DateTime dt) => DateOnly.FromDateTime(dt)));
+        fixture.Customize<TimeOnly>(o => o.FromFactory((DateTime dt) => TimeOnly.FromDateTime(dt)));
+
         _repositoryMock!
             .Setup(x => x.GetAsync(userId))
-            .ReturnsAsync(() => Fixture.Create<User>());
+            .ReturnsAsync(() => fixture.Create<User>());
 
         // Act
         var (status, _) = await sut.GetAsync(userId);
@@ -57,12 +64,19 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
     {
         // Arrange
         var sut = Setup();
+
+        var fixture = new Fixture();
+        fixture.Behaviors.OfType<ThrowingRecursionBehavior>().ToList().ForEach(b => fixture.Behaviors.Remove(b));
+        fixture.Behaviors.Add(new OmitOnRecursionBehavior());
+        fixture.Customize<DateOnly>(o => o.FromFactory((DateTime dt) => DateOnly.FromDateTime(dt)));
+        fixture.Customize<TimeOnly>(o => o.FromFactory((DateTime dt) => TimeOnly.FromDateTime(dt)));
+
         var externalAccountId =
-            Fixture
+            fixture
             .Create<string>();
         _repositoryMock!
             .Setup(x => x.GetByExternalAccountIdAsync(externalAccountId))
-            .ReturnsAsync(() => Fixture.Create<User>());
+            .ReturnsAsync(() => fixture.Create<User>());
 
         // Act
         var (status, _) = await sut.GetByExternalAccountIdAsync(externalAccountId);
@@ -125,11 +139,18 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
     {
         // Arrange
         var sut = Setup();
+
+        var fixture = new Fixture();
+        fixture.Behaviors.OfType<ThrowingRecursionBehavior>().ToList().ForEach(b => fixture.Behaviors.Remove(b));
+        fixture.Behaviors.Add(new OmitOnRecursionBehavior());
+        fixture.Customize<DateOnly>(o => o.FromFactory((DateTime dt) => DateOnly.FromDateTime(dt)));
+        fixture.Customize<TimeOnly>(o => o.FromFactory((DateTime dt) => TimeOnly.FromDateTime(dt)));
+
         var model =
-            Fixture
+            fixture
             .Create<UserRequestModel>();
         var user =
-            Fixture
+            fixture
             .Build<User>()
             .Create();
         _validatorMock!
@@ -154,11 +175,18 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
     {
         // Arrange
         var sut = Setup();
+       
+        var fixture = new Fixture();
+        fixture.Behaviors.OfType<ThrowingRecursionBehavior>().ToList().ForEach(b => fixture.Behaviors.Remove(b));
+        fixture.Behaviors.Add(new OmitOnRecursionBehavior());
+        fixture.Customize<DateOnly>(o => o.FromFactory((DateTime dt) => DateOnly.FromDateTime(dt)));
+        fixture.Customize<TimeOnly>(o => o.FromFactory((DateTime dt) => TimeOnly.FromDateTime(dt)));
+
         var model =
-            Fixture
+            fixture
             .Create<UserRequestModel>();
         var user =
-            Fixture
+            fixture
             .Build<User>()
             .Create();
         _validatorMock!
@@ -183,15 +211,22 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
     {
         // Arrange
         var sut = Setup();
+        
+        var fixture = new Fixture();
+        fixture.Behaviors.OfType<ThrowingRecursionBehavior>().ToList().ForEach(b => fixture.Behaviors.Remove(b));
+        fixture.Behaviors.Add(new OmitOnRecursionBehavior());
+        fixture.Customize<DateOnly>(o => o.FromFactory((DateTime dt) => DateOnly.FromDateTime(dt)));
+        fixture.Customize<TimeOnly>(o => o.FromFactory((DateTime dt) => TimeOnly.FromDateTime(dt)));
+
         var model =
-            Fixture
+            fixture
             .Create<UserRequestModel>();
         var user =
-            Fixture
+            fixture
             .Build<User>()
             .Create();
         var expected =
-            Fixture
+            fixture
             .Create<UserResponse>();
         _validatorMock!
             .Setup(x => x.Validate(model))
@@ -1349,8 +1384,15 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
     {
         // Arrange
         var sut = Setup();
+
+        var fixture = new Fixture();
+        fixture.Behaviors.OfType<ThrowingRecursionBehavior>().ToList().ForEach(b => fixture.Behaviors.Remove(b));
+        fixture.Behaviors.Add(new OmitOnRecursionBehavior());
+        fixture.Customize<DateOnly>(o => o.FromFactory((DateTime dt) => DateOnly.FromDateTime(dt)));
+        fixture.Customize<TimeOnly>(o => o.FromFactory((DateTime dt) => TimeOnly.FromDateTime(dt)));
+
         var users =
-            Fixture
+            fixture
             .Build<User>()
             .CreateMany(amount);
 
@@ -1359,7 +1401,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             .ReturnsAsync(users);
 
         // Act
-        var (_, response) = await sut.GetAsync(Fixture.Create<string>(), Fixture.Create<string>());
+        var (_, response) = await sut.GetAsync(fixture.Create<string>(), fixture.Create<string>());
         _ = response.ToList(); // To force enumeration
 
         // Assert
@@ -1373,8 +1415,15 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
     {
         // Arrange
         var sut = Setup();
+
+        var fixture = new Fixture();
+        fixture.Behaviors.OfType<ThrowingRecursionBehavior>().ToList().ForEach(b => fixture.Behaviors.Remove(b));
+        fixture.Behaviors.Add(new OmitOnRecursionBehavior());
+        fixture.Customize<DateOnly>(o => o.FromFactory((DateTime dt) => DateOnly.FromDateTime(dt)));
+        fixture.Customize<TimeOnly>(o => o.FromFactory((DateTime dt) => TimeOnly.FromDateTime(dt)));
+
         var users =
-            Fixture
+            fixture
             .Build<User>()
             .CreateMany(10);
 
@@ -1383,7 +1432,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             .ReturnsAsync(users);
 
         // Act
-        var (actual, _) = await sut.GetAsync(Fixture.Create<string>(), Fixture.Create<string>());
+        var (actual, _) = await sut.GetAsync(fixture.Create<string>(), fixture.Create<string>());
 
         // Assert
         Assert.Equal(ResponseStatus.Successful, actual);
