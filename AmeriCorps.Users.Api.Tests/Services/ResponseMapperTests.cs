@@ -3,6 +3,7 @@ using AmeriCorps.Users.Models;
 using AmeriCorps.Users.Api.Services;
 using AmeriCorps.Users.Data.Core;
 using System.Linq;
+using AutoFixture;
 
 namespace AmeriCorps.Users.Api.Tests;
 
@@ -13,7 +14,11 @@ public sealed class ResponseMapperTests : ResponseMapperSetup
     {
         // Arrange
         var sut = Setup();
-        var model = Fixture.Create<User>();
+
+        var model = Fixture.Build<User>()
+              .Without(u => u.Roles)
+              .Create();
+
 
         IResponseMapper mapper = new ResponseMapper();
 
