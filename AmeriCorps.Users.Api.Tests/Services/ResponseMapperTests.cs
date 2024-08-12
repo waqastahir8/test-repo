@@ -14,14 +14,10 @@ public sealed class ResponseMapperTests : ResponseMapperSetup
     {
         // Arrange`
         var sut = Setup();
-        
-        var fixture = new Fixture();
-        fixture.Behaviors.OfType<ThrowingRecursionBehavior>().ToList().ForEach(b => fixture.Behaviors.Remove(b));
-        fixture.Behaviors.Add(new OmitOnRecursionBehavior());
-        fixture.Customize<DateOnly>(o => o.FromFactory((DateTime dt) => DateOnly.FromDateTime(dt)));
-        fixture.Customize<TimeOnly>(o => o.FromFactory((DateTime dt) => TimeOnly.FromDateTime(dt)));
 
-        var model = fixture.Create<User>();
+        var model = Fixture.Build<User>()
+              .Without(u => u.Roles)
+              .Create();
 
 
         IResponseMapper mapper = new ResponseMapper();
