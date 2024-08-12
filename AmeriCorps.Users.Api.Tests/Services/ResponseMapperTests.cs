@@ -12,7 +12,7 @@ public sealed class ResponseMapperTests : ResponseMapperSetup
     [Fact]
     public void Map_CorrectlyMapsProperties()
     {
-        // Arrange`
+        // Arrange
         var sut = Setup();
 
         var model = Fixture.Build<User>()
