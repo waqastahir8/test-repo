@@ -38,6 +38,8 @@ public interface IUsersControllerService
 
     Task<(ResponseStatus Status, UserResponse? Response)> AssociateRoleAsync(int userId, int roleId);
     Task<(ResponseStatus Status, UserResponse? Response)> AddRoleToUserAsync(int userId, RoleRequestModel roleRequest);
+
+     Task<(ResponseStatus Status, UserListResponse? Response)> FetchUserListByOrg(String orgName);
 }
 
 public sealed class UsersControllerService : IUsersControllerService
@@ -736,4 +738,33 @@ public sealed class UsersControllerService : IUsersControllerService
 
         return (ResponseStatus.Successful, response);
     }
+
+
+    public async Task<(ResponseStatus Status, UserListResponse? Response)> FetchUserListByOrg(String orgName)
+    {
+
+        UserList? userList;
+
+        if(orgName == null){
+              _logger.LogError(e, $"Null OrgName recieved");
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        try
+        {
+            userList = await  _repository.FetchUserListByOrg(orgName);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Could not retrieve userList with given orgName {orgName}.");
+            return (ResponseStatus.UnknownError, null);
+        }
+
+
+        var response = _responseMapper.Map(userList);
+         return (ResponseStatus.Successful, response);
+
+    }
+
+
 }

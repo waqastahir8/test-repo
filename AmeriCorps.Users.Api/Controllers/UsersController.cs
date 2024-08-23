@@ -96,4 +96,9 @@ public sealed class UsersController(IUsersControllerService service) : Controlle
     [HttpPost("append/{userId}/roles")]
     public async Task<IActionResult> AddRoleToUserAsync(int userId, [FromBody] RoleRequestModel roleRequest) =>
         await ServeAsync(async () => await _service.AddRoleToUserAsync(userId, roleRequest));
+
+
+    [HttpGet("org/users/{orgName}")]
+    public async Task<IActionResult> FetchUserListByOrg(String orgName) =>
+        await ServeAsync(async () => await _service.FetchUserListByOrg(orgName));
 }
