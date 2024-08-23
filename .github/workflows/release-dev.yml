@@ -22,6 +22,10 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     environment: Dev
+    permissions:
+      contents: read
+      packages: write
+
 
     steps:
       - name: checkout code
@@ -43,6 +47,7 @@ jobs:
       - name: publish nuget package
         run: |
           dotnet pack ${{ env.NUGET_PROJECT_FILE }} --configuration ${{ env.BUILD_CONFIGURATION }} --artifacts-path ./nuget
+          echo "${{ secrets.GITHUB_TOKEN }}"
           dotnet nuget update source github --username USERNAME --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text
           dotnet nuget push "./nuget/package/release/*.nupkg" --source "github" --skip-duplicate
           
