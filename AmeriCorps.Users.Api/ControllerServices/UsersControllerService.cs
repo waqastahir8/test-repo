@@ -813,10 +813,11 @@ public sealed class UsersControllerService : IUsersControllerService
 
         UserList? userList;
 
-        if(orgCode == null){
-              _logger.LogError(e, $"Null orgCode recieved");
-            return (ResponseStatus.UnknownError, null);
+        if(orgCode == null)
+        {
+            return (ResponseStatus.MissingInformation, null);
         }
+        
 
         try
         {

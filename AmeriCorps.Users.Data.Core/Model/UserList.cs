@@ -5,11 +5,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace AmeriCorps.Users.Data.Core;
 
-public sealed class UserList : Entity 
+public sealed class UserList 
 {
-    public string OrgName {get; set; } = string.Empty;
+    public string OrgCode {get; set; } = string.Empty;
 
-    public List<User> Roles { get; set; } = new List<User>();
-
+    public List<User> Users { get; set; } = new List<User>();
 
 }

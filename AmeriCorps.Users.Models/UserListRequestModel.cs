@@ -4,8 +4,8 @@ namespace AmeriCorps.Users.Models;
 
 public class UserListRequestModel
 {
-    public string OrgName {get; set; } = string.Empty;
+    public string OrgCode {get; set; } = string.Empty;
 
-    public List<UserRequestModel> users { get; set; } = new List<UserRequestModel>();
+    public List<UserRequestModel> Users { get; set; } = new List<UserRequestModel>();
 
 }

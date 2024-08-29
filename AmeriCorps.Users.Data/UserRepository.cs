@@ -222,13 +222,11 @@ public sealed partial class UserRepository(
     }
 
 
-
-
-    public async Task<UserList> FetchUserListByOrg(string orgName) =>
-        UserList userlist = null;
-        userList.OrgName = orgName;
-
-        userList.users = await ExecuteAsync(async context =>
+    public async Task<UserList> FetchUserListByOrgCode(string orgCode)
+    {
+        
+        // userList.Users 
+        List<User> users = await ExecuteAsync (async context =>
                 await context.Users
                     .AsNoTracking()
                     .Include(u => u.Attributes)
@@ -241,8 +239,15 @@ public sealed partial class UserRepository(
                     .Include(u => u.Relatives)
                     .Include(u => u.CommunicationMethods)
                     .Include(u => u.Roles)
-                    .FirstOrDefaultAsync(x => x.orgId == orgName));
+                    .Include(u => u.UserProjects)
+                    .Where(x => x.OrgCode == orgCode).ToListAsync());
+
+
+        UserList? userList = new UserList(){
+            OrgCode = orgCode,
+            Users = users
+        };
 
         return userList;      
-
+    }
 }

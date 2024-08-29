@@ -18,6 +18,7 @@ public interface IResponseMapper
     List<RoleResponse> Map(List<Role> role);
     OrganizationResponse? Map(Organization? organization);
     ProjectResponse? Map(Project? project);
+    UserListResponse? Map(UserList? userList);
 }
 public sealed class ResponseMapper : IResponseMapper
 {
@@ -311,6 +312,174 @@ public sealed class ResponseMapper : IResponseMapper
         ProjectType = project.ProjectType,
         ProjectOrg = project.ProjectOrg,
         Description = project.Description
+    };
+
+    public UserListResponse? Map(UserList? userList) => userList == null ? null : new()
+    {
+        OrgCode = userList.OrgCode,
+        Users = MapperUtils.MapList<User, UserRequestModel>(
+            userList.Users, user => new UserRequestModel
+            {
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                MiddleName = user.MiddleName,
+                PreferredName = user.PreferredName,
+                UserName = user.UserName,
+                ExternalAccountId = user.ExternalAccountId,
+                DateOfBirth = user.DateOfBirth,
+                Pronouns = user.Pronouns,
+                Suffix = user.Suffix,
+                Prefix = user.Prefix,
+                OrgCode = user.OrgCode,
+                Attributes = MapperUtils.MapList<AmeriCorps.Users.Data.Core.Attribute, AttributeRequestModel>(
+                                user.Attributes,
+                                a => new AttributeRequestModel
+                                {
+                                    Id = a.Id,
+                                    Type = a.Type,
+                                    Value = a.Value
+                                }),
+
+
+                Languages = MapperUtils.MapList<Language, LanguageRequestModel>(
+                                user.Languages, l =>
+                                new LanguageRequestModel
+                                {
+                                    Id = l.Id,
+                                    PickListId = l.PickListId,
+                                    IsPrimary = l.IsPrimary,
+                                    SpeakingAbility = l.SpeakingAbility,
+                                    WritingAbility = l.WritingAbility
+                                }),
+
+                Addresses = MapperUtils.MapList<Address, AddressRequestModel>(
+                                user.Addresses, a =>
+                                new AddressRequestModel
+                                {
+                                    Id = a.Id,
+                                    IsForeign = a.IsForeign,
+                                    Type = a.Type,
+                                    Street1 = a.Street1,
+                                    Street2 = a.Street2,
+                                    City = a.City,
+                                    State = a.State,
+                                    Country = a.Country,
+                                    ZipCode = a.ZipCode,
+                                    MovingWithinSixMonths = a.MovingWithinSixMonths
+                                }),
+
+                Education = MapperUtils.MapList<Education, EducationRequestModel>(
+                                user.Education, e =>
+                                new EducationRequestModel
+                                {
+                                    Id = e.Id,
+                                    Level = e.Level,
+                                    MajorAreaOfStudy = e.MajorAreaOfStudy,
+                                    Institution = e.Institution,
+                                    City = e.City,
+                                    State = e.State,
+                                    DateAttendedFrom = e.DateAttendedFrom,
+                                    DateAttendedTo = e.DateAttendedTo,
+                                    DegreeTypePursued = e.DegreeTypePursued,
+                                    DegreeCompleted = e.DegreeCompleted
+                                }),
+
+                Skills = MapperUtils.MapList<Skill, SkillRequestModel>(
+                                user.Skills, s =>
+                                new SkillRequestModel
+                                {
+                                    Id = s.Id,
+                                    PickListId = s.PickListId
+                                }),
+
+                MilitaryService = MapperUtils.MapList<MilitaryService, MilitaryServiceRequestModel>(
+                                user.MilitaryService, s =>
+                                new MilitaryServiceRequestModel
+                                {
+                                    Id = s.Id,
+                                    PickListId = s.PickListId
+                                }),
+
+                SavedSearches = MapperUtils.MapList<SavedSearch, SavedSearchRequestModel>(
+                                    user.SavedSearches, s => new SavedSearchRequestModel
+                                    {
+                                        Id = s.Id,
+                                        UserId = s.UserId,
+                                        Name = s.Name,
+                                        Filters = s.Filters,
+                                        NotificationsOn = s.NotificationsOn
+                                    }),
+
+                References = MapperUtils.MapList<Reference, ReferenceRequestModel>(
+                            user.References, r => new ReferenceRequestModel
+                            {
+                                TypeId = r.TypeId,
+                                Relationship = r.Relationship,
+                                RelationshipLength = r.RelationshipLength,
+                                ContactName = r.ContactName,
+                                Email = r.Email,
+                                Phone = r.Phone,
+                                Address = r.Address,
+                                Company = r.Company,
+                                Position = r.Position,
+                                Notes = r.Notes,
+                                CanContact = r.CanContact,
+                                Contacted = r.Contacted,
+                                DateContacted = r.DateContacted
+                            }),
+
+                Relatives = MapperUtils.MapList<Relative, RelativeRequestModel>(
+                                user.Relatives, r =>
+                                new RelativeRequestModel
+                                {
+                                    Id = r.Id,
+                                    Relationship = r.Relationship,
+                                    HighestEducationLevel = r.HighestEducationLevel,
+                                    AnnualIncome = r.AnnualIncome
+                                }),
+
+                CommunicationMethods = MapperUtils.MapList<CommunicationMethod,
+                                                CommunicationMethodRequestModel>(
+                                user.CommunicationMethods, cm =>
+                                new CommunicationMethodRequestModel
+                                {
+                                    Id = cm.Id,
+                                    Type = cm.Type,
+                                    Value = cm.Value,
+                                    IsPreferred = cm.IsPreferred
+                                }),
+
+                Collection = MapperUtils.MapList<Collection, CollectionRequestModel>(
+                    user.Collection, c =>
+                        new CollectionRequestModel()
+                        {
+                            UserId = c.UserId,
+                            Type = c.Type,
+                            ListingId = c.ListingId,
+                        }),
+                
+                Roles = MapperUtils.MapList<Role, RoleRequestModel>(
+                    user.Roles, r =>
+                        new RoleRequestModel()
+                        {
+                            //Id = r.Id,
+                            RoleName = r.RoleName,
+                            FucntionalName = r.FucntionalName,
+                            Description = r.Description
+                        }),
+
+                UserProjects = MapperUtils.MapList<UserProject, UserProjectRequestModel>(
+                    user.UserProjects, p =>
+                        new UserProjectRequestModel()
+                        {
+                            ProjectName = p.ProjectName,
+                            ProjectCode = p.ProjectCode,
+                            ProjectType = p.ProjectType,
+                            ProjectOrg = p.ProjectOrg,
+                            Active = p.Active
+                        })
+            }
+        )
     };
     
 
