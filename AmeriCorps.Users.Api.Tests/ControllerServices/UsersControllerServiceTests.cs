@@ -128,6 +128,38 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
     }
 
     [Fact]
+    public async Task CreateAsync_GetByExternalIdThrowsException_UnknownErrorStatus()
+    {
+        // Arrange
+        var sut = Setup();
+
+        var model =
+            Fixture
+            .Create<UserRequestModel>();
+        var user =
+            Fixture
+            .Build<User>()
+            .Without(u => u.Roles)
+            .Create();
+        _validatorMock!
+            .Setup(x => x.Validate(model))
+            .Returns(true);
+        _requestMapperMock!
+            .Setup(x => x.Map(model))
+            .Returns(user);
+        _repositoryMock!
+            .Setup(x => x.GetUserIdByExternalAccountIdAsync(It.IsAny<string>()))
+            .ThrowsAsync(new Exception());
+
+        // Act
+        var (status, _) = await sut.CreateOrPatchAsync(model);
+
+        // Assert
+        Assert.Equal(ResponseStatus.UnknownError, status);
+    }
+
+
+    [Fact]
     public async Task CreateAsync_RepositoryThrowsException_UnknownErrorStatus()
     {
         // Arrange
@@ -156,6 +188,70 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
 
         // Assert
         Assert.Equal(ResponseStatus.UnknownError, status);
+    }
+
+    [Fact]
+    public async Task CreateAsync_SaveCalled_WhenUserIsNew()
+    {
+        // Arrange
+        var sut = Setup();
+
+        var model =
+            Fixture
+            .Create<UserRequestModel>();
+        var user =
+            Fixture
+            .Build<User>()
+            .Without(u => u.Roles)
+            .Create();
+        _validatorMock!
+            .Setup(x => x.Validate(model))
+            .Returns(true);
+        _requestMapperMock!
+            .Setup(x => x.Map(model))
+            .Returns(user);
+        _repositoryMock!
+            .Setup(x => x.GetUserIdByExternalAccountIdAsync(It.IsAny<string>()))
+            .ReturnsAsync(0);
+
+        // Act
+        var (status, _) = await sut.CreateOrPatchAsync(model);
+
+        // Assert
+        Assert.Equal(ResponseStatus.Successful, status);
+        _repositoryMock?.Verify(x => x.SaveAsync(It.IsAny<User>()), Times.Once);
+    }
+
+ [Fact]
+    public async Task CreateAsync_UpdateCalled_WhenUserIsNotNew()
+    {
+        // Arrange
+        var sut = Setup();
+
+        var model =
+            Fixture
+            .Create<UserRequestModel>();
+        var user =
+            Fixture
+            .Build<User>()
+            .Without(u => u.Roles)
+            .Create();
+        _validatorMock!
+            .Setup(x => x.Validate(model))
+            .Returns(true);
+        _requestMapperMock!
+            .Setup(x => x.Map(model))
+            .Returns(user);
+        _repositoryMock!
+            .Setup(x => x.GetUserIdByExternalAccountIdAsync(It.IsAny<string>()))
+            .ReturnsAsync(1);
+
+        // Act
+        var (status, _) = await sut.CreateOrPatchAsync(model);
+
+        // Assert
+        Assert.Equal(ResponseStatus.Successful, status);
+        _repositoryMock?.Verify(x => x.UpdateUserAsync(It.IsAny<User>()), Times.Once);
     }
 
     [Fact]
@@ -541,9 +637,6 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             .Returns(search);
         _repositoryMock!
             .Setup(x => x.ExistsAsync<User>(u => u.Id == userId))
-            .ThrowsAsync(new Exception());
-        _repositoryMock!
-            .Setup(x => x.SaveAsync(search))
             .ThrowsAsync(new Exception());
 
         // Act
@@ -936,6 +1029,26 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         // Assert
         Assert.Equal(ResponseStatus.UnknownError, status);
     }
+
+    [Fact]
+    public async Task GetReferencesAsync_RepositoryThrowsException_UnknownErrorStatus()
+    {
+               // Arrange
+        var sut = Setup();
+        var userId =
+            Fixture
+            .Create<int>();
+        _repositoryMock!
+            .Setup(x => x.GetUserReferencesAsync(userId))
+            .ThrowsAsync(new Exception());
+
+        // Act
+        var (status, _) = await sut.GetReferencesAsync(userId);
+
+        // Assert
+        Assert.Equal(ResponseStatus.UnknownError, status);
+    }
+
 
     [Fact]
     public async Task UpdateReference_NullReference_MissingInformationStatus()
