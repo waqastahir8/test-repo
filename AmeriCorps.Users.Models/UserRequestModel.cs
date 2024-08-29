@@ -15,6 +15,7 @@ public class UserRequestModel
     public string? Suffix { get; set; } = string.Empty;
     public DateOnly DateOfBirth { get; set; }
     public string Pronouns { get; set; } = string.Empty;
+    public string OrgCode { get; set; } = string.Empty;
     public List<AttributeRequestModel> Attributes { get; set; } = new List<AttributeRequestModel>();
     public List<LanguageRequestModel> Languages { get; set; } = new List<LanguageRequestModel>();
     public List<AddressRequestModel> Addresses { get; set; } = new List<AddressRequestModel>();
@@ -27,4 +28,5 @@ public class UserRequestModel
     public List<ReferenceRequestModel> References { get; set; } = new List<ReferenceRequestModel>();
     public List<CollectionRequestModel> Collection { get; set; } = new List<CollectionRequestModel>();
     public List<RoleRequestModel> Roles { get; set; } = new List<RoleRequestModel>();
+    public List<UserProjectRequestModel> UserProjects { get; set; } = new List<UserProjectRequestModel>();
 }
