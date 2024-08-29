@@ -224,8 +224,6 @@ public sealed partial class UserRepository(
 
     public async Task<UserList> FetchUserListByOrgCode(string orgCode)
     {
-        
-        // userList.Users 
         List<User> users = await ExecuteAsync (async context =>
                 await context.Users
                     .AsNoTracking()
