@@ -17,6 +17,7 @@ public sealed class ResponseMapperTests : ResponseMapperSetup
 
         var model = Fixture.Build<User>()
               .Without(u => u.Roles)
+              .Without(u => u.UserProjects)
               .Create();
 
 
@@ -41,6 +42,7 @@ public sealed class ResponseMapperTests : ResponseMapperSetup
         Assert.Equal(model.UserName, result.UserName);
         Assert.Equal(model.DateOfBirth, result.DateOfBirth);
         Assert.Equal(model.Pronouns, result.Pronouns);
+        Assert.Equal(model.OrgCode, result.OrgCode);
 
 
         //Assert attributes
@@ -170,7 +172,6 @@ public sealed class ResponseMapperTests : ResponseMapperSetup
                 Assert.Equal(pair.source.Value, pair.mapped.Value);
                 Assert.Equal(pair.source.IsPreferred, pair.mapped.IsPreferred);
             });
-
 
         TestUserCollectionResponseMapper(result, model);
     }

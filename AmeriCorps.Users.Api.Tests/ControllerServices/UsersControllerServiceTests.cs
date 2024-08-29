@@ -29,6 +29,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             .Setup(x => x.GetAsync(userId))
             .ReturnsAsync(() => Fixture.Build<User>()
             .Without(u => u.Roles)
+            .Without(u => u.UserProjects)
             .Create());
 
         // Act
@@ -143,6 +144,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             Fixture
             .Build<User>()
             .Without(u => u.Roles)
+            .Without(u => u.UserProjects)
             .Create();
         _validatorMock!
             .Setup(x => x.Validate(model))
@@ -175,6 +177,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             Fixture
             .Build<User>()
             .Without(u => u.Roles)
+            .Without(u => u.UserProjects)
             .Create();
         _validatorMock!
             .Setup(x => x.Validate(model))
@@ -206,6 +209,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             Fixture
             .Build<User>()
             .Without(u => u.Roles)
+            .Without(u => u.UserProjects)
             .Create();
         _validatorMock!
             .Setup(x => x.Validate(model))
@@ -238,6 +242,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             Fixture
             .Build<User>()
             .Without(u => u.Roles)
+            .Without(u => u.UserProjects)
             .Create();
         _validatorMock!
             .Setup(x => x.Validate(model))
@@ -270,6 +275,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             Fixture
             .Build<User>()
             .Without(u => u.Roles)
+            .Without(u => u.UserProjects)
             .Create();
         _validatorMock!
             .Setup(x => x.Validate(model))
@@ -301,6 +307,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             Fixture
             .Build<User>()
             .Without(u => u.Roles)
+            .Without(u => u.UserProjects)
             .Create();
         var expected =
             Fixture
@@ -1484,6 +1491,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             Fixture
             .Build<User>()
             .Without(u => u.Roles)
+            .Without(u => u.UserProjects)
             .CreateMany(amount);
 
         _repositoryMock!
@@ -1510,6 +1518,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             Fixture
             .Build<User>()
             .Without(u => u.Roles)
+            .Without(u => u.UserProjects)
             .CreateMany(10);
 
         _repositoryMock!
