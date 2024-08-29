@@ -30,6 +30,7 @@ public sealed class RequestMapperTests : RequestMapperSetup
         Assert.Equal(model.UserName, result.UserName);
         Assert.Equal(model.DateOfBirth, result.DateOfBirth);
         Assert.Equal(model.Pronouns, result.Pronouns);
+        Assert.Equal(model.OrgCode, result.OrgCode);
 
         //Assert attributes
         Assert.Equal(model.Attributes.Count, result.Attributes.Count);
@@ -159,8 +160,61 @@ public sealed class RequestMapperTests : RequestMapperSetup
                 Assert.Equal(pair.source.IsPreferred, pair.mapped.IsPreferred);
             });
 
+        //Assert User Project Methods
+        Assert.Equal(model.UserProjects.Count, result.UserProjects.Count);
+
+        Assert.All(result.UserProjects.Zip(model.UserProjects, (mapped, source) => (mapped, source)),
+            pair =>
+            {
+                Assert.Equal(pair.source.ProjectName, pair.mapped.ProjectName);
+                Assert.Equal(pair.source.ProjectCode, pair.mapped.ProjectCode);
+                Assert.Equal(pair.source.ProjectType, pair.mapped.ProjectType);
+                Assert.Equal(pair.source.ProjectOrg, pair.mapped.ProjectOrg);
+                Assert.Equal(pair.source.Active, pair.mapped.Active);
+            });
+
 
         TestUserCollectionRequestMapper(result, model);
+
+    }
+
+    [Fact]
+    public void Map_CorrectlyMapsOrganizationRequest()
+    {
+        // Arrange
+        var sut = Setup();
+        var model = Fixture.Create<OrganizationRequestModel>();
+
+        IRequestMapper mapper = new RequestMapper();
+
+        // Act
+        var result = mapper.Map(model);
+
+        // Assert
+
+        Assert.Equal(model.OrgName, result.OrgName);
+        Assert.Equal(model.OrgCode, result.OrgCode);
+        Assert.Equal(model.Description, result.Description);
+    }
+    [Fact]
+    public void Map_CorrectlyMapsProjecRequest()
+    {
+        // Arrange
+        var sut = Setup();
+        var model = Fixture.Create<ProjectRequestModel>();
+
+        IRequestMapper mapper = new RequestMapper();
+
+        // Act
+        var result = mapper.Map(model);
+
+        // Assert
+
+        Assert.Equal(model.ProjectName, result.ProjectName);
+        Assert.Equal(model.ProjectCode, result.ProjectCode);
+        Assert.Equal(model.ProjectType, result.ProjectType);
+        Assert.Equal(model.ProjectOrg, result.ProjectOrg);
+        Assert.Equal(model.Description, result.Description);
 
     }
 

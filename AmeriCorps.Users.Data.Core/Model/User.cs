@@ -28,5 +28,7 @@ public sealed class User : Entity
     public List<Reference> References { get; set; } = new List<Reference>();
     public List<Collection> Collection { get; set; } = new();
     public List<Role> Roles { get; set; } = new List<Role>();
+    public List<UserProject> UserProjects { get; set; } = new List<UserProject>();
+    public string OrgCode { get; set; } = string.Empty;
 
 }

@@ -16,6 +16,8 @@ public interface IResponseMapper
     CollectionListResponseModel Map(List<Collection>? collection);
     List<ReferenceResponseModel> Map(List<Reference> references);
     List<RoleResponse> Map(List<Role> role);
+    OrganizationResponse? Map(Organization? organization);
+    ProjectResponse? Map(Project? project);
 }
 public sealed class ResponseMapper : IResponseMapper
 {
@@ -123,6 +125,7 @@ public sealed class ResponseMapper : IResponseMapper
         Pronouns = user.Pronouns,
         Suffix = user.Suffix,
         Prefix = user.Prefix,
+        OrgCode = user.OrgCode,
         Attributes = MapperUtils.MapList<AmeriCorps.Users.Data.Core.Attribute, AttributeRequestModel>(
                         user.Attributes,
                         a => new AttributeRequestModel
@@ -258,6 +261,17 @@ public sealed class ResponseMapper : IResponseMapper
                     RoleName = r.RoleName,
                     FucntionalName = r.FucntionalName,
                     Description = r.Description
+                }),
+
+        UserProjects = MapperUtils.MapList<UserProject, UserProjectRequestModel>(
+            user.UserProjects, p =>
+                new UserProjectRequestModel()
+                {
+                    ProjectName = p.ProjectName,
+                    ProjectCode = p.ProjectCode,
+                    ProjectType = p.ProjectType,
+                    ProjectOrg = p.ProjectOrg,
+                    Active = p.Active
                 })
     };
 
@@ -280,5 +294,24 @@ public sealed class ResponseMapper : IResponseMapper
                                Description = a.Description
                            });
 
+    public OrganizationResponse? Map(Organization? organization) => organization == null ? null : new()
+    {
+        Id = organization.Id,
+        OrgName = organization.OrgName,
+        OrgCode = organization.OrgCode,
+        Description = organization.Description
+
+    };
+
+    public ProjectResponse? Map(Project? project) => project == null ? null : new()
+    {
+        Id = project.Id,
+        ProjectName = project.ProjectName,
+        ProjectCode = project.ProjectCode,
+        ProjectType = project.ProjectType,
+        ProjectOrg = project.ProjectOrg,
+        Description = project.Description
+    };
+    
 
 }

@@ -38,6 +38,8 @@ public interface IUsersControllerService
 
     Task<(ResponseStatus Status, UserResponse? Response)> AssociateRoleAsync(int userId, int roleId);
     Task<(ResponseStatus Status, UserResponse? Response)> AddRoleToUserAsync(int userId, RoleRequestModel roleRequest);
+
+    Task<(ResponseStatus Status, UserResponse? Response)> AddUserToProject(int userId, string projCode);
 }
 
 public sealed class UsersControllerService : IUsersControllerService
@@ -52,18 +54,22 @@ public sealed class UsersControllerService : IUsersControllerService
 
     private readonly IUserRepository _repository;
 
+    private readonly IProjectRepository _projectRepository;
+
     public UsersControllerService(
     ILogger<UsersControllerService> logger,
     IRequestMapper requestMapper,
     IResponseMapper responseMapper,
     IValidator validator,
-    IUserRepository repository)
+    IUserRepository repository,
+    IProjectRepository projectRepository)
     {
         _logger = logger;
         _requestMapper = requestMapper;
         _responseMapper = responseMapper;
         _validator = validator;
         _repository = repository;
+        _projectRepository =  projectRepository;
     }
 
     public async Task<(ResponseStatus Status, UserResponse? Response)> GetAsync(int id)
@@ -735,5 +741,68 @@ public sealed class UsersControllerService : IUsersControllerService
         var response = _responseMapper.Map(role);
 
         return (ResponseStatus.Successful, response);
+    }
+
+        public async Task<(ResponseStatus Status, UserResponse? Response)> AddUserToProject(int userId, string projCode)
+    {
+        User? user;
+        try
+        {
+            user = await _repository.GetAsync(userId);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Could not retrieve user with id {userId}.");
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        if (user == null)
+        {
+            return (ResponseStatus.MissingInformation, null);
+        }
+
+        Project? project;
+
+        try
+        {
+            project = await _projectRepository.GetProjectByCode(projCode);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Could not retrieve project with code {projCode}.");
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        if (project == null)
+        {
+            return (ResponseStatus.MissingInformation, null);
+        }
+
+        UserProject userProject =  new UserProject()
+        {
+            ProjectName = project.ProjectName,
+            ProjectCode = project.ProjectCode,
+            ProjectType = project.ProjectType,
+            ProjectOrg = project.ProjectOrg,
+            Active = true
+        };
+
+        if (user.UserProjects.Contains(userProject))
+        {
+            return (ResponseStatus.Successful, null);
+        }
+
+        user.UserProjects.Add(userProject);
+
+        try
+        {
+            await _repository.UpdateUserAsync(user);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Unable to save user with id {userId}.");
+            return (ResponseStatus.UnknownError, null);
+        }
+        return (ResponseStatus.Successful, _responseMapper.Map(user));
     }
 }
