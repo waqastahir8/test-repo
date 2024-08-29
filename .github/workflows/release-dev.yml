@@ -22,6 +22,10 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     environment: Dev
+    permissions:
+      contents: read
+      packages: write
+
 
     steps:
       - name: checkout code
@@ -38,11 +42,12 @@ jobs:
           dotnet restore ${{ env.SOLUTION_FILE }}
 
       - name: .net test
-        run: dotnet test ${{ env.SOLUTION_FILE }} --no-restore --collect:"XPlat Code Coverage" --settings coverlet.runsettings
+        run: dotnet test ${{ env.SOLUTION_FILE }} --no-restore --collect:"XPlat Code Coverage" --settings coverlet.runsettings.xml
 
       - name: publish nuget package
         run: |
           dotnet pack ${{ env.NUGET_PROJECT_FILE }} --configuration ${{ env.BUILD_CONFIGURATION }} --artifacts-path ./nuget
+          echo "${{ secrets.GITHUB_TOKEN }}"
           dotnet nuget update source github --username USERNAME --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text
           dotnet nuget push "./nuget/package/release/*.nupkg" --source "github" --skip-duplicate
           

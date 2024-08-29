@@ -487,3 +487,4 @@ publish-func
 local.settings.json
 AmeriCorps.Users.Data.Deployment.Orig
 coveragereport
+run-tests.sh
