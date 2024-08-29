@@ -13,10 +13,14 @@ builder.Services
     .AddScoped<IContextFactory, DefaultContextFactory>()
     .AddScoped<IUserRepository, UserRepository>()
     .AddScoped<IRoleRepository, RoleRepository>()
+    .AddScoped<IOrganizationRepository, OrganizationRepository>()
+    .AddScoped<IProjectRepository, ProjectRepository>()
     .AddScoped<IRequestMapper, RequestMapper>()
     .AddScoped<IResponseMapper, ResponseMapper>()
     .AddScoped<IUsersControllerService, UsersControllerService>()
-    .AddScoped<IRolesControllerService, RolesControllerService>();
+    .AddScoped<IRolesControllerService, RolesControllerService>()
+    .AddScoped<IOrgControllerService, OrgControllerService>()
+    .AddScoped<IProjectControllerService, ProjectControllerService>();
 
 
 builder.Configuration

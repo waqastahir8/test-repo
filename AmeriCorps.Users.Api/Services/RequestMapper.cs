@@ -16,6 +16,10 @@ public interface IRequestMapper
     List<Collection> Map(CollectionListRequestModel requestModel);
 
     Reference Map(ReferenceRequestModel requestModel);
+
+    Organization Map(OrganizationRequestModel requestModel);
+    
+    Project Map(ProjectRequestModel requestModel);
 }
 
 public sealed class RequestMapper : IRequestMapper
@@ -33,6 +37,7 @@ public sealed class RequestMapper : IRequestMapper
         Pronouns = requestModel.Pronouns,
         Suffix = requestModel.Suffix,
         Prefix = requestModel.Prefix,
+        OrgCode = requestModel.OrgCode,
 
         Attributes = MapperUtils.MapList<AttributeRequestModel, AmeriCorps.Users.Data.Core.Attribute>(
             requestModel.Attributes,
@@ -176,6 +181,17 @@ public sealed class RequestMapper : IRequestMapper
                     FucntionalName = c.FucntionalName,
                     Description = c.Description,
                 }),
+
+        UserProjects = MapperUtils.MapList<UserProjectRequestModel, UserProject>(
+            requestModel.UserProjects, p =>
+                new UserProject()
+                {
+                    ProjectName = p.ProjectName,
+                    ProjectCode = p.ProjectCode,
+                    ProjectType = p.ProjectType,
+                    ProjectOrg = p.ProjectOrg,
+                    Active = p.Active
+                })
     };
 
     public Role Map(RoleRequestModel roleRequestModel) => new()
@@ -233,5 +249,22 @@ public sealed class RequestMapper : IRequestMapper
         CanContact = requestModel.CanContact,
         Contacted = requestModel.Contacted,
         DateContacted = requestModel.DateContacted
+    };
+
+
+    public Organization Map(OrganizationRequestModel requestModel) => new()
+    {
+        OrgName = requestModel.OrgName,
+        OrgCode = requestModel.OrgCode,
+        Description = requestModel.Description
+    };
+
+    public Project Map(ProjectRequestModel requestModel) => new()
+    {
+        ProjectName = requestModel.ProjectName,
+        ProjectCode = requestModel.ProjectCode,
+        ProjectType = requestModel.ProjectType,
+        ProjectOrg = requestModel.ProjectOrg,
+        Description = requestModel.Description
     };
 }
