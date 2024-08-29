@@ -16,6 +16,11 @@ public abstract class NpgsqlContext : ContextBase
     public DbSet<SavedSearch> SavedSearch { get; set; }
 
     public DbSet<Collection> Collection { get; set; }
+
+    public DbSet<Organization> Organizations { get; set; }
+    public DbSet<Project> Projects { get; set; }
+
+    public DbSet<UserProject> UserProjects { get; set; }
     public static string Schema => "users";
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -52,6 +57,12 @@ public abstract class NpgsqlContext : ContextBase
         user.Property(p => p.DateOfBirth).HasColumnType("date");
 
         var role = Create<Role>("role");
+
+        var organization = Create<Organization>("organization");
+
+        var project = Create<Project>("project");
+
+        var userProject = Create<UserProject>("userProject");
 
         var collection = Create<Collection>("collection");
 

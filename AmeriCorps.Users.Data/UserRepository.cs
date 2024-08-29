@@ -28,6 +28,7 @@ public sealed partial class UserRepository(
                 .Include(u => u.Relatives)
                 .Include(u => u.CommunicationMethods)
                 .Include(u => u.Roles)
+                .Include(u => u.UserProjects)
                 .FirstOrDefaultAsync(x => x.Id == id));
 
     public async Task<User?> GetByExternalAccountIdAsync(string externalAccountId) =>
@@ -44,6 +45,7 @@ public sealed partial class UserRepository(
                 .Include(u => u.Relatives)
                 .Include(u => u.CommunicationMethods)
                 .Include(u => u.Roles)
+                .Include(u => u.UserProjects)
                 .FirstOrDefaultAsync(x => x.ExternalAccountId == externalAccountId));
 
     public async Task<IEnumerable<User>?> GetByAttributeAsync(string type, string value) =>
@@ -59,6 +61,7 @@ public sealed partial class UserRepository(
                 .Include(u => u.SavedSearches)
                 .Include(u => u.Relatives)
                 .Include(u => u.CommunicationMethods)
+                .Include(u => u.UserProjects)
                 .Where(x => x.Attributes.Any(x => x.Type == type && x.Value == value))
                 .ToListAsync());
 
@@ -176,6 +179,7 @@ public sealed partial class UserRepository(
         UpdateEntities(user.Relatives, context, userId);
         UpdateEntities(user.Languages, context, userId);
         UpdateEntities(user.Skills, context, userId);
+        UpdateEntities(user.UserProjects, context, userId);
 
         return user;
     }

@@ -12,6 +12,8 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
     private Mock<IResponseMapper>? _responseMapperMock;
     private Mock<IValidator>? _validatorMock;
 
+    private Mock<IProjectRepository>? _projectRepository;
+
     [Theory]
     [InlineData(5)]
     [InlineData(15)]
@@ -27,6 +29,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             .Setup(x => x.GetAsync(userId))
             .ReturnsAsync(() => Fixture.Build<User>()
             .Without(u => u.Roles)
+            .Without(u => u.UserProjects)
             .Create());
 
         // Act
@@ -69,6 +72,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             .Setup(x => x.GetByExternalAccountIdAsync(externalAccountId))
             .ReturnsAsync(() => Fixture.Build<User>()
              .Without(u => u.Roles)
+             .Without(u => u.UserProjects)
              .Create());
 
         // Act
@@ -140,6 +144,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             Fixture
             .Build<User>()
             .Without(u => u.Roles)
+            .Without(u => u.UserProjects)
             .Create();
         _validatorMock!
             .Setup(x => x.Validate(model))
@@ -172,6 +177,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             Fixture
             .Build<User>()
             .Without(u => u.Roles)
+            .Without(u => u.UserProjects)
             .Create();
         _validatorMock!
             .Setup(x => x.Validate(model))
@@ -203,6 +209,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             Fixture
             .Build<User>()
             .Without(u => u.Roles)
+            .Without(u => u.UserProjects)
             .Create();
         _validatorMock!
             .Setup(x => x.Validate(model))
@@ -235,6 +242,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             Fixture
             .Build<User>()
             .Without(u => u.Roles)
+            .Without(u => u.UserProjects)
             .Create();
         _validatorMock!
             .Setup(x => x.Validate(model))
@@ -267,6 +275,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             Fixture
             .Build<User>()
             .Without(u => u.Roles)
+            .Without(u => u.UserProjects)
             .Create();
         _validatorMock!
             .Setup(x => x.Validate(model))
@@ -298,6 +307,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             Fixture
             .Build<User>()
             .Without(u => u.Roles)
+            .Without(u => u.UserProjects)
             .Create();
         var expected =
             Fixture
@@ -1481,6 +1491,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             Fixture
             .Build<User>()
             .Without(u => u.Roles)
+            .Without(u => u.UserProjects)
             .CreateMany(amount);
 
         _repositoryMock!
@@ -1507,6 +1518,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             Fixture
             .Build<User>()
             .Without(u => u.Roles)
+            .Without(u => u.UserProjects)
             .CreateMany(10);
 
         _repositoryMock!
@@ -1526,6 +1538,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         _requestMapperMock = new();
         _responseMapperMock = new();
         _validatorMock = new();
+        _projectRepository = new();
 
         Fixture = new Fixture();
         Fixture.Customize<DateOnly>(x => x.FromFactory<DateTime>(DateOnly.FromDateTime));
@@ -1534,6 +1547,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             _requestMapperMock.Object,
             _responseMapperMock.Object,
             _validatorMock.Object,
-            _repositoryMock.Object);
+            _repositoryMock.Object,
+            _projectRepository.Object);
     }
 }

@@ -98,7 +98,14 @@ public sealed class UsersController(IUsersControllerService service) : Controlle
         await ServeAsync(async () => await _service.AddRoleToUserAsync(userId, roleRequest));
 
 
-    [HttpGet("org/users/{orgName}")]
-    public async Task<IActionResult> FetchUserListByOrg(String orgName) =>
-        await ServeAsync(async () => await _service.FetchUserListByOrg(orgName));
+    //Associate a role with a user by passing userId and RoleID
+    [HttpPost("project/add/{userId}/{projCode}")]
+    public async Task<IActionResult> AddUserToProject(int userId, string projCode) =>
+        await ServeAsync(async () => await _service.AddUserToProject(userId, projCode));
+
+
+    //Fetch List of Users by Org Code
+    [HttpGet("org/users/{orgCode}")]
+    public async Task<IActionResult> FetchUserListByOrgCode(String orgCode) =>
+        await ServeAsync(async () => await _service.FetchUserListByOrgCode(orgCode));
 }
