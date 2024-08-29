@@ -173,8 +173,79 @@ public sealed class ResponseMapperTests : ResponseMapperSetup
                 Assert.Equal(pair.source.IsPreferred, pair.mapped.IsPreferred);
             });
 
+        //Assert User Project Methods
+        Assert.Equal(model.UserProjects.Count, result.UserProjects.Count);
+
+        Assert.All(result.UserProjects.Zip(model.UserProjects, (mapped, source) => (mapped, source)),
+            pair =>
+            {
+                Assert.Equal(pair.source.ProjectName, pair.mapped.ProjectName);
+                Assert.Equal(pair.source.ProjectCode, pair.mapped.ProjectCode);
+                Assert.Equal(pair.source.ProjectType, pair.mapped.ProjectType);
+                Assert.Equal(pair.source.ProjectOrg, pair.mapped.ProjectOrg);
+                Assert.Equal(pair.source.Active, pair.mapped.Active);
+            });
+
         TestUserCollectionResponseMapper(result, model);
     }
+
+
+    [Fact]
+    public void Map_CorrectlyMapsPropertiesOrganizationResponse()
+    {
+        // Arrange
+        var sut = Setup();
+
+        var model = Fixture.Build<Organization>()
+              .Create();
+
+
+        IResponseMapper mapper = new ResponseMapper();
+
+        // Act
+        var result = mapper.Map(model);
+
+        // Assert
+        if(model == null) {
+            Assert.Null(result);
+            return;
+        }
+
+        Assert.NotNull(result);
+        Assert.Equal(model.OrgName, result.OrgName);
+        Assert.Equal(model.OrgCode, result.OrgCode);
+        Assert.Equal(model.Description, result.Description);
+    }
+
+    [Fact]
+    public void Map_CorrectlyMapsPropertiesProjectResponse()
+    {
+        // Arrange
+        var sut = Setup();
+
+        var model = Fixture.Build<Project>()
+              .Create();
+
+
+        IResponseMapper mapper = new ResponseMapper();
+
+        // Act
+        var result = mapper.Map(model);
+
+        // Assert
+        if(model == null) {
+            Assert.Null(result);
+            return;
+        }
+
+        Assert.NotNull(result);
+        Assert.Equal(model.ProjectName, result.ProjectName);
+        Assert.Equal(model.ProjectCode, result.ProjectCode);
+        Assert.Equal(model.ProjectType, result.ProjectType);
+        Assert.Equal(model.ProjectOrg, result.ProjectOrg);
+        Assert.Equal(model.Description, result.Description);
+    }
+
 
     private void TestUserCollectionResponseMapper(UserResponse result, User model)
     {
