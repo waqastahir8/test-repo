@@ -38,7 +38,7 @@ public interface IUsersControllerService
 
     Task<(ResponseStatus Status, UserResponse? Response)> AssociateRoleAsync(int userId, int roleId);
     Task<(ResponseStatus Status, UserResponse? Response)> AddRoleToUserAsync(int userId, RoleRequestModel roleRequest);
-
+    Task<(ResponseStatus Status, UserListResponse? Response)> FetchUserListByOrgCode(String orgCode);
     Task<(ResponseStatus Status, UserResponse? Response)> AddUserToProject(int userId, string projCode);
 }
 
@@ -743,7 +743,8 @@ public sealed class UsersControllerService : IUsersControllerService
         return (ResponseStatus.Successful, response);
     }
 
-        public async Task<(ResponseStatus Status, UserResponse? Response)> AddUserToProject(int userId, string projCode)
+
+    public async Task<(ResponseStatus Status, UserResponse? Response)> AddUserToProject(int userId, string projCode)
     {
         User? user;
         try
@@ -804,5 +805,32 @@ public sealed class UsersControllerService : IUsersControllerService
             return (ResponseStatus.UnknownError, null);
         }
         return (ResponseStatus.Successful, _responseMapper.Map(user));
+    }
+
+
+    public async Task<(ResponseStatus Status, UserListResponse? Response)> FetchUserListByOrgCode(String orgCode)
+    {
+
+        UserList? userList;
+
+        if(orgCode == null)
+        {
+            return (ResponseStatus.MissingInformation, null);
+        }
+        
+
+        try
+        {
+            userList = await  _repository.FetchUserListByOrgCode(orgCode);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Could not retrieve userList with given orgName {orgCode}.");
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        var response = _responseMapper.Map(userList);
+         return (ResponseStatus.Successful, response);
+
     }
 }

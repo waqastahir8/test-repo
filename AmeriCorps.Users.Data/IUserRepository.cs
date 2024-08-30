@@ -32,4 +32,6 @@ public interface IUserRepository
     Task<bool> DeleteCollectionAsync(List<Collection> collections);
     Task<Role?> GetRoleAsync(int roleId);
 
+    Task<UserList> FetchUserListByOrgCode(string orgCode);
+
 }

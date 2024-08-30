@@ -220,4 +220,32 @@ public sealed partial class UserRepository(
 
         return role;
     }
+
+
+    public async Task<UserList> FetchUserListByOrgCode(string orgCode)
+    {
+        List<User> users = await ExecuteAsync (async context =>
+                await context.Users
+                    .AsNoTracking()
+                    .Include(u => u.Attributes)
+                    .Include(u => u.Languages)
+                    .Include(u => u.Addresses)
+                    .Include(u => u.Education)
+                    .Include(u => u.Skills)
+                    .Include(u => u.MilitaryService)
+                    .Include(u => u.SavedSearches)
+                    .Include(u => u.Relatives)
+                    .Include(u => u.CommunicationMethods)
+                    .Include(u => u.Roles)
+                    .Include(u => u.UserProjects)
+                    .Where(x => x.OrgCode == orgCode).ToListAsync());
+
+
+        UserList? userList = new UserList(){
+            OrgCode = orgCode,
+            Users = users
+        };
+
+        return userList;      
+    }
 }
