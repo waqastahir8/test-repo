@@ -102,4 +102,10 @@ public sealed class UsersController(IUsersControllerService service) : Controlle
     [HttpPost("project/add/{userId}/{projCode}")]
     public async Task<IActionResult> AddUserToProject(int userId, string projCode) =>
         await ServeAsync(async () => await _service.AddUserToProject(userId, projCode));
+
+
+    //Fetch List of Users by Org Code
+    [HttpGet("org/users/{orgCode}")]
+    public async Task<IActionResult> FetchUserListByOrgCode(String orgCode) =>
+        await ServeAsync(async () => await _service.FetchUserListByOrgCode(orgCode));
 }
