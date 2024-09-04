@@ -14,6 +14,8 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
 
     private Mock<IProjectRepository>? _projectRepository;
 
+    private Mock<IRoleRepository>? _roleRepository;
+
     [Theory]
     [InlineData(5)]
     [InlineData(15)]
@@ -1532,6 +1534,148 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         Assert.Equal(ResponseStatus.Successful, actual);
     }
 
+    [Theory]
+    [InlineData(1,"proj")]    
+    public async Task AddUserToProject_Successful_Status(int userId, string projCode)
+    {
+        // Arrange
+        var sut = Setup();
+        var model = Fixture.Build<ProjectRequestModel>()
+                              .With(p => p.ProjectCode, projCode)
+                              .Create();
+        
+        var project =
+            Fixture
+            .Build<Project>()
+            .With(p => p.ProjectCode, projCode)
+            .Create();
+
+        _requestMapperMock!
+            .Setup(x => x.Map(model))
+            .Returns(project);
+
+        _projectRepository!
+            .Setup(x => x.GetProjectByCode(It.IsAny<string>()))
+            .ReturnsAsync(project);
+
+        _repositoryMock!
+            .Setup(x => x.GetAsync(userId))
+            .ReturnsAsync(() => Fixture.Build<User>()
+            .Without(u => u.Roles)
+            .Without(u => u.UserProjects)
+            .Create());
+
+        // Act
+        var (status, _) = await sut.AddUserToProject(userId,projCode);
+
+        // Assert
+        Assert.Equal(ResponseStatus.Successful, status);
+    }
+
+    [Theory]
+    [InlineData(1,"proj")]    
+    public async Task AddUserToProject_InformationMissing_Status(int userId, string projCode)
+    {
+        // Arrange
+        var sut = Setup();
+
+        var (status, _) = await sut.AddUserToProject(userId,projCode);
+
+        // Assert
+        Assert.Equal(ResponseStatus.MissingInformation, status);
+
+        _repositoryMock!
+            .Setup(x => x.GetAsync(userId))
+            .ReturnsAsync(() => Fixture.Build<User>()
+            .Without(u => u.Roles)
+            .Without(u => u.UserProjects)
+            .Create());
+
+        // Act
+        var (status2, _) = await sut.AddUserToProject(userId,projCode);
+
+        // Assert
+        Assert.Equal(ResponseStatus.MissingInformation, status2);
+    }
+
+    [Theory]
+    [InlineData("org")]    
+    public async Task FetchUserListByOrgCode_Successful_Status(string orgCode)
+    {
+        // Arrange
+        var sut = Setup();
+
+        _repositoryMock!
+            .Setup(x => x.GetAsync(1))
+            .ReturnsAsync(() => Fixture.Build<User>()
+            .With(u => u.OrgCode, orgCode)
+            .Without(u => u.Roles)
+            .Without(u => u.UserProjects)
+            .Create());
+
+        // Act
+        var (status, _) = await sut.FetchUserListByOrgCode(orgCode);
+
+        // Assert
+        Assert.Equal(ResponseStatus.Successful, status);
+    }
+
+    [Theory]
+    [InlineData("org")]    
+    public async Task FetchUserListByOrgCode_Missing_Status(string orgCode)
+    {
+        // Arrange
+        var sut = Setup();
+
+        // Act
+        var (status, _) = await sut.FetchUserListByOrgCode(null);
+
+        // Assert
+        Assert.Equal(ResponseStatus.MissingInformation, status);
+    }
+
+    [Theory]
+    [InlineData(1)]    
+    public async Task UpdateUserData_Successful_Status(int userId)
+    {
+        // Arrange
+        var sut = Setup();
+
+        var model = Fixture.Build<UserResponse>()
+                        .With(p => p.Id, userId)
+                        .Create();
+
+
+        _repositoryMock!
+            .Setup(x => x.GetAsync(userId))
+            .ReturnsAsync(() => Fixture.Build<User>()
+            .Without(u => u.Roles)
+            .Without(u => u.UserProjects)
+            .Create());
+
+        // Act
+        var (status, _) = await sut.UpdateUserData(model);
+
+        // Assert
+        Assert.Equal(ResponseStatus.Successful, status);
+    }
+
+    [Theory]
+    [InlineData(1)]    
+    public async Task UpdateUserData_Missing_Status(int userId)
+    {
+        // Arrange
+        var sut = Setup();
+
+        // Act
+        var (status, _) = await sut.UpdateUserData(null);
+
+        // Assert
+        Assert.Equal(ResponseStatus.MissingInformation, status);
+
+    }
+
+
     protected override UsersControllerService Setup()
     {
         _repositoryMock = new();
@@ -1539,6 +1683,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         _responseMapperMock = new();
         _validatorMock = new();
         _projectRepository = new();
+        _roleRepository = new();
 
         Fixture = new Fixture();
         Fixture.Customize<DateOnly>(x => x.FromFactory<DateTime>(DateOnly.FromDateTime));
@@ -1548,6 +1693,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             _responseMapperMock.Object,
             _validatorMock.Object,
             _repositoryMock.Object,
-            _projectRepository.Object);
+            _projectRepository.Object,
+            _roleRepository.Object);
     }
 }

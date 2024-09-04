@@ -40,6 +40,8 @@ public interface IUsersControllerService
     Task<(ResponseStatus Status, UserResponse? Response)> AddRoleToUserAsync(int userId, RoleRequestModel roleRequest);
     Task<(ResponseStatus Status, UserListResponse? Response)> FetchUserListByOrgCode(String orgCode);
     Task<(ResponseStatus Status, UserResponse? Response)> AddUserToProject(int userId, string projCode);
+
+    Task<(ResponseStatus Status, UserResponse? Response)> UpdateUserData(UserResponse toUpdate);
 }
 
 public sealed class UsersControllerService : IUsersControllerService
@@ -56,13 +58,16 @@ public sealed class UsersControllerService : IUsersControllerService
 
     private readonly IProjectRepository _projectRepository;
 
+    private readonly IRoleRepository _roleRepository;
+    
     public UsersControllerService(
     ILogger<UsersControllerService> logger,
     IRequestMapper requestMapper,
     IResponseMapper responseMapper,
     IValidator validator,
     IUserRepository repository,
-    IProjectRepository projectRepository)
+    IProjectRepository projectRepository,
+    IRoleRepository roleRepository)
     {
         _logger = logger;
         _requestMapper = requestMapper;
@@ -70,6 +75,7 @@ public sealed class UsersControllerService : IUsersControllerService
         _validator = validator;
         _repository = repository;
         _projectRepository =  projectRepository;
+        _roleRepository = roleRepository;
     }
 
     public async Task<(ResponseStatus Status, UserResponse? Response)> GetAsync(int id)
@@ -785,15 +791,16 @@ public sealed class UsersControllerService : IUsersControllerService
             ProjectCode = project.ProjectCode,
             ProjectType = project.ProjectType,
             ProjectOrg = project.ProjectOrg,
-            Active = true
+            Active = true,
+            UserId = userId
         };
 
         if (user.UserProjects.Contains(userProject))
         {
             return (ResponseStatus.Successful, null);
+        }else{
+            user.UserProjects.Add(userProject);
         }
-
-        user.UserProjects.Add(userProject);
 
         try
         {
@@ -833,4 +840,115 @@ public sealed class UsersControllerService : IUsersControllerService
          return (ResponseStatus.Successful, response);
 
     }
+
+    public async Task<(ResponseStatus Status, UserResponse? Response)> UpdateUserData(UserResponse toUpdate)
+    {
+        if(toUpdate == null || String.IsNullOrEmpty(toUpdate.Id.ToString()))
+        {
+            return (ResponseStatus.MissingInformation, null);
+        }
+
+        User? existingUser;
+
+        try
+        {
+            existingUser = await  _repository.GetAsync(toUpdate.Id);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Could not retrieve existing user with given user name {toUpdate.UserName}.");
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        User? updatedUser = new User();
+
+        if(existingUser != null)
+        {   
+            updatedUser.Id = existingUser.Id;
+
+            updatedUser = existingUser;
+
+
+            //TODO add access
+
+            if(toUpdate.UserProjects != null){
+                List<UserProject> projectList = new List<UserProject>();
+                for (int i = 0; i < toUpdate.UserProjects.Count; i++) 
+                {
+                    var project =  toUpdate.UserProjects[i];
+                    if(!String.IsNullOrEmpty(project.ProjectCode)){
+                    var orgProj = await _projectRepository.GetProjectByCode(project.ProjectCode);
+                        if(orgProj != null){
+                            UserProject uProject =  new UserProject()
+                            {
+                                ProjectName = orgProj.ProjectName,
+                                ProjectCode = orgProj.ProjectCode,
+                                ProjectType = orgProj.ProjectType,
+                                ProjectOrg = orgProj.ProjectOrg,
+                                Active = true,
+                                UserId = toUpdate.Id
+                            };
+                            projectList.Add(uProject);
+                        }
+                    }
+
+                }
+
+                 updatedUser.UserProjects = projectList;
+            }else{
+                updatedUser.UserProjects = existingUser.UserProjects;
+            }
+
+            if(toUpdate.Roles != null){
+                List<Role> roleList = new List<Role>();
+                for (int i = 0; i < toUpdate.Roles.Count; i++) 
+                {
+                    var role = toUpdate.Roles[i];
+                    if(!String.IsNullOrEmpty(role.RoleName.ToString())){
+                        var orgRole = await _roleRepository.GetRoleByName(role.RoleName);
+                        if(orgRole != null){
+                            roleList.Add(orgRole);
+                        }
+                    }
+                }
+
+                updatedUser.Roles = roleList;    
+
+            }else{
+                updatedUser.Roles = existingUser.Roles;
+            }
+
+        /// add tests
+        /// add proxy
+        /// make endpoints for all orgs and project by org
+
+            try{
+                updatedUser = await _repository.UpdateUserAsync(updatedUser);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"Unable to save reference for user {updatedUser}.");
+                return (ResponseStatus.UnknownError, null);
+            }
+
+            if(toUpdate.Roles != null){
+                //clear existingUser roles
+                for (int i = 0; i < toUpdate.Roles.Count; i++) 
+                {
+                    var role = toUpdate.Roles[i];
+                    if(!String.IsNullOrEmpty(role.RoleName.ToString())){
+                        var orgRole = _responseMapper.Map(await _roleRepository.GetRoleByName(role.RoleName));
+                        if(orgRole != null){
+                            await AddRoleToUserAsync(toUpdate.Id, orgRole);
+                        }
+                    }
+                }
+            }
+        }
+
+        var response = _responseMapper.Map(updatedUser);
+
+        return (ResponseStatus.Successful, response);
+    }
+
 }

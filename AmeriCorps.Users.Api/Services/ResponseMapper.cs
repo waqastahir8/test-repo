@@ -482,5 +482,4 @@ public sealed class ResponseMapper : IResponseMapper
         )
     };
     
-
 }
