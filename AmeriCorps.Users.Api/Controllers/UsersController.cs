@@ -99,7 +99,7 @@ public sealed class UsersController(IUsersControllerService service) : Controlle
 
 
     //Associate a role with a user by passing userId and RoleID
-    [HttpPost("project/add/{userId}/{projCode}")]
+    [HttpGet("project/add/{userId}/{projCode}")]
     public async Task<IActionResult> AddUserToProject(int userId, string projCode) =>
         await ServeAsync(async () => await _service.AddUserToProject(userId, projCode));
 
