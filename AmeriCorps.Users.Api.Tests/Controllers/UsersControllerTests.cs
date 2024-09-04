@@ -484,6 +484,121 @@ public sealed partial class UsersControllerTests : BaseTests<UsersController>
         Assert.NotNull(response);
         Assert.Equal((int)HttpStatusCode.OK, response.StatusCode);
     }
+    [Fact]
+    public async Task AddUserToProject_SuccessProcessing_200StatusCode()
+    {
+        //Arrange
+        var sut = Setup();
+        var userId = Fixture.Create<int>();
+        var projCode = Fixture.Create<string>();
+        var userResponse = Fixture.Create<UserResponse>();
+
+        _serviceMock!
+            .Setup(x => x.AddUserToProject(userId,projCode))
+            .ReturnsAsync((ResponseStatus.Successful, userResponse));
+        //Act
+        var actual = await sut.AddUserToProject(userId,projCode);
+
+        //Assert
+        var response = actual as OkObjectResult;
+        Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task AddUserToProject_NonExistent_UnprocessableEntity_422StatusCode()
+    {
+        //Arrange
+        var sut = Setup();
+        var userId = Fixture.Create<int>();
+
+        _serviceMock!
+            .Setup(x => x.AddUserToProject(userId,null))
+            .ReturnsAsync((ResponseStatus.MissingInformation, null));
+        //Act
+        var actual = await sut.AddUserToProject(userId,null);
+
+        //Assert
+        var response = actual as StatusCodeResult;
+        Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.UnprocessableEntity, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task FetchUserListByOrgCode_SuccessProcessing_200StatusCode()
+    {
+        //Arrange
+        var sut = Setup();
+        var orgCode = Fixture.Create<string>();
+        var userResponse = Fixture.Create<UserListResponse>();
+
+        _serviceMock!
+            .Setup(x => x.FetchUserListByOrgCode(orgCode))
+            .ReturnsAsync((ResponseStatus.Successful, userResponse));
+        //Act
+        var actual = await sut.FetchUserListByOrgCode(orgCode);
+
+        //Assert
+        var response = actual as OkObjectResult;
+        Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task FetchUserListByOrgCode_NonExistent_UnprocessableEntity_422StatusCode()
+    {
+        //Arrange
+        var sut = Setup();
+
+        _serviceMock!
+            .Setup(x => x.FetchUserListByOrgCode(null))
+            .ReturnsAsync((ResponseStatus.MissingInformation, null));
+        //Act
+        var actual = await sut.FetchUserListByOrgCode(null);
+
+        //Assert
+        var response = actual as StatusCodeResult;
+        Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.UnprocessableEntity, response.StatusCode);
+    }
+
+        [Fact]
+    public async Task UpdateUserData_SuccessProcessing_200StatusCode()
+    {
+        //Arrange
+        var sut = Setup();
+        var toUpdate = Fixture.Create<UserResponse>();
+        var userResponse = Fixture.Create<UserResponse>();
+
+        _serviceMock!
+            .Setup(x => x.UpdateUserData(toUpdate))
+            .ReturnsAsync((ResponseStatus.Successful, userResponse));
+        //Act
+        var actual = await sut.UpdateUserData(toUpdate);
+
+        //Assert
+        var response = actual as OkObjectResult;
+        Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task UpdateUserData_NonExistent_UnprocessableEntity_422StatusCode()
+    {
+        //Arrange
+        var sut = Setup();
+
+        _serviceMock!
+            .Setup(x => x.UpdateUserData(null))
+            .ReturnsAsync((ResponseStatus.MissingInformation, null));
+        //Act
+        var actual = await sut.UpdateUserData(null);
+
+        //Assert
+        var response = actual as StatusCodeResult;
+        Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.UnprocessableEntity, response.StatusCode);
+    }
 
     protected override UsersController Setup()
     {

@@ -14,6 +14,9 @@ public interface IProjectRepository
 
     Task<T> SaveAsync<T>(T entity) where T : Entity;
 
+
+    UserProject FindExistingProject(string projectCode, User user);
+
 }
 
 public sealed partial class ProjectRepository(
@@ -45,4 +48,18 @@ public sealed partial class ProjectRepository(
            return entity;
        });
 
+
+    public UserProject FindExistingProject(string projectCode, User user)
+    {
+        if(!String.IsNullOrEmpty(projectCode) && user != null){
+            for (int i = 0; i < user.UserProjects.Count; i++) 
+            {
+                var existingProject =  user.UserProjects[i];
+                if(existingProject.ProjectCode == projectCode && existingProject.Active){
+                    return existingProject;
+                }
+            }
+        }
+        return null;
+    }
 }

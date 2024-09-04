@@ -83,4 +83,8 @@ public sealed partial class RoleRepository(
             }
             return false;
         });
+
+    
+    public async Task<Role?> GetRoleByName(string roleName) =>
+        await ExecuteAsync(async context => await context.Roles.FirstOrDefaultAsync(r =>r.RoleName == roleName));
 }

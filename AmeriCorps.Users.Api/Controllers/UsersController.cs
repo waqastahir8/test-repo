@@ -108,4 +108,11 @@ public sealed class UsersController(IUsersControllerService service) : Controlle
     [HttpGet("org/users/{orgCode}")]
     public async Task<IActionResult> FetchUserListByOrgCode(String orgCode) =>
         await ServeAsync(async () => await _service.FetchUserListByOrgCode(orgCode));
+
+
+    
+    //Update User acces, roles and projects
+    [HttpPost("org/users/update")]
+    public async Task<IActionResult> UpdateUserData([FromBody] UserResponse toUpdate) =>
+        await ServeAsync(async () => await _service.UpdateUserData(toUpdate));
 }

@@ -180,7 +180,7 @@ public sealed partial class UserRepository(
         UpdateEntities(user.Languages, context, userId);
         UpdateEntities(user.Skills, context, userId);
         UpdateEntities(user.UserProjects, context, userId);
-
+        
         return user;
     }
 
