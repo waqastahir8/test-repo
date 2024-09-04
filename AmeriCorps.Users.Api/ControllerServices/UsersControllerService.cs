@@ -918,10 +918,6 @@ public sealed class UsersControllerService : IUsersControllerService
                 updatedUser.Roles = existingUser.Roles;
             }
 
-        /// add tests
-        /// add proxy
-        /// make endpoints for all orgs and project by org
-
             try{
                 updatedUser = await _repository.UpdateUserAsync(updatedUser);
             }
