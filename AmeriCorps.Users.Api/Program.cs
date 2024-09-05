@@ -1,3 +1,7 @@
+
+using AmeriCorps.Users.Configuration;
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
@@ -20,7 +24,8 @@ builder.Services
     .AddScoped<IUsersControllerService, UsersControllerService>()
     .AddScoped<IRolesControllerService, RolesControllerService>()
     .AddScoped<IOrgControllerService, OrgControllerService>()
-    .AddScoped<IProjectControllerService, ProjectControllerService>();
+    .AddScoped<IProjectControllerService, ProjectControllerService>()
+    .AddScoped<IApiService, ApiService>();
 
 
 builder.Configuration
@@ -57,6 +62,9 @@ builder.Configuration
 
 builder.Services.Configure<UserContextOptions>(
     builder.Configuration.GetSection(nameof(UserContextOptions)));
+
+builder.Services.Configure<NotificationOptions>(
+    builder.Configuration.GetSection(nameof(NotificationOptions)));
 
 var app = builder.Build();
 
