@@ -1015,7 +1015,7 @@ public sealed class UsersControllerService : IUsersControllerService
 
         //Add call for email invite
 
-        await _apiService.SendInviteEmailAsync(user);
+        // await _apiService.SendInviteEmailAsync(user);
 
         var response = _responseMapper.Map(user);
 
