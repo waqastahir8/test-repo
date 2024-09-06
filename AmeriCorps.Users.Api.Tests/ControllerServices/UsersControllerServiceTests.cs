@@ -16,6 +16,8 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
 
     private Mock<IRoleRepository>? _roleRepository;
 
+    private Mock<IApiService>? _apiService;
+
     [Theory]
     [InlineData(5)]
     [InlineData(15)]
@@ -1536,7 +1538,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
 
     [Theory]
     [InlineData(1,"proj")]    
-    public async Task AddUserToProject_Successful_Status(int userId, string projCode)
+    public async Task AddUserToProjectAsync_Successful_Status(int userId, string projCode)
     {
         // Arrange
         var sut = Setup();
@@ -1555,7 +1557,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             .Returns(project);
 
         _projectRepository!
-            .Setup(x => x.GetProjectByCode(It.IsAny<string>()))
+            .Setup(x => x.GetProjectByCodeAsync(It.IsAny<string>()))
             .ReturnsAsync(project);
 
         _repositoryMock!
@@ -1566,7 +1568,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             .Create());
 
         // Act
-        var (status, _) = await sut.AddUserToProject(userId,projCode);
+        var (status, _) = await sut.AddUserToProjectAsync(userId,projCode);
 
         // Assert
         Assert.Equal(ResponseStatus.Successful, status);
@@ -1574,12 +1576,12 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
 
     [Theory]
     [InlineData(1,"proj")]    
-    public async Task AddUserToProject_InformationMissing_Status(int userId, string projCode)
+    public async Task AddUserToProjectAsync_InformationMissing_Status(int userId, string projCode)
     {
         // Arrange
         var sut = Setup();
 
-        var (status, _) = await sut.AddUserToProject(userId,projCode);
+        var (status, _) = await sut.AddUserToProjectAsync(userId,projCode);
 
         // Assert
         Assert.Equal(ResponseStatus.MissingInformation, status);
@@ -1592,7 +1594,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             .Create());
 
         // Act
-        var (status2, _) = await sut.AddUserToProject(userId,projCode);
+        var (status2, _) = await sut.AddUserToProjectAsync(userId,projCode);
 
         // Assert
         Assert.Equal(ResponseStatus.MissingInformation, status2);
@@ -1600,7 +1602,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
 
     [Theory]
     [InlineData("org")]    
-    public async Task FetchUserListByOrgCode_Successful_Status(string orgCode)
+    public async Task FetchUserListByOrgCodeAsync_Successful_Status(string orgCode)
     {
         // Arrange
         var sut = Setup();
@@ -1614,7 +1616,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             .Create());
 
         // Act
-        var (status, _) = await sut.FetchUserListByOrgCode(orgCode);
+        var (status, _) = await sut.FetchUserListByOrgCodeAsync(orgCode);
 
         // Assert
         Assert.Equal(ResponseStatus.Successful, status);
@@ -1622,13 +1624,13 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
 
     [Theory]
     [InlineData("org")]    
-    public async Task FetchUserListByOrgCode_Missing_Status(string orgCode)
+    public async Task FetchUserListByOrgCodeAsync_Missing_Status(string orgCode)
     {
         // Arrange
         var sut = Setup();
 
         // Act
-        var (status, _) = await sut.FetchUserListByOrgCode(null);
+        var (status, _) = await sut.FetchUserListByOrgCodeAsync(null);
 
         // Assert
         Assert.Equal(ResponseStatus.MissingInformation, status);
@@ -1636,7 +1638,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
 
     [Theory]
     [InlineData(1)]    
-    public async Task UpdateUserData_Successful_Status(int userId)
+    public async Task UpdateUserDataAsync_Successful_Status(int userId)
     {
         // Arrange
         var sut = Setup();
@@ -1654,7 +1656,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             .Create());
 
         // Act
-        var (status, _) = await sut.UpdateUserData(model);
+        var (status, _) = await sut.UpdateUserDataAsync(model);
 
         // Assert
         Assert.Equal(ResponseStatus.Successful, status);
@@ -1662,18 +1664,75 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
 
     [Theory]
     [InlineData(1)]    
-    public async Task UpdateUserData_Missing_Status(int userId)
+    public async Task UpdateUserDataAsync_Missing_Status(int userId)
     {
         // Arrange
         var sut = Setup();
 
         // Act
-        var (status, _) = await sut.UpdateUserData(null);
+        var (status, _) = await sut.UpdateUserDataAsync(null);
 
         // Assert
         Assert.Equal(ResponseStatus.MissingInformation, status);
 
     }
+
+    [Fact]
+    public async Task InviteUserToOrgAsync_Successful_Status()
+    {
+        // Arrange
+        var sut = Setup();
+
+        var model = Fixture.Build<UserRequestModel>()
+                        .Create();
+        var user =
+            Fixture
+            .Build<User>()
+            .Without(u => u.Roles)
+            .Without(u => u.UserProjects)
+            .Create();
+        _validatorMock!
+            .Setup(x => x.Validate(model))
+            .Returns(true);
+        _requestMapperMock!
+            .Setup(x => x.Map(model))
+            .Returns(user);
+
+        _repositoryMock!
+            .Setup(x => x.SaveAsync(user))
+            .ReturnsAsync(user);
+
+        var (status, _) = await sut.InviteUserToOrgAsync(model);
+
+        // Assert
+        Assert.Equal(ResponseStatus.Successful, status);
+    }
+
+
+    [Fact]
+    public async Task InviteUserToOrgAsync_Missing_Status()
+    {
+        // Arrange
+        var sut = Setup();
+
+        // Act
+        var (status, _) = await sut.InviteUserToOrgAsync(null);
+
+        // Assert
+        Assert.Equal(ResponseStatus.MissingInformation, status);
+
+    }
+
+    /**
+
+    proxy for invite
+
+    Push this and portal changes
+
+    Project role updates
+
+    */
+
 
 
     protected override UsersControllerService Setup()
@@ -1684,6 +1743,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         _validatorMock = new();
         _projectRepository = new();
         _roleRepository = new();
+        _apiService = new ();
 
         Fixture = new Fixture();
         Fixture.Customize<DateOnly>(x => x.FromFactory<DateTime>(DateOnly.FromDateTime));
@@ -1694,6 +1754,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             _validatorMock.Object,
             _repositoryMock.Object,
             _projectRepository.Object,
-            _roleRepository.Object);
+            _roleRepository.Object,
+            _apiService.Object);
     }
 }

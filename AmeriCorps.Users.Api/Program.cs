@@ -27,6 +27,7 @@ builder.Services
     .AddScoped<IProjectControllerService, ProjectControllerService>()
     .AddScoped<IApiService, ApiService>();
 
+// builder.Services.AddApiClients();
 
 builder.Configuration
     .AddJsonFile("appsettings.local.json", optional: true)

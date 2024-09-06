@@ -15,18 +15,18 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
 
     [Theory]
     [InlineData("proj")]
-    public async Task GetProjectByCode_Successful_Status(string projCode)
+    public async Task GetProjectByCodeAsync_Successful_Status(string projCode)
     {
         // Arrange
         var sut = Setup();
         
         _repositoryMock!
-            .Setup(x => x.GetProjectByCode(projCode))
+            .Setup(x => x.GetProjectByCodeAsync(projCode))
             .ReturnsAsync(() => Fixture.Build<Project>()
             .Create());
 
         // Act
-        var (status, _) = await sut.GetProjectByCode(projCode);
+        var (status, _) = await sut.GetProjectByCodeAsync(projCode);
 
         // Assert
         Assert.Equal(ResponseStatus.Successful, status);
@@ -34,16 +34,16 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
 
     [Theory]
     [InlineData("proj")]
-    public async Task GetProjectByCode_NonExistent_InformationMissing_Status(string projCode)
+    public async Task GetProjectByCodeAsync_NonExistent_InformationMissing_Status(string projCode)
     {
         // Arrange
         var sut = Setup();
         _repositoryMock!
-            .Setup(x => x.GetProjectByCode(projCode))
+            .Setup(x => x.GetProjectByCodeAsync(projCode))
             .ReturnsAsync(() => null);
 
         // Act
-        var (status, _) = await sut.GetProjectByCode(projCode);
+        var (status, _) = await sut.GetProjectByCodeAsync(projCode);
 
         // Assert
         Assert.Equal(ResponseStatus.MissingInformation, status);
@@ -51,20 +51,20 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
 
 
     [Fact]
-    public async Task CreateProject_NullProject_MissingInformationStatus()
+    public async Task CreateProjectAsync_NullProject_MissingInformationStatus()
     {
         //Arrange
         var sut = Setup();
 
         //Act
-        var (status, _) = await sut.CreateProject(null);
+        var (status, _) = await sut.CreateProjectAsync(null);
 
         //Assert
         Assert.Equal(ResponseStatus.MissingInformation, status);
     }
 
     [Fact]
-    public async Task CreateProject_SuccessfulStatus()
+    public async Task CreateProjectAsync_SuccessfulStatus()
     {
         // Arrange
         var sut = Setup();
@@ -83,11 +83,11 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
             .Returns(project);
 
         _repositoryMock!
-            .Setup(x => x.GetProjectByCode(It.IsAny<string>()))
+            .Setup(x => x.GetProjectByCodeAsync(It.IsAny<string>()))
             .ReturnsAsync(project);
 
         // Act
-        var (status, _) = await sut.CreateProject(model);
+        var (status, _) = await sut.CreateProjectAsync(model);
 
         // Assert
         Assert.Equal(ResponseStatus.Successful, status);
@@ -95,7 +95,7 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
     }
 
     [Fact]
-    public async Task CreateProject_ReturnsMappedObject()
+    public async Task CreateProjectAsync_ReturnsMappedObject()
     {
         // Arrange
         var sut = Setup();
@@ -122,11 +122,11 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
             .Returns(expected);
 
         _repositoryMock!
-            .Setup(x => x.GetProjectByCode(It.IsAny<string>()))
+            .Setup(x => x.GetProjectByCodeAsync(It.IsAny<string>()))
             .ReturnsAsync(project);
 
         // Act
-        var (_, actual) = await sut.CreateProject(model);
+        var (_, actual) = await sut.CreateProjectAsync(model);
 
         // Assert
         Assert.Equal(expected, actual);

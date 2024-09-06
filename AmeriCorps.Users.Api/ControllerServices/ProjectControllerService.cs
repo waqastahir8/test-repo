@@ -10,9 +10,9 @@ namespace AmeriCorps.Users.Api;
 public interface IProjectControllerService
 {
 
-    Task<(ResponseStatus Status, ProjectResponse? Response)> GetProjectByCode(string projCode);
+    Task<(ResponseStatus Status, ProjectResponse? Response)> GetProjectByCodeAsync(string projCode);
 
-    Task<(ResponseStatus Status, ProjectResponse? Response)> CreateProject(ProjectRequestModel? projRequest);
+    Task<(ResponseStatus Status, ProjectResponse? Response)> CreateProjectAsync(ProjectRequestModel? projRequest);
 
 }
 
@@ -36,13 +36,13 @@ public sealed class ProjectControllerService : IProjectControllerService
     }
 
 
-    public async Task<(ResponseStatus Status, ProjectResponse? Response)> GetProjectByCode(string projCode)
+    public async Task<(ResponseStatus Status, ProjectResponse? Response)> GetProjectByCodeAsync(string projCode)
     {
         Project? project;
        
         try
         {
-            project =  await _repository.GetProjectByCode(projCode);
+            project =  await _repository.GetProjectByCodeAsync(projCode);
         }
         catch (Exception e)
         {
@@ -62,7 +62,7 @@ public sealed class ProjectControllerService : IProjectControllerService
 
 
 
-    public async Task<(ResponseStatus Status, ProjectResponse? Response)> CreateProject(ProjectRequestModel? projRequest)
+    public async Task<(ResponseStatus Status, ProjectResponse? Response)> CreateProjectAsync(ProjectRequestModel? projRequest)
     {
         if (projRequest == null)
         {
@@ -73,7 +73,7 @@ public sealed class ProjectControllerService : IProjectControllerService
 
         try
         {
-            var foundProj = await _repository.GetProjectByCode(project.ProjectCode);
+            var foundProj = await _repository.GetProjectByCodeAsync(project.ProjectCode);
             if (foundProj == null)
             {
                 project = await _repository.SaveAsync(project);

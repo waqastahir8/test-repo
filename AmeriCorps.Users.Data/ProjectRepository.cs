@@ -10,7 +10,7 @@ namespace AmeriCorps.Users.Data;
 
 public interface IProjectRepository
 {
-    Task<Project?> GetProjectByCode(string projCode);
+    Task<Project?> GetProjectByCodeAsync(string projCode);
 
     Task<T> SaveAsync<T>(T entity) where T : Entity;
 
@@ -26,7 +26,7 @@ public sealed partial class ProjectRepository(
 ) : RepositoryBase<RepositoryContext, UserContextOptions>(logger, contextFactory, options),
     IProjectRepository
 {
-    public async Task<Project?> GetProjectByCode(string projCode) =>
+    public async Task<Project?> GetProjectByCodeAsync(string projCode) =>
         await ExecuteAsync(async context => await context.Projects.FirstOrDefaultAsync(p => p.ProjectCode == projCode));
 
     public async Task<T> SaveAsync<T>(T entity) where T : Entity =>

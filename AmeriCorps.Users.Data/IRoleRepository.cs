@@ -16,6 +16,6 @@ public interface IRoleRepository
 
     Task<bool> DeleteAsync<T>(int id) where T : Entity;
 
-    Task<Role?> GetRoleByName(string roleName);
+    Task<Role?> GetRoleByNameAsync(string roleName);
 
 }

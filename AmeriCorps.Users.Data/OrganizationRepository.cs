@@ -10,7 +10,7 @@ namespace AmeriCorps.Users.Data;
 
 public interface IOrganizationRepository
 {
-    Task<Organization?> GetOrgByCode(string orgCode);
+    Task<Organization?> GetOrgByCodeAsync(string orgCode);
 
     Task<T> SaveAsync<T>(T entity) where T : Entity;
 
@@ -24,7 +24,7 @@ public sealed partial class OrganizationRepository(
 ) : RepositoryBase<RepositoryContext, UserContextOptions>(logger, contextFactory, options),
     IOrganizationRepository
 {
-    public async Task<Organization?> GetOrgByCode(string orgCode) =>
+    public async Task<Organization?> GetOrgByCodeAsync(string orgCode) =>
         await ExecuteAsync(async context => await context.Organizations.FirstOrDefaultAsync(o =>o.OrgCode == orgCode));
 
     public async Task<T> SaveAsync<T>(T entity) where T : Entity =>

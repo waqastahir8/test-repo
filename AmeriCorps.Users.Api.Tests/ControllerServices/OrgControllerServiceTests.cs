@@ -15,18 +15,18 @@ public sealed partial class OrgControllerServiceTests : BaseTests<OrgControllerS
 
     [Theory]
     [InlineData("org")]
-    public async Task GetOrgByCode_Successful_Status(string orgCode)
+    public async Task GetOrgByCodeAsync_Successful_Status(string orgCode)
     {
         // Arrange
         var sut = Setup();
         
         _repositoryMock!
-            .Setup(x => x.GetOrgByCode(orgCode))
+            .Setup(x => x.GetOrgByCodeAsync(orgCode))
             .ReturnsAsync(() => Fixture.Build<Organization>()
             .Create());
 
         // Act
-        var (status, _) = await sut.GetOrgByCode(orgCode);
+        var (status, _) = await sut.GetOrgByCodeAsync(orgCode);
 
         // Assert
         Assert.Equal(ResponseStatus.Successful, status);
@@ -34,36 +34,36 @@ public sealed partial class OrgControllerServiceTests : BaseTests<OrgControllerS
 
     [Theory]
     [InlineData("org")]
-    public async Task GetOrgByCode_NonExistent_InformationMissing_Status(string orgCode)
+    public async Task GetOrgByCodeAsync_NonExistent_InformationMissing_Status(string orgCode)
     {
         // Arrange
         var sut = Setup();
         _repositoryMock!
-            .Setup(x => x.GetOrgByCode(orgCode))
+            .Setup(x => x.GetOrgByCodeAsync(orgCode))
             .ReturnsAsync(() => null);
 
         // Act
-        var (status, _) = await sut.GetOrgByCode(orgCode);
+        var (status, _) = await sut.GetOrgByCodeAsync(orgCode);
 
         // Assert
         Assert.Equal(ResponseStatus.MissingInformation, status);
     }
 
     [Fact]
-    public async Task CreateOrg_NullOrg_MissingInformationStatus()
+    public async Task CreateOrgAsync_NullOrg_MissingInformationStatus()
     {
         //Arrange
         var sut = Setup();
 
         //Act
-        var (status, _) = await sut.CreateOrg(null);
+        var (status, _) = await sut.CreateOrgAsync(null);
 
         //Assert
         Assert.Equal(ResponseStatus.MissingInformation, status);
     }
 
     [Fact]
-    public async Task CreateOrg_SuccessfulStatus()
+    public async Task CreateOrgAsync_SuccessfulStatus()
     {
         // Arrange
         var sut = Setup();
@@ -82,11 +82,11 @@ public sealed partial class OrgControllerServiceTests : BaseTests<OrgControllerS
             .Returns(org);
 
         _repositoryMock!
-            .Setup(x => x.GetOrgByCode(It.IsAny<string>()))
+            .Setup(x => x.GetOrgByCodeAsync(It.IsAny<string>()))
             .ReturnsAsync(org);
 
         // Act
-        var (status, _) = await sut.CreateOrg(model);
+        var (status, _) = await sut.CreateOrgAsync(model);
 
         // Assert
         Assert.Equal(ResponseStatus.Successful, status);
@@ -94,7 +94,7 @@ public sealed partial class OrgControllerServiceTests : BaseTests<OrgControllerS
     }
 
     [Fact]
-    public async Task CreateOrg_ReturnsMappedObject()
+    public async Task CreateOrgAsync_ReturnsMappedObject()
     {
         // Arrange
         var sut = Setup();
@@ -121,11 +121,11 @@ public sealed partial class OrgControllerServiceTests : BaseTests<OrgControllerS
             .Returns(expected);
 
         _repositoryMock!
-            .Setup(x => x.GetOrgByCode(It.IsAny<string>()))
+            .Setup(x => x.GetOrgByCodeAsync(It.IsAny<string>()))
             .ReturnsAsync(org);
 
         // Act
-        var (_, actual) = await sut.CreateOrg(model);
+        var (_, actual) = await sut.CreateOrgAsync(model);
 
         // Assert
         Assert.Equal(expected, actual);
