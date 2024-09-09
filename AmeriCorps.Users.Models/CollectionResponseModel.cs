@@ -7,6 +7,6 @@ public class CollectionResponseModel
     public int UserId { get; set; }
     
     public int ListingId { get; set; }
-    
-    public string Type { get; set; }
+
+    public string Type { get; set; } = string.Empty;
 }
