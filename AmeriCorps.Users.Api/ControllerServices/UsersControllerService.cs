@@ -38,10 +38,12 @@ public interface IUsersControllerService
 
     Task<(ResponseStatus Status, UserResponse? Response)> AssociateRoleAsync(int userId, int roleId);
     Task<(ResponseStatus Status, UserResponse? Response)> AddRoleToUserAsync(int userId, RoleRequestModel roleRequest);
-    Task<(ResponseStatus Status, UserListResponse? Response)> FetchUserListByOrgCode(String orgCode);
-    Task<(ResponseStatus Status, UserResponse? Response)> AddUserToProject(int userId, string projCode);
+    Task<(ResponseStatus Status, UserListResponse? Response)> FetchUserListByOrgCodeAsync(String orgCode);
+    Task<(ResponseStatus Status, UserResponse? Response)> AddUserToProjectAsync(int userId, string projCode);
 
-    Task<(ResponseStatus Status, UserResponse? Response)> UpdateUserData(UserResponse toUpdate);
+    Task<(ResponseStatus Status, UserResponse? Response)> UpdateUserDataAsync(UserResponse toUpdate);
+
+    Task<(ResponseStatus Status, UserResponse? Response)> InviteUserToOrgAsync( UserRequestModel toInvite);
 }
 
 public sealed class UsersControllerService : IUsersControllerService
@@ -59,6 +61,8 @@ public sealed class UsersControllerService : IUsersControllerService
     private readonly IProjectRepository _projectRepository;
 
     private readonly IRoleRepository _roleRepository;
+
+    private readonly IApiService _apiService;
     
     public UsersControllerService(
     ILogger<UsersControllerService> logger,
@@ -67,7 +71,8 @@ public sealed class UsersControllerService : IUsersControllerService
     IValidator validator,
     IUserRepository repository,
     IProjectRepository projectRepository,
-    IRoleRepository roleRepository)
+    IRoleRepository roleRepository,
+    IApiService apiService)
     {
         _logger = logger;
         _requestMapper = requestMapper;
@@ -76,6 +81,7 @@ public sealed class UsersControllerService : IUsersControllerService
         _repository = repository;
         _projectRepository =  projectRepository;
         _roleRepository = roleRepository;
+        _apiService =  apiService;
     }
 
     public async Task<(ResponseStatus Status, UserResponse? Response)> GetAsync(int id)
@@ -750,7 +756,7 @@ public sealed class UsersControllerService : IUsersControllerService
     }
 
 
-    public async Task<(ResponseStatus Status, UserResponse? Response)> AddUserToProject(int userId, string projCode)
+    public async Task<(ResponseStatus Status, UserResponse? Response)> AddUserToProjectAsync(int userId, string projCode)
     {
         User? user;
         try
@@ -772,7 +778,7 @@ public sealed class UsersControllerService : IUsersControllerService
 
         try
         {
-            project = await _projectRepository.GetProjectByCode(projCode);
+            project = await _projectRepository.GetProjectByCodeAsync(projCode);
         }
         catch (Exception e)
         {
@@ -815,7 +821,7 @@ public sealed class UsersControllerService : IUsersControllerService
     }
 
 
-    public async Task<(ResponseStatus Status, UserListResponse? Response)> FetchUserListByOrgCode(String orgCode)
+    public async Task<(ResponseStatus Status, UserListResponse? Response)> FetchUserListByOrgCodeAsync(String orgCode)
     {
 
         UserList? userList;
@@ -828,7 +834,7 @@ public sealed class UsersControllerService : IUsersControllerService
 
         try
         {
-            userList = await  _repository.FetchUserListByOrgCode(orgCode);
+            userList = await  _repository.FetchUserListByOrgCodeAsync(orgCode);
         }
         catch (Exception e)
         {
@@ -841,7 +847,7 @@ public sealed class UsersControllerService : IUsersControllerService
 
     }
 
-    public async Task<(ResponseStatus Status, UserResponse? Response)> UpdateUserData(UserResponse toUpdate)
+    public async Task<(ResponseStatus Status, UserResponse? Response)> UpdateUserDataAsync(UserResponse toUpdate)
     {
         if(toUpdate == null || String.IsNullOrEmpty(toUpdate.Id.ToString()))
         {
@@ -877,7 +883,7 @@ public sealed class UsersControllerService : IUsersControllerService
                 {
                     var project =  toUpdate.UserProjects[i];
                     if(!String.IsNullOrEmpty(project.ProjectCode)){
-                    var orgProj = await _projectRepository.GetProjectByCode(project.ProjectCode);
+                    var orgProj = await _projectRepository.GetProjectByCodeAsync(project.ProjectCode);
                         if(orgProj != null){
                             UserProject uProject =  new UserProject()
                             {
@@ -893,8 +899,7 @@ public sealed class UsersControllerService : IUsersControllerService
                     }
 
                 }
-
-                 updatedUser.UserProjects = projectList;
+                updatedUser.UserProjects = projectList;
             }else{
                 updatedUser.UserProjects = existingUser.UserProjects;
             }
@@ -905,7 +910,7 @@ public sealed class UsersControllerService : IUsersControllerService
                 {
                     var role = toUpdate.Roles[i];
                     if(!String.IsNullOrEmpty(role.RoleName.ToString())){
-                        var orgRole = await _roleRepository.GetRoleByName(role.RoleName);
+                        var orgRole = await _roleRepository.GetRoleByNameAsync(role.RoleName);
                         if(orgRole != null){
                             roleList.Add(orgRole);
                         }
@@ -933,7 +938,7 @@ public sealed class UsersControllerService : IUsersControllerService
                 {
                     var role = toUpdate.Roles[i];
                     if(!String.IsNullOrEmpty(role.RoleName.ToString())){
-                        var orgRole = _responseMapper.Map(await _roleRepository.GetRoleByName(role.RoleName));
+                        var orgRole = _responseMapper.Map(await _roleRepository.GetRoleByNameAsync(role.RoleName));
                         if(orgRole != null){
                             await AddRoleToUserAsync(toUpdate.Id, orgRole);
                         }
@@ -945,6 +950,77 @@ public sealed class UsersControllerService : IUsersControllerService
         var response = _responseMapper.Map(updatedUser);
 
         return (ResponseStatus.Successful, response);
+    }
+
+
+
+    public async Task<(ResponseStatus Status, UserResponse? Response)> InviteUserToOrgAsync(UserRequestModel toInvite)
+    {
+
+        if(toInvite == null || String.IsNullOrEmpty(toInvite.Email.ToString()))
+        {
+            return (ResponseStatus.MissingInformation, null);
+        }
+
+
+        var user = _requestMapper.Map(toInvite);
+        user.UserName = "InviteHold";
+
+        user = await _repository.SaveAsync(user);
+
+
+        if(toInvite.UserProjects != null){
+            List<UserProject> projectList = new List<UserProject>();
+            for (int i = 0; i < toInvite.UserProjects.Count; i++) 
+            {
+                var project =  toInvite.UserProjects[i];
+                if(!String.IsNullOrEmpty(project.ProjectCode)){
+                var orgProj = await _projectRepository.GetProjectByCodeAsync(project.ProjectCode);
+                    if(orgProj != null){
+                        UserProject uProject =  new UserProject()
+                        {
+                            ProjectName = orgProj.ProjectName,
+                            ProjectCode = orgProj.ProjectCode,
+                            ProjectType = orgProj.ProjectType,
+                            ProjectOrg = orgProj.ProjectOrg,
+                            Active = true,
+                            UserId = user.Id
+                        };
+                        projectList.Add(uProject);
+                    }
+                }
+
+            }
+            user.UserProjects = projectList;
+        }
+
+
+        if(toInvite.Roles != null){
+            List<Role> roleList = new List<Role>();
+            for (int i = 0; i < toInvite.Roles.Count; i++) 
+            {
+                var role = toInvite.Roles[i];
+                if(!String.IsNullOrEmpty(role.RoleName.ToString())){
+                    var orgResponse = await _roleRepository.GetRoleByNameAsync(role.RoleName);
+                    var orgRole = _responseMapper.Map(orgResponse);
+                    if(orgRole != null){
+                        await AddRoleToUserAsync(user.Id, orgRole);
+                    }
+                }
+            }
+            user.Roles = roleList;    
+        }
+
+        user = await _repository.SaveAsync(user);
+
+        //Add call for email invite
+
+        // await _apiService.SendInviteEmailAsync(user);
+
+        var response = _responseMapper.Map(user);
+
+        return (ResponseStatus.Successful, response);
+
     }
 
 }

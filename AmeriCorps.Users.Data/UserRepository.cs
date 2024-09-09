@@ -222,7 +222,7 @@ public sealed partial class UserRepository(
     }
 
 
-    public async Task<UserList> FetchUserListByOrgCode(string orgCode)
+    public async Task<UserList> FetchUserListByOrgCodeAsync(string orgCode)
     {
         List<User> users = await ExecuteAsync (async context =>
                 await context.Users

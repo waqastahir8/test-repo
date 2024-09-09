@@ -10,9 +10,9 @@ namespace AmeriCorps.Users.Api;
 public interface IOrgControllerService
 {
 
-    Task<(ResponseStatus Status, OrganizationResponse? Response)> GetOrgByCode(string orgCode);
+    Task<(ResponseStatus Status, OrganizationResponse? Response)> GetOrgByCodeAsync(string orgCode);
 
-    Task<(ResponseStatus Status, OrganizationResponse? Response)> CreateOrg(OrganizationRequestModel? orgRequest);
+    Task<(ResponseStatus Status, OrganizationResponse? Response)> CreateOrgAsync(OrganizationRequestModel? orgRequest);
 
 }
 
@@ -36,13 +36,13 @@ public sealed class OrgControllerService : IOrgControllerService
     }
 
 
-    public async Task<(ResponseStatus Status, OrganizationResponse? Response)> GetOrgByCode(string orgCode)
+    public async Task<(ResponseStatus Status, OrganizationResponse? Response)> GetOrgByCodeAsync(string orgCode)
     {
         Organization? organization;
        
         try
         {
-            organization =  await _repository.GetOrgByCode(orgCode);
+            organization =  await _repository.GetOrgByCodeAsync(orgCode);
         }
         catch (Exception e)
         {
@@ -62,7 +62,7 @@ public sealed class OrgControllerService : IOrgControllerService
 
 
 
-    public async Task<(ResponseStatus Status, OrganizationResponse? Response)> CreateOrg(OrganizationRequestModel? orgRequest)
+    public async Task<(ResponseStatus Status, OrganizationResponse? Response)> CreateOrgAsync(OrganizationRequestModel? orgRequest)
     {
         if (orgRequest == null)
         {
@@ -73,7 +73,7 @@ public sealed class OrgControllerService : IOrgControllerService
 
         try
         {
-            var foundOrg =  await _repository.GetOrgByCode(org.OrgCode);
+            var foundOrg =  await _repository.GetOrgByCodeAsync(org.OrgCode);
             if (foundOrg == null)
             {
                 org = await _repository.SaveAsync(org);

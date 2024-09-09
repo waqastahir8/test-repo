@@ -13,12 +13,12 @@ public sealed class OrgController(IOrgControllerService service) : ControllerBas
 
 
     [HttpGet("{orgCode}")]
-    public async Task<IActionResult> GetOrgByCode(string orgCode) =>
-        await ServeAsync(async () => await _service.GetOrgByCode(orgCode));
+    public async Task<IActionResult> GetOrgByCodeAsync(string orgCode) =>
+        await ServeAsync(async () => await _service.GetOrgByCodeAsync(orgCode));
 
     [HttpPost("create")]
-    public async Task<IActionResult> CreateOrg([FromBody] OrganizationRequestModel orgRequest) =>
-        await ServeAsync(async () => await _service.CreateOrg(orgRequest));
+    public async Task<IActionResult> CreateOrgAsync([FromBody] OrganizationRequestModel orgRequest) =>
+        await ServeAsync(async () => await _service.CreateOrgAsync(orgRequest));
 
 
 

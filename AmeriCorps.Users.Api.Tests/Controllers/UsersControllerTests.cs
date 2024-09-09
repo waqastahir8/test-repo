@@ -485,7 +485,7 @@ public sealed partial class UsersControllerTests : BaseTests<UsersController>
         Assert.Equal((int)HttpStatusCode.OK, response.StatusCode);
     }
     [Fact]
-    public async Task AddUserToProject_SuccessProcessing_200StatusCode()
+    public async Task AddUserToProjectAsync_SuccessProcessing_200StatusCode()
     {
         //Arrange
         var sut = Setup();
@@ -494,10 +494,10 @@ public sealed partial class UsersControllerTests : BaseTests<UsersController>
         var userResponse = Fixture.Create<UserResponse>();
 
         _serviceMock!
-            .Setup(x => x.AddUserToProject(userId,projCode))
+            .Setup(x => x.AddUserToProjectAsync(userId,projCode))
             .ReturnsAsync((ResponseStatus.Successful, userResponse));
         //Act
-        var actual = await sut.AddUserToProject(userId,projCode);
+        var actual = await sut.AddUserToProjectAsync(userId,projCode);
 
         //Assert
         var response = actual as OkObjectResult;
@@ -506,17 +506,18 @@ public sealed partial class UsersControllerTests : BaseTests<UsersController>
     }
 
     [Fact]
-    public async Task AddUserToProject_NonExistent_UnprocessableEntity_422StatusCode()
+    public async Task AddUserToProjectAsync_NonExistent_UnprocessableEntity_422StatusCode()
     {
         //Arrange
         var sut = Setup();
         var userId = Fixture.Create<int>();
+        var projCode = Fixture.Create<string>();
 
         _serviceMock!
-            .Setup(x => x.AddUserToProject(userId,null))
+            .Setup(x => x.AddUserToProjectAsync(userId,projCode))
             .ReturnsAsync((ResponseStatus.MissingInformation, null));
         //Act
-        var actual = await sut.AddUserToProject(userId,null);
+        var actual = await sut.AddUserToProjectAsync(userId,projCode);
 
         //Assert
         var response = actual as StatusCodeResult;
@@ -525,7 +526,7 @@ public sealed partial class UsersControllerTests : BaseTests<UsersController>
     }
 
     [Fact]
-    public async Task FetchUserListByOrgCode_SuccessProcessing_200StatusCode()
+    public async Task FetchUserListByOrgCodeAsync_SuccessProcessing_200StatusCode()
     {
         //Arrange
         var sut = Setup();
@@ -533,10 +534,10 @@ public sealed partial class UsersControllerTests : BaseTests<UsersController>
         var userResponse = Fixture.Create<UserListResponse>();
 
         _serviceMock!
-            .Setup(x => x.FetchUserListByOrgCode(orgCode))
+            .Setup(x => x.FetchUserListByOrgCodeAsync(orgCode))
             .ReturnsAsync((ResponseStatus.Successful, userResponse));
         //Act
-        var actual = await sut.FetchUserListByOrgCode(orgCode);
+        var actual = await sut.FetchUserListByOrgCodeAsync(orgCode);
 
         //Assert
         var response = actual as OkObjectResult;
@@ -545,16 +546,17 @@ public sealed partial class UsersControllerTests : BaseTests<UsersController>
     }
 
     [Fact]
-    public async Task FetchUserListByOrgCode_NonExistent_UnprocessableEntity_422StatusCode()
+    public async Task FetchUserListByOrgCodeAsync_NonExistent_UnprocessableEntity_422StatusCode()
     {
         //Arrange
         var sut = Setup();
+        var orgCode = Fixture.Create<string>();
 
         _serviceMock!
-            .Setup(x => x.FetchUserListByOrgCode(null))
+            .Setup(x => x.FetchUserListByOrgCodeAsync(orgCode))
             .ReturnsAsync((ResponseStatus.MissingInformation, null));
         //Act
-        var actual = await sut.FetchUserListByOrgCode(null);
+        var actual = await sut.FetchUserListByOrgCodeAsync(orgCode);
 
         //Assert
         var response = actual as StatusCodeResult;
@@ -562,8 +564,8 @@ public sealed partial class UsersControllerTests : BaseTests<UsersController>
         Assert.Equal((int)HttpStatusCode.UnprocessableEntity, response.StatusCode);
     }
 
-        [Fact]
-    public async Task UpdateUserData_SuccessProcessing_200StatusCode()
+    [Fact]
+    public async Task UpdateUserDataAsync_SuccessProcessing_200StatusCode()
     {
         //Arrange
         var sut = Setup();
@@ -571,10 +573,10 @@ public sealed partial class UsersControllerTests : BaseTests<UsersController>
         var userResponse = Fixture.Create<UserResponse>();
 
         _serviceMock!
-            .Setup(x => x.UpdateUserData(toUpdate))
+            .Setup(x => x.UpdateUserDataAsync(toUpdate))
             .ReturnsAsync((ResponseStatus.Successful, userResponse));
         //Act
-        var actual = await sut.UpdateUserData(toUpdate);
+        var actual = await sut.UpdateUserDataAsync(toUpdate);
 
         //Assert
         var response = actual as OkObjectResult;
@@ -583,16 +585,57 @@ public sealed partial class UsersControllerTests : BaseTests<UsersController>
     }
 
     [Fact]
-    public async Task UpdateUserData_NonExistent_UnprocessableEntity_422StatusCode()
+    public async Task UpdateUserDataAsync_NonExistent_UnprocessableEntity_422StatusCode()
     {
         //Arrange
         var sut = Setup();
+        var toUpdate = Fixture.Create<UserResponse>();
 
         _serviceMock!
-            .Setup(x => x.UpdateUserData(null))
+            .Setup(x => x.UpdateUserDataAsync(toUpdate))
             .ReturnsAsync((ResponseStatus.MissingInformation, null));
         //Act
-        var actual = await sut.UpdateUserData(null);
+        var actual = await sut.UpdateUserDataAsync(toUpdate);
+
+        //Assert
+        var response = actual as StatusCodeResult;
+        Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.UnprocessableEntity, response.StatusCode);
+    }
+
+
+    [Fact]
+    public async Task InviteUserToOrgAsync_SuccessProcessing_200StatusCode()
+    {
+        //Arrange
+        var sut = Setup();
+        var toInvite = Fixture.Create<UserRequestModel>();
+        var userResponse = Fixture.Create<UserResponse>();
+
+        _serviceMock!
+            .Setup(x => x.InviteUserToOrgAsync(toInvite))
+            .ReturnsAsync((ResponseStatus.Successful, userResponse));
+        //Act
+        var actual = await sut.InviteUserToOrgAsync(toInvite);
+
+        //Assert
+        var response = actual as OkObjectResult;
+        Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task InviteUserToOrgAsync_NonExistent_UnprocessableEntity_422StatusCode()
+    {
+        //Arrange
+        var sut = Setup();
+        var toInvite = Fixture.Create<UserRequestModel>();
+
+        _serviceMock!
+            .Setup(x => x.InviteUserToOrgAsync(toInvite))
+            .ReturnsAsync((ResponseStatus.MissingInformation, null));
+        //Act
+        var actual = await sut.InviteUserToOrgAsync(toInvite);
 
         //Assert
         var response = actual as StatusCodeResult;

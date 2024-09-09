@@ -11,7 +11,7 @@ public sealed partial class OrgControllerTests : BaseTests<OrgController>
 
 
     [Fact]
-    public async Task GetOrgByCode_SuccessProcessing_200StatusCode()
+    public async Task GetOrgByCodeAsync_SuccessProcessing_200StatusCode()
     {
         //Arrange
         var sut = Setup();
@@ -19,10 +19,10 @@ public sealed partial class OrgControllerTests : BaseTests<OrgController>
         var orgResponse = Fixture.Create<OrganizationResponse>();
 
         _serviceMock!
-            .Setup(x => x.GetOrgByCode(orgCode))
+            .Setup(x => x.GetOrgByCodeAsync(orgCode))
             .ReturnsAsync((ResponseStatus.Successful, orgResponse));
         //Act
-        var actual = await sut.GetOrgByCode(orgCode);
+        var actual = await sut.GetOrgByCodeAsync(orgCode);
 
         //Assert
         var response = actual as OkObjectResult;
@@ -31,17 +31,17 @@ public sealed partial class OrgControllerTests : BaseTests<OrgController>
     }
 
         [Fact]
-    public async Task GetOrgByCode_NonExistent_UnprocessableEntity_422StatusCode()
+    public async Task GetOrgByCodeAsync_NonExistent_UnprocessableEntity_422StatusCode()
     {
         //Arrange
         var sut = Setup();
         var orgCode = Fixture.Create<string>();
 
         _serviceMock!
-            .Setup(x => x.GetOrgByCode(orgCode))
+            .Setup(x => x.GetOrgByCodeAsync(orgCode))
             .ReturnsAsync((ResponseStatus.MissingInformation, null));
         //Act
-        var actual = await sut.GetOrgByCode(orgCode);
+        var actual = await sut.GetOrgByCodeAsync(orgCode);
 
         //Assert
         var response = actual as StatusCodeResult;
@@ -50,18 +50,18 @@ public sealed partial class OrgControllerTests : BaseTests<OrgController>
     }
 
     [Fact]
-    public async Task CreateOrg_InformationMissing_422StatusCode()
+    public async Task CreateOrgAsync_InformationMissing_422StatusCode()
     {
         //Arrange
         var sut = Setup();
         var model = Fixture.Create<OrganizationResponse>();
 
         _serviceMock!
-            .Setup(x => x.CreateOrg(model))
+            .Setup(x => x.CreateOrgAsync(model))
             .ReturnsAsync((ResponseStatus.MissingInformation, null));
 
         //Act
-        var actual = await sut.CreateOrg(model);
+        var actual = await sut.CreateOrgAsync(model);
 
         //Assert
         var response = actual as StatusCodeResult;
@@ -70,7 +70,7 @@ public sealed partial class OrgControllerTests : BaseTests<OrgController>
     }
 
     [Fact]
-    public async Task CreateOrg_UnknownError_500StatusCode()
+    public async Task CreateOrgAsync_UnknownError_500StatusCode()
     {
 
         //Arrange
@@ -78,11 +78,11 @@ public sealed partial class OrgControllerTests : BaseTests<OrgController>
         var model = Fixture.Create<OrganizationRequestModel>();
 
         _serviceMock!
-            .Setup(x => x.CreateOrg(model))
+            .Setup(x => x.CreateOrgAsync(model))
             .ReturnsAsync((ResponseStatus.UnknownError, null));
 
         //Act
-        var actual = await sut.CreateOrg(model);
+        var actual = await sut.CreateOrgAsync(model);
 
         //Assert
         var response = actual as StatusCodeResult;
@@ -91,18 +91,18 @@ public sealed partial class OrgControllerTests : BaseTests<OrgController>
     }
 
     [Fact]
-    public async Task CreateOrg_SuccessProcessing_200StatusCode()
+    public async Task CreateOrgAsync_SuccessProcessing_200StatusCode()
     {
         // Arrange
         var sut = Setup();
         var model = Fixture.Create<OrganizationRequestModel>();
 
         _serviceMock!
-            .Setup(x => x.CreateOrg(model))
+            .Setup(x => x.CreateOrgAsync(model))
             .ReturnsAsync((ResponseStatus.Successful, Fixture.Create<OrganizationResponse>()));
 
         // Act
-        var actual = await sut.CreateOrg(model);
+        var actual = await sut.CreateOrgAsync(model);
 
         // Assert
         var response = actual as OkObjectResult;

@@ -100,19 +100,25 @@ public sealed class UsersController(IUsersControllerService service) : Controlle
 
     //Associate a role with a user by passing userId and RoleID
     [HttpGet("project/add/{userId}/{projCode}")]
-    public async Task<IActionResult> AddUserToProject(int userId, string projCode) =>
-        await ServeAsync(async () => await _service.AddUserToProject(userId, projCode));
+    public async Task<IActionResult> AddUserToProjectAsync(int userId, string projCode) =>
+        await ServeAsync(async () => await _service.AddUserToProjectAsync(userId, projCode));
 
 
     //Fetch List of Users by Org Code
     [HttpGet("org/users/{orgCode}")]
-    public async Task<IActionResult> FetchUserListByOrgCode(String orgCode) =>
-        await ServeAsync(async () => await _service.FetchUserListByOrgCode(orgCode));
-
-
+    public async Task<IActionResult> FetchUserListByOrgCodeAsync(String orgCode) =>
+        await ServeAsync(async () => await _service.FetchUserListByOrgCodeAsync(orgCode));
     
+
+
     //Update User acces, roles and projects
     [HttpPost("org/users/update")]
-    public async Task<IActionResult> UpdateUserData([FromBody] UserResponse toUpdate) =>
-        await ServeAsync(async () => await _service.UpdateUserData(toUpdate));
+    public async Task<IActionResult> UpdateUserDataAsync([FromBody] UserResponse toUpdate) =>
+        await ServeAsync(async () => await _service.UpdateUserDataAsync(toUpdate));
+
+        
+    //Invite user to org
+    [HttpPost("org/users/invite")]
+    public async Task<IActionResult> InviteUserToOrgAsync([FromBody] UserRequestModel toInvite) =>
+        await ServeAsync(async () => await _service.InviteUserToOrgAsync(toInvite));
 }

@@ -85,6 +85,6 @@ public sealed partial class RoleRepository(
         });
 
     
-    public async Task<Role?> GetRoleByName(string roleName) =>
+    public async Task<Role?> GetRoleByNameAsync(string roleName) =>
         await ExecuteAsync(async context => await context.Roles.FirstOrDefaultAsync(r =>r.RoleName == roleName));
 }

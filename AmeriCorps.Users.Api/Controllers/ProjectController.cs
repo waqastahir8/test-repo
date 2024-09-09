@@ -13,12 +13,12 @@ public sealed class ProjectController(IProjectControllerService service) : Contr
 
 
     [HttpGet("{projCode}")]
-    public async Task<IActionResult> GetProjectByCode(string projCode) =>
-        await ServeAsync(async () => await _service.GetProjectByCode(projCode));
+    public async Task<IActionResult> GetProjectByCodeAsync(string projCode) =>
+        await ServeAsync(async () => await _service.GetProjectByCodeAsync(projCode));
 
     [HttpPost("create")]
-    public async Task<IActionResult> CreateProject([FromBody] ProjectRequestModel projRequest) =>
-        await ServeAsync(async () => await _service.CreateProject(projRequest));
+    public async Task<IActionResult> CreateProjectAsync([FromBody] ProjectRequestModel projRequest) =>
+        await ServeAsync(async () => await _service.CreateProjectAsync(projRequest));
 
 
 
