@@ -254,16 +254,6 @@ public sealed class ResponseMapper : IResponseMapper
                     ListingId = c.ListingId,
                 }),
         
-        Roles = MapperUtils.MapList<Role, RoleRequestModel>(
-            user.Roles, r =>
-                new RoleRequestModel()
-                {
-                    //Id = r.Id,
-                    RoleName = r.RoleName,
-                    FucntionalName = r.FucntionalName,
-                    Description = r.Description
-                }),
-
         UserProjects = MapperUtils.MapList<UserProject, UserProjectRequestModel>(
             user.UserProjects, p =>
                 new UserProjectRequestModel()
@@ -280,7 +270,7 @@ public sealed class ResponseMapper : IResponseMapper
     {
         Id = role.Id,
         RoleName = role.RoleName,
-        FucntionalName = role.FucntionalName,
+        FunctionalName = role.FunctionalName,
         Description = role.Description
     };
 
@@ -291,7 +281,7 @@ public sealed class ResponseMapper : IResponseMapper
                            {
                                Id = a.Id,
                                RoleName = a.RoleName,
-                               FucntionalName = a.FucntionalName,
+                               FunctionalName = a.FunctionalName,
                                Description = a.Description
                            });
 
@@ -458,15 +448,6 @@ public sealed class ResponseMapper : IResponseMapper
                             ListingId = c.ListingId,
                         }),
                 
-                Roles = MapperUtils.MapList<Role, RoleRequestModel>(
-                    user.Roles, r =>
-                        new RoleRequestModel()
-                        {
-                            //Id = r.Id,
-                            RoleName = r.RoleName,
-                            FucntionalName = r.FucntionalName,
-                            Description = r.Description
-                        }),
 
                 UserProjects = MapperUtils.MapList<UserProject, UserProjectRequestModel>(
                     user.UserProjects, p =>

@@ -27,7 +27,6 @@ public sealed partial class UserRepository(
                 .Include(u => u.SavedSearches)
                 .Include(u => u.Relatives)
                 .Include(u => u.CommunicationMethods)
-                .Include(u => u.Roles)
                 .Include(u => u.UserProjects)
                 .FirstOrDefaultAsync(x => x.Id == id));
 
@@ -44,7 +43,6 @@ public sealed partial class UserRepository(
                 .Include(u => u.SavedSearches)
                 .Include(u => u.Relatives)
                 .Include(u => u.CommunicationMethods)
-                .Include(u => u.Roles)
                 .Include(u => u.UserProjects)
                 .FirstOrDefaultAsync(x => x.ExternalAccountId == externalAccountId));
 
@@ -236,7 +234,6 @@ public sealed partial class UserRepository(
                     .Include(u => u.SavedSearches)
                     .Include(u => u.Relatives)
                     .Include(u => u.CommunicationMethods)
-                    .Include(u => u.Roles)
                     .Include(u => u.UserProjects)
                     .Where(x => x.OrgCode == orgCode).ToListAsync());
 

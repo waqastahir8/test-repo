@@ -172,16 +172,6 @@ public sealed class RequestMapper : IRequestMapper
                     DateContacted = r.DateContacted
                 }),
 
-        Roles = MapperUtils.MapList<RoleRequestModel, Role>(
-            requestModel.Roles, c =>
-                new Role()
-                {
-                    //Id = c.Id,
-                    RoleName = c.RoleName,
-                    FucntionalName = c.FucntionalName,
-                    Description = c.Description,
-                }),
-
         UserProjects = MapperUtils.MapList<UserProjectRequestModel, UserProject>(
             requestModel.UserProjects, p =>
                 new UserProject()
@@ -198,7 +188,7 @@ public sealed class RequestMapper : IRequestMapper
     {
         //Id = roleRequestModel.Id,
         RoleName = roleRequestModel.RoleName,
-        FucntionalName = roleRequestModel.FucntionalName,
+        FunctionalName = roleRequestModel.FunctionalName,
         Description = roleRequestModel.Description
     };
 

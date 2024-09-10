@@ -664,12 +664,12 @@ public sealed class UsersControllerService : IUsersControllerService
             return (ResponseStatus.MissingInformation, null);
         }
 
-        if (user.Roles.Contains(role))
-        {
-            return (ResponseStatus.Successful, null);
-        }
+        // if (user.Roles.Contains(role))
+        // {
+        //     return (ResponseStatus.Successful, null);
+        // }
 
-        user.Roles.Add(role);
+        // user.Roles.Add(role);
 
         try
         {
@@ -710,12 +710,12 @@ public sealed class UsersControllerService : IUsersControllerService
             return (ResponseStatus.MissingInformation, null);
         }
 
-        if (user.Roles.Contains(role))
-        {
-            return (ResponseStatus.Successful, null);
-        }
+        // if (user.Roles.Contains(role))
+        // {
+        //     return (ResponseStatus.Successful, null);
+        // }
 
-        user.Roles.Add(role);
+        // user.Roles.Add(role);
 
         try
         {
@@ -904,25 +904,6 @@ public sealed class UsersControllerService : IUsersControllerService
                 updatedUser.UserProjects = existingUser.UserProjects;
             }
 
-            if(toUpdate.Roles != null){
-                List<Role> roleList = new List<Role>();
-                for (int i = 0; i < toUpdate.Roles.Count; i++) 
-                {
-                    var role = toUpdate.Roles[i];
-                    if(!String.IsNullOrEmpty(role.RoleName.ToString())){
-                        var orgRole = await _roleRepository.GetRoleByNameAsync(role.RoleName);
-                        if(orgRole != null){
-                            roleList.Add(orgRole);
-                        }
-                    }
-                }
-
-                updatedUser.Roles = roleList;    
-
-            }else{
-                updatedUser.Roles = existingUser.Roles;
-            }
-
             try{
                 updatedUser = await _repository.UpdateUserAsync(updatedUser);
             }
@@ -930,20 +911,6 @@ public sealed class UsersControllerService : IUsersControllerService
             {
                 _logger.LogError(e, $"Unable to save reference for user {updatedUser}.");
                 return (ResponseStatus.UnknownError, null);
-            }
-
-            if(toUpdate.Roles != null){
-                //clear existingUser roles
-                for (int i = 0; i < toUpdate.Roles.Count; i++) 
-                {
-                    var role = toUpdate.Roles[i];
-                    if(!String.IsNullOrEmpty(role.RoleName.ToString())){
-                        var orgRole = _responseMapper.Map(await _roleRepository.GetRoleByNameAsync(role.RoleName));
-                        if(orgRole != null){
-                            await AddRoleToUserAsync(toUpdate.Id, orgRole);
-                        }
-                    }
-                }
             }
         }
 
@@ -992,23 +959,6 @@ public sealed class UsersControllerService : IUsersControllerService
 
             }
             user.UserProjects = projectList;
-        }
-
-
-        if(toInvite.Roles != null){
-            List<Role> roleList = new List<Role>();
-            for (int i = 0; i < toInvite.Roles.Count; i++) 
-            {
-                var role = toInvite.Roles[i];
-                if(!String.IsNullOrEmpty(role.RoleName.ToString())){
-                    var orgResponse = await _roleRepository.GetRoleByNameAsync(role.RoleName);
-                    var orgRole = _responseMapper.Map(orgResponse);
-                    if(orgRole != null){
-                        await AddRoleToUserAsync(user.Id, orgRole);
-                    }
-                }
-            }
-            user.Roles = roleList;    
         }
 
         user = await _repository.SaveAsync(user);

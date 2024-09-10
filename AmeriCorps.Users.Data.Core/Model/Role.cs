@@ -10,12 +10,11 @@ public sealed class Role : Entity
     /**
 * Human redeable name for display purposes
 */
-    public string FucntionalName { get; set; } = string.Empty;
+    public string FunctionalName { get; set; } = string.Empty;
     /**
      * Optional summary of what the role means 
      */
     public string Description { get; set; } = string.Empty;
 
-    public List<User> Users { get; set; } = new List<User>();
 
 }
