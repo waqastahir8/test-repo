@@ -102,7 +102,7 @@ public sealed class UsersControllerService : IUsersControllerService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, $"Could not retrieve users with attribute {attributeType} = {attributeValue}");
+            _logger.LogError(e, "Could not retrieve users with attribute {AttributeType} = {AttributeValue}",attributeType.Replace(Environment.NewLine, ""),attributeValue.Replace(Environment.NewLine, ""));
             return (ResponseStatus.UnknownError, []);
         }
 
@@ -126,7 +126,7 @@ public sealed class UsersControllerService : IUsersControllerService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, $"Could not retrieve user with external account {externalAccountId}.");
+            _logger.LogError(e, "Could not retrieve user with external account {ExternalAccountId}.",externalAccountId.Replace(Environment.NewLine, ""));
             return (ResponseStatus.UnknownError, null);
         }
 
@@ -221,7 +221,8 @@ public sealed class UsersControllerService : IUsersControllerService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, $"Unable to check for user with external account id: {user?.ExternalAccountId}");
+            _logger.LogError(e, "Unable to check for user with external account id: {User}",
+                                        user.ExternalAccountId.Replace(Environment.NewLine, ""));
             return (ResponseStatus.UnknownError, null);
         }
 
@@ -240,7 +241,7 @@ public sealed class UsersControllerService : IUsersControllerService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, $"Unable to create user for {userRequest.LastName}, {userRequest.FirstName}.");
+            _logger.LogError(e, "Unable to create user for {LastName}, {FirstName}.",userRequest.LastName.Replace(Environment.NewLine, ""),userRequest.FirstName.Replace(Environment.NewLine, ""));
             return (ResponseStatus.UnknownError, null);
         }
 
@@ -314,7 +315,8 @@ public sealed class UsersControllerService : IUsersControllerService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, $"Unable to save search {searchRequest}.");
+            
+            _logger.LogError(e, "Unable to save search with exception: {ExceptionMessage}.",e.Message);
             return (ResponseStatus.UnknownError, null);
         }
 
@@ -552,7 +554,7 @@ public sealed class UsersControllerService : IUsersControllerService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, $"Unable to save search {saveRequest?.Name}.");
+            _logger.LogError(e, "Unable to save search {SaveReuest}",saveRequest?.Name.Replace(Environment.NewLine, "") ?? "");
             return (ResponseStatus.UnknownError, null);
         }
 

@@ -21,6 +21,9 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     environment: Test
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       - name: checkout code
@@ -37,7 +40,7 @@ jobs:
           dotnet restore ${{ env.SOLUTION_FILE }}
 
       - name: .net test
-        run: dotnet test ${{ env.SOLUTION_FILE }} --no-restore --collect:"XPlat Code Coverage" --settings coverlet.runsettings
+        run: dotnet test ${{ env.SOLUTION_FILE }} --no-restore --collect:"XPlat Code Coverage" --settings coverlet.runsettings.xml
 
       - name: generate code coverage report
         run: |
