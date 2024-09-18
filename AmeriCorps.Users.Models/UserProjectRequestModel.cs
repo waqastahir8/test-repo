@@ -13,4 +13,8 @@ public class UserProjectRequestModel
 
     public bool Active { get; set; } = true;
 
+    public List<ProjectRoleRequestModel> ProjectRoles { get; set; } = new List<ProjectRoleRequestModel>();
+
+    public List<ProjectAccessRequestModel> ProjectAccess { get; set; } = new List<ProjectAccessRequestModel>();
+
 }
