@@ -1,7 +1,9 @@
 ﻿using AmeriCorps.Users.Api.Services;
 using AmeriCorps.Users.Data;
 using AmeriCorps.Users.Data.Core;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+
 
 namespace AmeriCorps.Users.Api.Tests;
 
@@ -17,6 +19,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
     private Mock<IRoleRepository>? _roleRepository;
 
     private Mock<IApiService>? _apiService;
+    private Mock<IConfiguration>? _configuration;
 
     private Mock<IAccessRepository>? _accessRepository;
 
@@ -36,6 +39,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             .ReturnsAsync(() => Fixture.Build<User>()
             .Without(u => u.Roles)
             .Without(u => u.UserProjects)
+            .Without(u => u.EncryptedSocialSecurityNumber)
             .Create());
 
         // Act
@@ -161,7 +165,6 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         _repositoryMock!
             .Setup(x => x.GetUserIdByExternalAccountIdAsync(It.IsAny<string>()))
             .ThrowsAsync(new Exception());
-
         // Act
         var (status, _) = await sut.CreateOrPatchAsync(model);
 
@@ -1780,6 +1783,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         _roleRepository = new();
         _apiService = new ();
         _accessRepository = new ();
+        _configuration = new ();
 
         Fixture = new Fixture();
         Fixture.Customize<DateOnly>(x => x.FromFactory<DateTime>(DateOnly.FromDateTime));
@@ -1792,6 +1796,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             _projectRepository.Object,
             _roleRepository.Object,
             _apiService.Object,
-            _accessRepository.Object);
+            _accessRepository.Object,
+            _configuration.Object);
     }
 }

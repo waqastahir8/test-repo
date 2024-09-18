@@ -3,6 +3,7 @@ using System;
 using AmeriCorps.Users.Data.Migrations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AmeriCorps.Users.Data.Migrations.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    partial class UserDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240916181003_UserPPIUpdate")]
+    partial class UserPPIUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,40 +25,6 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("AmeriCorps.Users.Data.Core.Access", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AccessLevel")
-                        .HasColumnType("integer")
-                        .HasColumnName("access_level");
-
-                    b.Property<string>("AccessName")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("access_name");
-
-                    b.Property<string>("AccessType")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("access_type");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("description");
-
-                    b.HasKey("Id")
-                        .HasName("pk_access");
-
-                    b.ToTable("access", "users");
-                });
 
             modelBuilder.Entity("AmeriCorps.Users.Data.Core.Address", b =>
                 {
@@ -423,69 +392,6 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                     b.ToTable("project", "users");
                 });
 
-            modelBuilder.Entity("AmeriCorps.Users.Data.Core.ProjectAccess", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AccessLevel")
-                        .HasColumnType("integer")
-                        .HasColumnName("access_level");
-
-                    b.Property<string>("AccessName")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("access_name");
-
-                    b.Property<int>("UserProjectId")
-                        .HasColumnType("integer")
-                        .HasColumnName("user_project_id");
-
-                    b.HasKey("Id")
-                        .HasName("pk_project_access");
-
-                    b.HasIndex("UserProjectId")
-                        .HasDatabaseName("ix_project_access_user_project_id");
-
-                    b.ToTable("project_access", "users");
-                });
-
-            modelBuilder.Entity("AmeriCorps.Users.Data.Core.ProjectRole", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("FunctionalName")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("functional_name");
-
-                    b.Property<string>("RoleName")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("role_name");
-
-                    b.Property<int>("UserProjectId")
-                        .HasColumnType("integer")
-                        .HasColumnName("user_project_id");
-
-                    b.HasKey("Id")
-                        .HasName("pk_project_role");
-
-                    b.HasIndex("UserProjectId")
-                        .HasDatabaseName("ix_project_role_user_project_id");
-
-                    b.ToTable("project_role", "users");
-                });
-
             modelBuilder.Entity("AmeriCorps.Users.Data.Core.Reference", b =>
                 {
                     b.Property<int>("Id")
@@ -619,20 +525,15 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                         .HasColumnType("text")
                         .HasColumnName("description");
 
-                    b.Property<string>("FunctionalName")
+                    b.Property<string>("FucntionalName")
                         .IsRequired()
                         .HasColumnType("text")
-                        .HasColumnName("functional_name");
+                        .HasColumnName("fucntional_name");
 
                     b.Property<string>("RoleName")
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("role_name");
-
-                    b.Property<string>("RoleType")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("role_type");
 
                     b.HasKey("Id")
                         .HasName("pk_role");
@@ -838,42 +739,45 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                     b.HasKey("Id")
                         .HasName("pk_user_project");
 
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("ix_user_project_user_id");
-
                     b.ToTable("userProject", "users");
                 });
 
-            modelBuilder.Entity("AmeriCorps.Users.Data.Core.UserRole", b =>
+            modelBuilder.Entity("RoleUser", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<int>("RolesId")
                         .HasColumnType("integer")
-                        .HasColumnName("id");
+                        .HasColumnName("roles_id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("FunctionalName")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("functional_name");
-
-                    b.Property<string>("RoleName")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("role_name");
-
-                    b.Property<int>("UserId")
+                    b.Property<int>("UsersId")
                         .HasColumnType("integer")
-                        .HasColumnName("user_id");
+                        .HasColumnName("users_id");
 
-                    b.HasKey("Id")
-                        .HasName("pk_user_role");
+                    b.HasKey("RolesId", "UsersId")
+                        .HasName("pk_role_user");
 
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("ix_user_role_user_id");
+                    b.HasIndex("UsersId")
+                        .HasDatabaseName("ix_role_user_users_id");
 
-                    b.ToTable("user_role", "users");
+                    b.ToTable("role_user", "users");
+                });
+
+            modelBuilder.Entity("UserUserProject", b =>
+                {
+                    b.Property<int>("UserProjectsId")
+                        .HasColumnType("integer")
+                        .HasColumnName("user_projects_id");
+
+                    b.Property<int>("UsersId")
+                        .HasColumnType("integer")
+                        .HasColumnName("users_id");
+
+                    b.HasKey("UserProjectsId", "UsersId")
+                        .HasName("pk_user_user_project");
+
+                    b.HasIndex("UsersId")
+                        .HasDatabaseName("ix_user_user_project_users_id");
+
+                    b.ToTable("user_user_project", "users");
                 });
 
             modelBuilder.Entity("AmeriCorps.Users.Data.Core.Address", b =>
@@ -946,26 +850,6 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                         .HasConstraintName("fk_military_service_users_user_id");
                 });
 
-            modelBuilder.Entity("AmeriCorps.Users.Data.Core.ProjectAccess", b =>
-                {
-                    b.HasOne("AmeriCorps.Users.Data.Core.UserProject", null)
-                        .WithMany("ProjectAccess")
-                        .HasForeignKey("UserProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_project_access_user_projects_user_project_id");
-                });
-
-            modelBuilder.Entity("AmeriCorps.Users.Data.Core.ProjectRole", b =>
-                {
-                    b.HasOne("AmeriCorps.Users.Data.Core.UserProject", null)
-                        .WithMany("ProjectRoles")
-                        .HasForeignKey("UserProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_project_role_user_projects_user_project_id");
-                });
-
             modelBuilder.Entity("AmeriCorps.Users.Data.Core.Reference", b =>
                 {
                     b.HasOne("AmeriCorps.Users.Data.Core.User", null)
@@ -1006,24 +890,38 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                         .HasConstraintName("fk_skill_users_user_id");
                 });
 
-            modelBuilder.Entity("AmeriCorps.Users.Data.Core.UserProject", b =>
+            modelBuilder.Entity("RoleUser", b =>
                 {
-                    b.HasOne("AmeriCorps.Users.Data.Core.User", null)
-                        .WithMany("UserProjects")
-                        .HasForeignKey("UserId")
+                    b.HasOne("AmeriCorps.Users.Data.Core.Role", null)
+                        .WithMany()
+                        .HasForeignKey("RolesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_user_project_user_user_id");
+                        .HasConstraintName("fk_role_user_roles_roles_id");
+
+                    b.HasOne("AmeriCorps.Users.Data.Core.User", null)
+                        .WithMany()
+                        .HasForeignKey("UsersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_role_user_users_users_id");
                 });
 
-            modelBuilder.Entity("AmeriCorps.Users.Data.Core.UserRole", b =>
+            modelBuilder.Entity("UserUserProject", b =>
                 {
-                    b.HasOne("AmeriCorps.Users.Data.Core.User", null)
-                        .WithMany("Roles")
-                        .HasForeignKey("UserId")
+                    b.HasOne("AmeriCorps.Users.Data.Core.UserProject", null)
+                        .WithMany()
+                        .HasForeignKey("UserProjectsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_user_role_users_user_id");
+                        .HasConstraintName("fk_user_user_project_user_projects_user_projects_id");
+
+                    b.HasOne("AmeriCorps.Users.Data.Core.User", null)
+                        .WithMany()
+                        .HasForeignKey("UsersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_user_user_project_users_users_id");
                 });
 
             modelBuilder.Entity("AmeriCorps.Users.Data.Core.User", b =>
@@ -1046,20 +944,9 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
 
                     b.Navigation("Relatives");
 
-                    b.Navigation("Roles");
-
                     b.Navigation("SavedSearches");
 
                     b.Navigation("Skills");
-
-                    b.Navigation("UserProjects");
-                });
-
-            modelBuilder.Entity("AmeriCorps.Users.Data.Core.UserProject", b =>
-                {
-                    b.Navigation("ProjectAccess");
-
-                    b.Navigation("ProjectRoles");
                 });
 #pragma warning restore 612, 618
         }

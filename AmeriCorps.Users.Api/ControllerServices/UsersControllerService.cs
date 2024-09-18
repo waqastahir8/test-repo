@@ -1,6 +1,10 @@
-﻿using System.Data;
+﻿using System.Configuration;
+using System.Data;
+using System.Security.Cryptography;
 using AmeriCorps.Users.Api.Services;
 using AmeriCorps.Users.Data.Core;
+
+
 
 namespace AmeriCorps.Users.Api;
 
@@ -66,6 +70,9 @@ public sealed class UsersControllerService : IUsersControllerService
 
     private readonly IAccessRepository _accessRepository;
     
+    private readonly IConfiguration _configuration;
+
+
     public UsersControllerService(
     ILogger<UsersControllerService> logger,
     IRequestMapper requestMapper,
@@ -75,7 +82,8 @@ public sealed class UsersControllerService : IUsersControllerService
     IProjectRepository projectRepository,
     IRoleRepository roleRepository,
     IApiService apiService,
-    IAccessRepository accessRepository)
+    IAccessRepository accessRepository,
+    IConfiguration configuration)
     {
         _logger = logger;
         _requestMapper = requestMapper;
@@ -86,6 +94,7 @@ public sealed class UsersControllerService : IUsersControllerService
         _roleRepository = roleRepository;
         _apiService = apiService;
         _accessRepository = accessRepository;
+        _configuration = configuration;
     }
 
     public async Task<(ResponseStatus Status, UserResponse? Response)> GetAsync(int id)
@@ -105,6 +114,11 @@ public sealed class UsersControllerService : IUsersControllerService
         if (user == null)
         {
             return (ResponseStatus.MissingInformation, null);
+        }
+
+        if (!string.IsNullOrWhiteSpace(user.EncryptedSocialSecurityNumber))
+        {
+            user.EncryptedSocialSecurityNumber = Decrypt(user.EncryptedSocialSecurityNumber);
         }
 
         var response = _responseMapper.Map(user);
@@ -129,7 +143,7 @@ public sealed class UsersControllerService : IUsersControllerService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, $"Could not retrieve users with attribute {attributeType} = {attributeValue}");
+            _logger.LogError(e, "Could not retrieve users with attribute {AttributeType} = {AttributeValue}",attributeType.Replace(Environment.NewLine, ""),attributeValue.Replace(Environment.NewLine, ""));
             return (ResponseStatus.UnknownError, []);
         }
 
@@ -153,7 +167,7 @@ public sealed class UsersControllerService : IUsersControllerService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, $"Could not retrieve user with external account {externalAccountId}.");
+            _logger.LogError(e, "Could not retrieve user with external account {ExternalAccountId}.",externalAccountId.Replace(Environment.NewLine, ""));
             return (ResponseStatus.UnknownError, null);
         }
 
@@ -226,16 +240,21 @@ public sealed class UsersControllerService : IUsersControllerService
     }
 
     public async Task<(ResponseStatus Status, UserResponse? Response)>
-        CreateOrPatchAsync(UserRequestModel? userRequest)
+     CreateOrPatchAsync(UserRequestModel? userRequest)
     {
         if (userRequest == null || !_validator.Validate(userRequest))
         {
             return (ResponseStatus.MissingInformation, null);
         }
 
+        if (!string.IsNullOrWhiteSpace(userRequest.EncryptedSocialSecurityNumber))
+        {
+            userRequest.EncryptedSocialSecurityNumber = Encrypt(userRequest.EncryptedSocialSecurityNumber);
+        }
+
         var user = _requestMapper.Map(userRequest);
 
-        // TODO Fix this, get rid of ExternalAccountId since it is redundant. User username instead.
+        // TODO Fix this, get rid of ExternalAccountId since it is redundant. Use username instead.
         int userId = !string.IsNullOrWhiteSpace(user.ExternalAccountId) && int.TryParse(user.ExternalAccountId, out var id)
             ? id
             : 0;
@@ -248,7 +267,8 @@ public sealed class UsersControllerService : IUsersControllerService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, $"Unable to check for user with external account id: {user?.ExternalAccountId}");
+            _logger.LogError(e, "Unable to check for user with external account id: {User}",
+                                        user.ExternalAccountId.Replace(Environment.NewLine, ""));
             return (ResponseStatus.UnknownError, null);
         }
 
@@ -267,7 +287,7 @@ public sealed class UsersControllerService : IUsersControllerService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, $"Unable to create user for {userRequest.LastName}, {userRequest.FirstName}.");
+            _logger.LogError(e, "Unable to create user for {LastName}, {FirstName}.",userRequest.LastName.Replace(Environment.NewLine, ""),userRequest.FirstName.Replace(Environment.NewLine, ""));
             return (ResponseStatus.UnknownError, null);
         }
 
@@ -341,7 +361,8 @@ public sealed class UsersControllerService : IUsersControllerService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, $"Unable to save search {searchRequest}.");
+            
+            _logger.LogError(e, "Unable to save search with exception: {ExceptionMessage}.",e.Message);
             return (ResponseStatus.UnknownError, null);
         }
 
@@ -579,7 +600,7 @@ public sealed class UsersControllerService : IUsersControllerService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, $"Unable to save search {saveRequest?.Name}.");
+            _logger.LogError(e, "Unable to save search {SaveReuest}",saveRequest?.Name.Replace(Environment.NewLine, "") ?? "");
             return (ResponseStatus.UnknownError, null);
         }
 
@@ -1061,5 +1082,52 @@ public sealed class UsersControllerService : IUsersControllerService
         return (ResponseStatus.Successful, response);
 
     }
+
+    private string Encrypt(string plainText)
+    {
+        using (var aes = Aes.Create())
+        {
+            aes.Key = Convert.FromBase64String("69PhJU1v1SMbE6mRBWalOIQlBqAmvHQ5WCMX4IoCwZ0=");
+            aes.IV = Convert.FromBase64String("vNWAOAbK+6wi0NDXbCAncA==");
+
+            var encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
+
+            using (var ms = new MemoryStream())
+            {
+                using (var cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
+                {
+                    using (var sw = new StreamWriter(cs))
+                    {
+                        sw.Write(plainText);
+                    }
+                }
+
+                return Convert.ToBase64String(ms.ToArray());
+            }
+        }
+    }
+
+    private string Decrypt(string cipherText)
+    {
+        using (var aes = Aes.Create())
+        {
+            aes.Key = Convert.FromBase64String("69PhJU1v1SMbE6mRBWalOIQlBqAmvHQ5WCMX4IoCwZ0=");
+            aes.IV = Convert.FromBase64String("vNWAOAbK+6wi0NDXbCAncA==");
+
+            var decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
+
+            using (var ms = new MemoryStream(Convert.FromBase64String(cipherText)))
+            {
+                using (var cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read))
+                {
+                    using (var sr = new StreamReader(cs))
+                    {
+                        return sr.ReadToEnd();
+                    }
+                }
+            }
+        }
+    }
+
 
 }
