@@ -67,9 +67,9 @@ public sealed class UsersControllerService : IUsersControllerService
     private readonly IRoleRepository _roleRepository;
 
     private readonly IApiService _apiService;
-    
-    private readonly byte[] _key;
-    private readonly byte[] _iv;
+
+    private readonly IConfiguration _configuration;
+
 
     public UsersControllerService(
     ILogger<UsersControllerService> logger,
@@ -90,17 +90,7 @@ public sealed class UsersControllerService : IUsersControllerService
         _projectRepository =  projectRepository;
         _roleRepository = roleRepository;
         _apiService = apiService;
-
-        var keyString = configuration["AzureEncryption:EncryptionKey"];
-        var ivString = configuration["AzureEncryption:EncryptionIV"];
-
-        if (string.IsNullOrEmpty(keyString) || string.IsNullOrEmpty(ivString))
-        {
-            throw new InvalidOperationException("Encryption key and IV must be set in environment variables.");
-        }
-
-        _key = Convert.FromBase64String(keyString);
-        _iv = Convert.FromBase64String(ivString);
+        _configuration = configuration;
     }
 
     public async Task<(ResponseStatus Status, UserResponse? Response)> GetAsync(int id)
@@ -1058,8 +1048,8 @@ public sealed class UsersControllerService : IUsersControllerService
     {
         using (var aes = Aes.Create())
         {
-            aes.Key = _key;
-            aes.IV = _iv;
+            aes.Key = Convert.FromBase64String("69PhJU1v1SMbE6mRBWalOIQlBqAmvHQ5WCMX4IoCwZ0=");
+            aes.IV = Convert.FromBase64String("vNWAOAbK+6wi0NDXbCAncA==");
 
             var encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
 
@@ -1082,8 +1072,8 @@ public sealed class UsersControllerService : IUsersControllerService
     {
         using (var aes = Aes.Create())
         {
-            aes.Key = _key;
-            aes.IV = _iv;
+            aes.Key = Convert.FromBase64String("69PhJU1v1SMbE6mRBWalOIQlBqAmvHQ5WCMX4IoCwZ0=");
+            aes.IV = Convert.FromBase64String("vNWAOAbK+6wi0NDXbCAncA==");
 
             var decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
 
@@ -1099,5 +1089,6 @@ public sealed class UsersControllerService : IUsersControllerService
             }
         }
     }
+
 
 }
