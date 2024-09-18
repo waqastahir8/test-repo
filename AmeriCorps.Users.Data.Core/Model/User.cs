@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using AmeriCorps.Users.Data.Core.Model;
 
 namespace AmeriCorps.Users.Data.Core;
 
@@ -30,5 +31,8 @@ public sealed class User : Entity
     public List<Role> Roles { get; set; } = new List<Role>();
     public List<UserProject> UserProjects { get; set; } = new List<UserProject>();
     public string OrgCode { get; set; } = string.Empty;
-
+    public string EncryptedSocialSecurityNumber { get; set; } = string.Empty;
+    public CitizenshipStatus CitzenShipStatus { get; set; }
+    public string CountryOfBirth { get; set; } = string.Empty;
+    public string CityOfBirth { get; set; } = string.Empty;
 }

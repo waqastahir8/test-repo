@@ -127,6 +127,10 @@ public sealed class ResponseMapper : IResponseMapper
         Suffix = user.Suffix,
         Prefix = user.Prefix,
         OrgCode = user.OrgCode,
+        EncryptedSocialSecurityNumber = user.EncryptedSocialSecurityNumber,
+        CitzenShipStatus = (global::AmeriCorps.Users.Models.CitizenshipStatusRequestModel)user.CitzenShipStatus,
+        CountryOfBirth = user.CountryOfBirth,
+        CityOfBirth = user.CityOfBirth,
         Attributes = MapperUtils.MapList<AmeriCorps.Users.Data.Core.Attribute, AttributeRequestModel>(
                         user.Attributes,
                         a => new AttributeRequestModel
@@ -321,6 +325,10 @@ public sealed class ResponseMapper : IResponseMapper
                 Suffix = user.Suffix,
                 Prefix = user.Prefix,
                 OrgCode = user.OrgCode,
+                EncryptedSocialSecurityNumber = user.EncryptedSocialSecurityNumber,
+                CitzenShipStatus = (global::AmeriCorps.Users.Models.CitizenshipStatusRequestModel)user.CitzenShipStatus,
+                CountryOfBirth = user.CountryOfBirth,
+                CityOfBirth = user.CityOfBirth,
                 Attributes = MapperUtils.MapList<AmeriCorps.Users.Data.Core.Attribute, AttributeRequestModel>(
                                 user.Attributes,
                                 a => new AttributeRequestModel
