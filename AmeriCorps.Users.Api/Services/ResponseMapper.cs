@@ -360,18 +360,6 @@ public sealed class ResponseMapper : IResponseMapper
                                 Description = p.Description
                            });
 
-    // public List<RoleResponse> Map(List<Role> roleList) =>
-    //    MapperUtils.MapList<Role, RoleResponse>(
-    //                        roleList,
-    //                        r => new RoleResponse
-    //                        {
-    //                             Id = r.Id,
-    //                             RoleName = r.RoleName,
-    //                             RoleType = r.RoleType,
-    //                             FunctionalName = r.FunctionalName,
-    //                             Description = r.Description
-    //                        });
-
     public OrganizationResponse? Map(Organization? organization) => organization == null ? null : new()
     {
         Id = organization.Id,

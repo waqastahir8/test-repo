@@ -1615,20 +1615,6 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         var userId =
             Fixture
             .Create<int>();
-
-        // var organization =
-        //     Fixture
-        //     .Build<Organization>()
-        //     .With(p => o.OrgCode, orgCode)
-        //     .Create();
-
-        // var user =
-        //     Fixture
-        //     .Build<User>()
-        //     .With(o => o.OrgCode, orgCode)
-        //     .Without(u => u.Roles)
-        //     .Without(u => u.UserProjects)
-        //     .Create();
         
         _repositoryMock!
             .Setup(x => x.GetAsync(userId))
@@ -1665,9 +1651,20 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
     {
         // Arrange
         var sut = Setup();
+        
+
+
+        var roles = Fixture.Build<List<UserRoleRequestModel>>()
+                        .Create();
+
+        var projs = Fixture.Build<List<UserProjectRequestModel>>()
+                        .Create();
+
 
         var model = Fixture.Build<UserProjectRoleUpdateRequestModel>()
                         .With(p => p.Id, userId)
+                        .With(p => p.UserRoles, roles)
+                        .With(p => p.UserProjects, projs)
                         .Create();
 
 

@@ -293,7 +293,6 @@ public sealed class RequestMapper : IRequestMapper
                            role,
                            a => new ProjectRole
                            {
-                            //    Id = a.Id,
                                RoleName = a.RoleName,
                                FunctionalName = a.FunctionalName
                            });
@@ -303,7 +302,6 @@ public sealed class RequestMapper : IRequestMapper
                            access,
                            a => new ProjectAccess
                            {
-                            //    Id = a.Id,
                                AccessName = a.AccessName,
                                AccessLevel = a.AccessLevel
                            });

@@ -27,6 +27,7 @@ public sealed partial class UserRepository(
                 .Include(u => u.SavedSearches)
                 .Include(u => u.Relatives)
                 .Include(u => u.CommunicationMethods)
+                .Include(u => u.Roles)
                 .Include(u => u.UserProjects).ThenInclude(p => p.ProjectRoles)
                 .Include(u => u.UserProjects).ThenInclude(a => a.ProjectAccess)
                 .FirstOrDefaultAsync(x => x.Id == id));
@@ -44,7 +45,9 @@ public sealed partial class UserRepository(
                 .Include(u => u.SavedSearches)
                 .Include(u => u.Relatives)
                 .Include(u => u.CommunicationMethods)
-                .Include(u => u.UserProjects)
+                .Include(u => u.Roles)
+                .Include(u => u.UserProjects).ThenInclude(p => p.ProjectRoles)
+                .Include(u => u.UserProjects).ThenInclude(a => a.ProjectAccess)
                 .FirstOrDefaultAsync(x => x.ExternalAccountId == externalAccountId));
 
     public async Task<IEnumerable<User>?> GetByAttributeAsync(string type, string value) =>
@@ -60,7 +63,9 @@ public sealed partial class UserRepository(
                 .Include(u => u.SavedSearches)
                 .Include(u => u.Relatives)
                 .Include(u => u.CommunicationMethods)
-                .Include(u => u.UserProjects)
+                .Include(u => u.Roles)
+                .Include(u => u.UserProjects).ThenInclude(p => p.ProjectRoles)
+                .Include(u => u.UserProjects).ThenInclude(a => a.ProjectAccess)
                 .Where(x => x.Attributes.Any(x => x.Type == type && x.Value == value))
                 .ToListAsync());
 

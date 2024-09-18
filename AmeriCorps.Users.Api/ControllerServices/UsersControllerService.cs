@@ -898,18 +898,16 @@ public sealed class UsersControllerService : IUsersControllerService
 
             updatedUser = existingUser;
 
-            if(toUpdate.UserRoles != null){
+            if(toUpdate.UserRoles != null && toUpdate.UserRoles.Count > 0){
                 List<UserRole> userRoleList = new List<UserRole>();
                 for (int i = 0; i < toUpdate.UserRoles.Count; i++) 
                 {
                     var role = toUpdate.UserRoles[i];
-                    // var userRole = await _roleRepository.GetAsync(role.Id);
                     var userRole = await _roleRepository.GetRoleByNameAsync(role.RoleName);
 
                     if(userRole != null){
                         UserRole uRole = new UserRole()
                         {
-                            Id = userRole.Id,
                             RoleName = userRole.RoleName,
                             FunctionalName = userRole.FunctionalName
                         };
@@ -926,7 +924,7 @@ public sealed class UsersControllerService : IUsersControllerService
 
             
 
-            if(toUpdate.UserProjects != null){
+            if(toUpdate.UserProjects != null && toUpdate.UserProjects.Count > 0){
                 List<UserProject> projectList = new List<UserProject>();
                 for (int i = 0; i < toUpdate.UserProjects.Count; i++) 
                 {
@@ -940,13 +938,11 @@ public sealed class UsersControllerService : IUsersControllerService
                         for (int j = 0; j < roles.Count; j++) 
                         {
                             var role = roles[i];
-                            // var projRole = await _roleRepository.GetAsync(role.Id);
                             var projRole = await _roleRepository.GetRoleByNameAsync(role.RoleName);
 
                             if(projRole != null){
                                 ProjectRole uRole = new ProjectRole()
                                 { 
-                                    Id = projRole.Id,
                                     RoleName = projRole.RoleName,
                                     FunctionalName = projRole.FunctionalName
                                 };
@@ -963,7 +959,6 @@ public sealed class UsersControllerService : IUsersControllerService
                         for (int j = 0; j < accesses.Count; j++) 
                         {
                             var access = accesses[i];
-                            // var projAccess = await _accessRepository.GetAsync(access.Id);
                             var projAccess = await _accessRepository.GetAccessByNameAsync(access.AccessName);
 
                             if(projAccess != null){
@@ -981,8 +976,7 @@ public sealed class UsersControllerService : IUsersControllerService
                     }
 
 
-                    if(!String.IsNullOrEmpty(project.ProjectCode)){ //!String.IsNullOrEmpty(project.Id.ToString())
-                        // var orgProj = await _projectRepository.GetAsync(project.Id);
+                    if(!String.IsNullOrEmpty(project.ProjectCode)){
                         var orgProj = await _projectRepository.GetProjectByCodeAsync(project.ProjectCode);
                             if(orgProj != null){
                                 UserProject uProject =  new UserProject()
@@ -992,7 +986,6 @@ public sealed class UsersControllerService : IUsersControllerService
                                     ProjectType = orgProj.ProjectType,
                                     ProjectOrg = orgProj.ProjectOrg,
                                     Active = true,
-                                    UserId = toUpdate.Id,
                                     ProjectRoles = roleList,
                                     ProjectAccess = accessList
                                 };
