@@ -12,6 +12,8 @@ public interface IProjectControllerService
 
     Task<(ResponseStatus Status, ProjectResponse? Response)> GetProjectByCodeAsync(string projCode);
 
+    Task<(ResponseStatus Status, List<ProjectResponse>? Response)> GetProjectListByOrgAsync(string orgCode);
+
     Task<(ResponseStatus Status, ProjectResponse? Response)> CreateProjectAsync(ProjectRequestModel? projRequest);
 
 }
@@ -56,6 +58,30 @@ public sealed class ProjectControllerService : IProjectControllerService
         }
 
         var response = _responseMapper.Map(project);
+
+        return (ResponseStatus.Successful, response);
+    }
+
+    public async  Task<(ResponseStatus Status, List<ProjectResponse>? Response)> GetProjectListByOrgAsync(string orgCode)
+    {
+        List<Project>? projList;
+       
+        try
+        {
+            projList = await _repository.GetProjectListByOrgAsync(orgCode);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Could not retrieve project list with orgCode {orgCode}.");
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        if (projList == null)
+        {
+            return (ResponseStatus.MissingInformation, null);
+        }
+
+        var response = _responseMapper.Map(projList);
 
         return (ResponseStatus.Successful, response);
     }

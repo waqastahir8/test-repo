@@ -15,7 +15,7 @@ public sealed class UserProject : EntityWithUserId
 
     public bool Active { get; set; } = true;
 
-    public List<UserRole> UserRoles { get; set; } = new List<UserRole>();
+    public List<ProjectRole> ProjectRoles { get; set; } = new List<ProjectRole>();
 
     public List<ProjectAccess> ProjectAccess { get; set; } = new List<ProjectAccess>();
 }

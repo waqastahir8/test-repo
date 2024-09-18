@@ -12,10 +12,12 @@ public interface IRoleRepository
 
     Task<T> SaveAsync<T>(T entity) where T : Entity;
 
-    Task<Role?> UpdateRoleAsync(Role entity);
+    Task<Role?> UpdateRoleAsync(Role role);
 
     Task<bool> DeleteAsync<T>(int id) where T : Entity;
 
     Task<Role?> GetRoleByNameAsync(string roleName);
+
+    Task<List<Role>?> GetRoleListByTypeAsync(string roleType);
 
 }

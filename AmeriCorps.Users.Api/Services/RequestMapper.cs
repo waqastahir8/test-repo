@@ -20,6 +20,10 @@ public interface IRequestMapper
     Organization Map(OrganizationRequestModel requestModel);
     
     Project Map(ProjectRequestModel requestModel);
+
+    UserRole Map(Role role);
+
+    Access Map(AccessRequestModel requestModel);
 }
 
 public sealed class RequestMapper : IRequestMapper
@@ -172,6 +176,15 @@ public sealed class RequestMapper : IRequestMapper
                     DateContacted = r.DateContacted
                 }),
 
+        Roles = MapperUtils.MapList<UserRoleRequestModel, UserRole>(
+            requestModel.UserRoles, c =>
+                new UserRole()
+                {
+                    //Id = c.Id,
+                    RoleName = c.RoleName,
+                    FunctionalName = c.FunctionalName
+                }),
+
         UserProjects = MapperUtils.MapList<UserProjectRequestModel, UserProject>(
             requestModel.UserProjects, p =>
                 new UserProject()
@@ -180,7 +193,9 @@ public sealed class RequestMapper : IRequestMapper
                     ProjectCode = p.ProjectCode,
                     ProjectType = p.ProjectType,
                     ProjectOrg = p.ProjectOrg,
-                    Active = p.Active
+                    Active = p.Active,
+                    ProjectRoles = Map(p.ProjectRoles),
+                    ProjectAccess = Map(p.ProjectAccess)
                 })
     };
 
@@ -257,4 +272,38 @@ public sealed class RequestMapper : IRequestMapper
         ProjectOrg = requestModel.ProjectOrg,
         Description = requestModel.Description
     };
+
+    public Access Map(AccessRequestModel requestModel) => new()
+    {
+        AccessName = requestModel.AccessName,
+        AccessLevel = requestModel.AccessLevel,
+        AccessType = requestModel.AccessType,
+        Description = requestModel.Description
+    };
+
+    public UserRole Map(Role role) => new()
+    {
+        RoleName = role.RoleName,
+        FunctionalName = role.FunctionalName
+    };
+
+    public List<ProjectRole> Map(List<ProjectRoleRequestModel> role) =>
+       MapperUtils.MapList<ProjectRoleRequestModel, ProjectRole>(
+                           role,
+                           a => new ProjectRole
+                           {
+                            //    Id = a.Id,
+                               RoleName = a.RoleName,
+                               FunctionalName = a.FunctionalName
+                           });
+
+    public List<ProjectAccess> Map(List<ProjectAccessRequestModel> access) =>
+       MapperUtils.MapList<ProjectAccessRequestModel, ProjectAccess>(
+                           access,
+                           a => new ProjectAccess
+                           {
+                            //    Id = a.Id,
+                               AccessName = a.AccessName,
+                               AccessLevel = a.AccessLevel
+                           });
 }

@@ -19,6 +19,11 @@ public interface IResponseMapper
     OrganizationResponse? Map(Organization? organization);
     ProjectResponse? Map(Project? project);
     UserListResponse? Map(UserList? userList);
+    AccessResponse? Map(Access? access);
+    List<AccessResponse> Map(List<Access> access);
+    List<OrganizationResponse> Map(List<Organization> orgList);
+    List<ProjectResponse> Map(List<Project> projList);
+    // List<RoleResponse> Map(List<Role> roleList);
 }
 public sealed class ResponseMapper : IResponseMapper
 {
@@ -254,6 +259,15 @@ public sealed class ResponseMapper : IResponseMapper
                     ListingId = c.ListingId,
                 }),
         
+        UserRoles = MapperUtils.MapList<UserRole, UserRoleRequestModel>(
+            user.Roles, r =>
+                new UserRoleRequestModel()
+                {
+                    //Id = r.Id,
+                    RoleName = r.RoleName,
+                    FunctionalName = r.FunctionalName
+                }),
+
         UserProjects = MapperUtils.MapList<UserProject, UserProjectRequestModel>(
             user.UserProjects, p =>
                 new UserProjectRequestModel()
@@ -262,7 +276,9 @@ public sealed class ResponseMapper : IResponseMapper
                     ProjectCode = p.ProjectCode,
                     ProjectType = p.ProjectType,
                     ProjectOrg = p.ProjectOrg,
-                    Active = p.Active
+                    Active = p.Active,
+                    ProjectRoles = Map(p.ProjectRoles),
+                    ProjectAccess = Map(p.ProjectAccess)
                 })
     };
 
@@ -285,6 +301,73 @@ public sealed class ResponseMapper : IResponseMapper
                                Description = a.Description
                            });
 
+    public List<ProjectRoleRequestModel> Map(List<ProjectRole> role) =>
+       MapperUtils.MapList<ProjectRole, ProjectRoleRequestModel>(
+                           role,
+                           a => new ProjectRoleRequestModel
+                           {
+                            //    Id = a.Id,
+                               RoleName = a.RoleName,
+                               FunctionalName = a.FunctionalName
+                           });
+
+    public List<ProjectAccessRequestModel> Map(List<ProjectAccess> access) =>
+       MapperUtils.MapList<ProjectAccess, ProjectAccessRequestModel>(
+                           access,
+                           a => new ProjectAccessRequestModel
+                           {
+                               AccessName = a.AccessName,
+                               AccessLevel = a.AccessLevel
+                           });
+
+    public List<AccessResponse> Map(List<Access> access) =>
+       MapperUtils.MapList<Access, AccessResponse>(
+                           access,
+                           a => new AccessResponse
+                           {
+                               Id = a.Id,
+                               AccessName = a.AccessName,
+                               AccessLevel = a.AccessLevel,
+                               AccessType = a.AccessType,
+                               Description = a.Description
+                           });
+
+    public List<OrganizationResponse> Map(List<Organization> orgList) =>
+       MapperUtils.MapList<Organization, OrganizationResponse>(
+                           orgList,
+                           o => new OrganizationResponse
+                           {
+                               Id = o.Id,
+                               OrgName = o.OrgName,
+                               OrgCode = o.OrgCode,
+                               Description = o.Description
+                           });
+
+    public List<ProjectResponse> Map(List<Project> projList) =>
+       MapperUtils.MapList<Project, ProjectResponse>(
+                           projList,
+                           p => new ProjectResponse
+                           {
+                                Id = p.Id,
+                                ProjectName = p.ProjectName,
+                                ProjectCode = p.ProjectCode,
+                                ProjectType = p.ProjectType,
+                                ProjectOrg = p.ProjectOrg,
+                                Description = p.Description
+                           });
+
+    // public List<RoleResponse> Map(List<Role> roleList) =>
+    //    MapperUtils.MapList<Role, RoleResponse>(
+    //                        roleList,
+    //                        r => new RoleResponse
+    //                        {
+    //                             Id = r.Id,
+    //                             RoleName = r.RoleName,
+    //                             RoleType = r.RoleType,
+    //                             FunctionalName = r.FunctionalName,
+    //                             Description = r.Description
+    //                        });
+
     public OrganizationResponse? Map(Organization? organization) => organization == null ? null : new()
     {
         Id = organization.Id,
@@ -304,12 +387,22 @@ public sealed class ResponseMapper : IResponseMapper
         Description = project.Description
     };
 
+    public AccessResponse? Map(Access? access) => access == null ? null : new()
+    {
+        Id = access.Id,
+        AccessName = access.AccessName,
+        AccessLevel = access.AccessLevel,
+        AccessType = access.AccessType,
+        Description = access.Description
+    };
+
     public UserListResponse? Map(UserList? userList) => userList == null ? null : new()
     {
         OrgCode = userList.OrgCode,
-        Users = MapperUtils.MapList<User, UserRequestModel>(
-            userList.Users, user => new UserRequestModel
+        Users = MapperUtils.MapList<User, UserResponse>(
+            userList.Users, user => new UserResponse
             {
+                Id = user.Id,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 MiddleName = user.MiddleName,
@@ -447,7 +540,15 @@ public sealed class ResponseMapper : IResponseMapper
                             Type = c.Type,
                             ListingId = c.ListingId,
                         }),
-                
+
+                UserRoles = MapperUtils.MapList<UserRole, UserRoleRequestModel>(
+                    user.Roles, r =>
+                        new UserRoleRequestModel()
+                        {
+                            //Id = r.Id,
+                            RoleName = r.RoleName,
+                            FunctionalName = r.FunctionalName
+                        }),
 
                 UserProjects = MapperUtils.MapList<UserProject, UserProjectRequestModel>(
                     user.UserProjects, p =>
@@ -457,7 +558,9 @@ public sealed class ResponseMapper : IResponseMapper
                             ProjectCode = p.ProjectCode,
                             ProjectType = p.ProjectType,
                             ProjectOrg = p.ProjectOrg,
-                            Active = p.Active
+                            Active = p.Active,
+                            ProjectRoles = Map(p.ProjectRoles),
+                            ProjectAccess = Map(p.ProjectAccess)
                         })
             }
         )

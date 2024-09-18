@@ -565,18 +565,18 @@ public sealed partial class UsersControllerTests : BaseTests<UsersController>
     }
 
     [Fact]
-    public async Task UpdateUserDataAsync_SuccessProcessing_200StatusCode()
+    public async Task UpdateUserProjectAndRoleDataAsync_SuccessProcessing_200StatusCode()
     {
         //Arrange
         var sut = Setup();
-        var toUpdate = Fixture.Create<UserResponse>();
+        var toUpdate = Fixture.Create<UserProjectRoleUpdateRequestModel>();
         var userResponse = Fixture.Create<UserResponse>();
 
         _serviceMock!
-            .Setup(x => x.UpdateUserDataAsync(toUpdate))
+            .Setup(x => x.UpdateUserProjectAndRoleDataAsync(toUpdate))
             .ReturnsAsync((ResponseStatus.Successful, userResponse));
         //Act
-        var actual = await sut.UpdateUserDataAsync(toUpdate);
+        var actual = await sut.UpdateUserProjectAndRoleDataAsync(toUpdate);
 
         //Assert
         var response = actual as OkObjectResult;
@@ -585,17 +585,17 @@ public sealed partial class UsersControllerTests : BaseTests<UsersController>
     }
 
     [Fact]
-    public async Task UpdateUserDataAsync_NonExistent_UnprocessableEntity_422StatusCode()
+    public async Task UpdateUserProjectAndRoleDataAsync_NonExistent_UnprocessableEntity_422StatusCode()
     {
         //Arrange
         var sut = Setup();
-        var toUpdate = Fixture.Create<UserResponse>();
+        var toUpdate = Fixture.Create<UserProjectRoleUpdateRequestModel>();
 
         _serviceMock!
-            .Setup(x => x.UpdateUserDataAsync(toUpdate))
+            .Setup(x => x.UpdateUserProjectAndRoleDataAsync(toUpdate))
             .ReturnsAsync((ResponseStatus.MissingInformation, null));
         //Act
-        var actual = await sut.UpdateUserDataAsync(toUpdate);
+        var actual = await sut.UpdateUserProjectAndRoleDataAsync(toUpdate);
 
         //Assert
         var response = actual as StatusCodeResult;

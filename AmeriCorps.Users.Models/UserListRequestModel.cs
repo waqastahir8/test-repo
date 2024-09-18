@@ -6,6 +6,6 @@ public class UserListRequestModel
 {
     public string OrgCode {get; set; } = string.Empty;
 
-    public List<UserRequestModel> Users { get; set; } = new List<UserRequestModel>();
+    public List<UserResponse> Users { get; set; } = new List<UserResponse>();
 
 }
