@@ -12,6 +12,8 @@ public interface IRolesControllerService
     Task<(ResponseStatus Status, RoleResponse? Response)> GetAsync(int id);
 
     Task<(ResponseStatus Status, RoleResponse? Response)> CreateOrPatchAsync(RoleRequestModel? roleRequest);
+
+    Task<(ResponseStatus Status, List<RoleResponse>? Response)> GetRoleListByTypeAsync(string roleType);
 }
 
 public sealed class RolesControllerService : IRolesControllerService
@@ -48,7 +50,7 @@ public sealed class RolesControllerService : IRolesControllerService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, $"Could not retrieve role with id {id}.");
+            _logger.LogError(e, "Could not retrieve role with id {Identifier}.",id.ToString().Replace(Environment.NewLine, ""));
             return (ResponseStatus.UnknownError, null);
         }
 
@@ -62,6 +64,30 @@ public sealed class RolesControllerService : IRolesControllerService
         return (ResponseStatus.Successful, response);
     }
 
+    public async Task<(ResponseStatus Status, List<RoleResponse>? Response)> GetRoleListByTypeAsync(string roleType)
+    {
+        List<Role>? roleList;
+       
+        try
+        {
+            roleList = await _repository.GetRoleListByTypeAsync(roleType);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Could not retrieve access list");
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        if (roleList == null)
+        {
+            return (ResponseStatus.MissingInformation, null);
+        }
+
+        var response = _respMapper.Map(roleList);
+
+        return (ResponseStatus.Successful, response);
+    }
+
     public async Task<(ResponseStatus Status, RoleResponse? Response)> CreateOrPatchAsync(RoleRequestModel? roleRequest)
     {
         if (roleRequest == null || !_validator.Validate(roleRequest))
@@ -69,7 +95,7 @@ public sealed class RolesControllerService : IRolesControllerService
             return (ResponseStatus.MissingInformation, null);
         }
 
-        Role role = _reqMapper.Map(roleRequest);
+        Role? role = _reqMapper.Map(roleRequest);
 
         try
         {
@@ -85,7 +111,7 @@ public sealed class RolesControllerService : IRolesControllerService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, $"Unable to create or update role for {roleRequest.RoleName}.");
+            _logger.LogError(e, "Unable to create or update role for {Identifier}.",roleRequest.RoleName.Replace(Environment.NewLine, ""));
             return (ResponseStatus.UnknownError, null);
         }
 

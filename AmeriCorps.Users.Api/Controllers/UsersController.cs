@@ -113,8 +113,8 @@ public sealed class UsersController(IUsersControllerService service) : Controlle
 
     //Update User acces, roles and projects
     [HttpPost("org/users/update")]
-    public async Task<IActionResult> UpdateUserDataAsync([FromBody] UserResponse toUpdate) =>
-        await ServeAsync(async () => await _service.UpdateUserDataAsync(toUpdate));
+    public async Task<IActionResult> UpdateUserProjectAndRoleDataAsync([FromBody] UserProjectRoleUpdateRequestModel toUpdate) =>
+        await ServeAsync(async () => await _service.UpdateUserProjectAndRoleDataAsync(toUpdate));
 
         
     //Invite user to org

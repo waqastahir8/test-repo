@@ -132,6 +132,44 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
         Assert.Equal(expected, actual);
     }
 
+
+    [Theory]
+    [InlineData("proj")]
+    public async Task GetProjectListByOrgAsync_Successful_Status(string orgCode)
+    {
+        // Arrange
+        var sut = Setup();
+        
+        _repositoryMock!
+            .Setup(x => x.GetProjectListByOrgAsync(orgCode))
+            .ReturnsAsync(() => Fixture.Build<List<Project>>()
+            .Create());
+
+        // Act
+        var (status, _) = await sut.GetProjectListByOrgAsync(orgCode);
+
+        // Assert
+        Assert.Equal(ResponseStatus.Successful, status);
+    }
+
+    [Theory]
+    [InlineData("proj")]
+    public async Task GetProjectListByOrgAsync_NonExistent_InformationMissing_Status(string orgCode)
+    {
+        // Arrange
+        var sut = Setup();
+        _repositoryMock!
+            .Setup(x => x.GetProjectListByOrgAsync(orgCode))
+            .ReturnsAsync(() => null);
+
+        // Act
+        var (status, _) = await sut.GetProjectListByOrgAsync(orgCode);
+
+        // Assert
+        Assert.Equal(ResponseStatus.MissingInformation, status);
+    }
+
+    
     protected override ProjectControllerService Setup()
     {
         _repositoryMock = new();

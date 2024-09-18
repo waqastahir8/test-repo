@@ -27,6 +27,10 @@ public sealed class RolesController(IRolesControllerService service) : Controlle
     public async Task<IActionResult> PatchUserAsync([FromBody] RoleRequestModel roleRequest) =>
         await ServeAsync(async () => await _service.CreateOrPatchAsync(roleRequest));
 
+    [HttpGet("list/{roleType}")]
+    public async Task<IActionResult> GetRoleListByTypeAsync(string roleType) =>
+        await ServeAsync(async () => await _service.GetRoleListByTypeAsync(roleType));
+
 
 
     private async Task<IActionResult> ServeAsync<T>(Func<Task<(ResponseStatus, T)>> callAsync)

@@ -21,6 +21,9 @@ public sealed class ProjectController(IProjectControllerService service) : Contr
         await ServeAsync(async () => await _service.CreateProjectAsync(projRequest));
 
 
+    [HttpGet("list/{orgCode}")]
+    public async Task<IActionResult> GetProjectListByOrgAsync(string orgCode) =>
+        await ServeAsync(async () => await _service.GetProjectListByOrgAsync(orgCode));
 
 
 

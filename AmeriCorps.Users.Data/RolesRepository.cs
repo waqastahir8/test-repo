@@ -17,6 +17,10 @@ public sealed partial class RoleRepository(
     public async Task<Role?> GetAsync(int id) =>
         await ExecuteAsync(async context => await context.Roles.FindAsync(id));
 
+
+    public async Task<List<Role>?> GetRoleListByTypeAsync(string roleType) =>
+        await ExecuteAsync(async context => await context.Roles.Where(o =>o.RoleType == roleType).ToListAsync());
+
     public async Task<T> SaveAsync<T>(T entity) where T : Entity =>
        await ExecuteAsync(async context =>
        {

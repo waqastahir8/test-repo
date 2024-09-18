@@ -21,6 +21,8 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
     private Mock<IApiService>? _apiService;
     private Mock<IConfiguration>? _configuration;
 
+    private Mock<IAccessRepository>? _accessRepository;
+
     [Theory]
     [InlineData(5)]
     [InlineData(15)]
@@ -1610,10 +1612,14 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         // Arrange
         var sut = Setup();
 
+        var userId =
+            Fixture
+            .Create<int>();
+        
         _repositoryMock!
-            .Setup(x => x.GetAsync(1))
+            .Setup(x => x.GetAsync(userId))
             .ReturnsAsync(() => Fixture.Build<User>()
-            .With(u => u.OrgCode, orgCode)
+            .With(o => o.OrgCode, orgCode)
             .Without(u => u.Roles)
             .Without(u => u.UserProjects)
             .Create());
@@ -1626,14 +1632,14 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
     }
 
     [Theory]
-    [InlineData("org")]    
+    [InlineData("")]    
     public async Task FetchUserListByOrgCodeAsync_Missing_Status(string orgCode)
     {
         // Arrange
         var sut = Setup();
 
         // Act
-        var (status, _) = await sut.FetchUserListByOrgCodeAsync(null);
+        var (status, _) = await sut.FetchUserListByOrgCodeAsync(orgCode);
 
         // Assert
         Assert.Equal(ResponseStatus.MissingInformation, status);
@@ -1641,13 +1647,24 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
 
     [Theory]
     [InlineData(1)]    
-    public async Task UpdateUserDataAsync_Successful_Status(int userId)
+    public async Task UpdateUserProjectAndRoleDataAsync_Successful_Status(int userId)
     {
         // Arrange
         var sut = Setup();
+        
 
-        var model = Fixture.Build<UserResponse>()
+
+        var roles = Fixture.Build<List<UserRoleRequestModel>>()
+                        .Create();
+
+        var projs = Fixture.Build<List<UserProjectRequestModel>>()
+                        .Create();
+
+
+        var model = Fixture.Build<UserProjectRoleUpdateRequestModel>()
                         .With(p => p.Id, userId)
+                        .With(p => p.UserRoles, roles)
+                        .With(p => p.UserProjects, projs)
                         .Create();
 
 
@@ -1659,21 +1676,24 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             .Create());
 
         // Act
-        var (status, _) = await sut.UpdateUserDataAsync(model);
+        var (status, _) = await sut.UpdateUserProjectAndRoleDataAsync(model);
 
         // Assert
         Assert.Equal(ResponseStatus.Successful, status);
     }
 
-    [Theory]
-    [InlineData(1)]    
-    public async Task UpdateUserDataAsync_Missing_Status(int userId)
+    [Fact]
+    public async Task UpdateUserProjectAndRoleDataAsync_Missing_Status()
     {
         // Arrange
         var sut = Setup();
 
+        var user = Fixture.Build<UserProjectRoleUpdateRequestModel>()
+                        .With(u => u.Id, 0)
+                        .Create();
+
         // Act
-        var (status, _) = await sut.UpdateUserDataAsync(null);
+        var (status, _) = await sut.UpdateUserProjectAndRoleDataAsync(user);
 
         // Assert
         Assert.Equal(ResponseStatus.MissingInformation, status);
@@ -1718,23 +1738,35 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         // Arrange
         var sut = Setup();
 
+        var user = Fixture.Build<UserRequestModel>()
+                .With(p => p.Email, "")
+                .Create();
+
         // Act
-        var (status, _) = await sut.InviteUserToOrgAsync(null);
+        var (status, _) = await sut.InviteUserToOrgAsync(user);
 
         // Assert
         Assert.Equal(ResponseStatus.MissingInformation, status);
 
     }
 
-    /**
+    
+    [Fact]
+    public async Task InviteUserToOrgAsync_Unkown_Error()
+    {
+        // Arrange
+        var sut = Setup();
+        
+        var user = Fixture.Build<UserRequestModel>()
+                .Create();
 
-    proxy for invite
+        // Act
+        var (status, _) = await sut.InviteUserToOrgAsync(user);
 
-    Push this and portal changes
+        // Assert
+        Assert.Equal(ResponseStatus.UnknownError, status);
 
-    Project role updates
-
-    */
+    }
 
 
 
@@ -1747,6 +1779,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         _projectRepository = new();
         _roleRepository = new();
         _apiService = new ();
+        _accessRepository = new ();
         _configuration = new ();
 
         Fixture = new Fixture();
@@ -1760,6 +1793,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             _projectRepository.Object,
             _roleRepository.Object,
             _apiService.Object,
+            _accessRepository.Object,
             _configuration.Object);
     }
 }

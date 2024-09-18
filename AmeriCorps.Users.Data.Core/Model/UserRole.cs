@@ -1,7 +1,7 @@
-﻿﻿namespace AmeriCorps.Users.Data.Core;
+namespace AmeriCorps.Users.Data.Core;
 
 
-public sealed class Role : Entity
+public sealed class UserRole : EntityWithUserId
 {
     /**
      * Role name in the format of NAME1_NAME2
@@ -14,10 +14,6 @@ public sealed class Role : Entity
     /**
      * Optional summary of what the role means 
      */
-    public string Description { get; set; } = string.Empty;
-
-
-    public string RoleType { get; set; } = string.Empty;
 
 
 }

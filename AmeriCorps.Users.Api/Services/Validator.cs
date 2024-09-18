@@ -21,7 +21,7 @@ public sealed class Validator : IValidator
         !string.IsNullOrWhiteSpace(model.LastName);
     public bool Validate(RoleRequestModel model) =>
        !string.IsNullOrWhiteSpace(model.RoleName) &&
-       !string.IsNullOrWhiteSpace(model.FucntionalName) &&
+       !string.IsNullOrWhiteSpace(model.FunctionalName) &&
        !string.IsNullOrWhiteSpace(model.Description);
 
     public bool Validate(SavedSearchRequestModel model) =>

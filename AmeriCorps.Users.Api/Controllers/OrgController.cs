@@ -16,6 +16,10 @@ public sealed class OrgController(IOrgControllerService service) : ControllerBas
     public async Task<IActionResult> GetOrgByCodeAsync(string orgCode) =>
         await ServeAsync(async () => await _service.GetOrgByCodeAsync(orgCode));
 
+    [HttpGet("list-all")]
+    public async Task<IActionResult> GetOrgListAsync() =>
+        await ServeAsync(async () => await _service.GetOrgListAsync());
+
     [HttpPost("create")]
     public async Task<IActionResult> CreateOrgAsync([FromBody] OrganizationRequestModel orgRequest) =>
         await ServeAsync(async () => await _service.CreateOrgAsync(orgRequest));

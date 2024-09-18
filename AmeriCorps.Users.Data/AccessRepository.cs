@@ -8,28 +8,43 @@ using System.Linq.Expressions;
 
 namespace AmeriCorps.Users.Data;
 
-public interface IOrganizationRepository
+public interface IAccessRepository
 {
-    Task<Organization?> GetOrgByCodeAsync(string orgCode);
 
-    Task<List<Organization>?> GetOrgListAsync();
+    Task<Access?> GetAsync(int id);
+    Task<Access?> GetAccessByNameAsync(string accessName);
+
+    Task<List<Access>?> GetAccessListByTypeAsync(string accessType);
+
+    Task<List<Access>?> GetAccessListAsync();
 
     Task<T> SaveAsync<T>(T entity) where T : Entity;
+
 }
 
 
-public sealed partial class OrganizationRepository(
-    ILogger<OrganizationRepository> logger,
+public sealed partial class AccessRepository(
+    ILogger<AccessRepository> logger,
     IContextFactory contextFactory,
     IOptions<UserContextOptions> options
 ) : RepositoryBase<RepositoryContext, UserContextOptions>(logger, contextFactory, options),
-    IOrganizationRepository
+    IAccessRepository
 {
-    public async Task<Organization?> GetOrgByCodeAsync(string orgCode) =>
-        await ExecuteAsync(async context => await context.Organizations.FirstOrDefaultAsync(o =>o.OrgCode == orgCode));
 
-    public async Task<List<Organization>?> GetOrgListAsync() =>
-        await ExecuteAsync(async context => await context.Organizations.ToListAsync());
+    public async Task<Access?> GetAsync(int id) =>
+        await ExecuteAsync(async context => await context.Access.FirstOrDefaultAsync(a =>a.Id == id));
+        
+    public async Task<Access?> GetAccessByNameAsync(string accessName) =>
+        await ExecuteAsync(async context => await context.Access.FirstOrDefaultAsync(a =>a.AccessName == accessName));
+
+    public async Task<List<Access>?> GetAccessListByTypeAsync(string accessType) =>
+        await ExecuteAsync(async context => await context.Access.Where(o =>o.AccessType == accessType).ToListAsync());
+
+    public async Task<List<Access>?> GetAccessListAsync() =>
+        await ExecuteAsync(async context => await context.Access.ToListAsync());
+
+
+
 
     public async Task<T> SaveAsync<T>(T entity) where T : Entity =>
        await ExecuteAsync(async context =>
