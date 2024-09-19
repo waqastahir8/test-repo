@@ -19,12 +19,14 @@ builder.Services
     .AddScoped<IRoleRepository, RoleRepository>()
     .AddScoped<IOrganizationRepository, OrganizationRepository>()
     .AddScoped<IProjectRepository, ProjectRepository>()
+    .AddScoped<IAccessRepository, AccessRepository>()
     .AddScoped<IRequestMapper, RequestMapper>()
     .AddScoped<IResponseMapper, ResponseMapper>()
     .AddScoped<IUsersControllerService, UsersControllerService>()
     .AddScoped<IRolesControllerService, RolesControllerService>()
     .AddScoped<IOrgControllerService, OrgControllerService>()
     .AddScoped<IProjectControllerService, ProjectControllerService>()
+    .AddScoped<IAccessControllerService, AccessControllerService>()
     .AddScoped<IApiService, ApiService>();
 
 builder.Services.AddHttpClient()

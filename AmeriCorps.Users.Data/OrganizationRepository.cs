@@ -12,8 +12,9 @@ public interface IOrganizationRepository
 {
     Task<Organization?> GetOrgByCodeAsync(string orgCode);
 
-    Task<T> SaveAsync<T>(T entity) where T : Entity;
+    Task<List<Organization>?> GetOrgListAsync();
 
+    Task<T> SaveAsync<T>(T entity) where T : Entity;
 }
 
 
@@ -26,6 +27,9 @@ public sealed partial class OrganizationRepository(
 {
     public async Task<Organization?> GetOrgByCodeAsync(string orgCode) =>
         await ExecuteAsync(async context => await context.Organizations.FirstOrDefaultAsync(o =>o.OrgCode == orgCode));
+
+    public async Task<List<Organization>?> GetOrgListAsync() =>
+        await ExecuteAsync(async context => await context.Organizations.ToListAsync());
 
     public async Task<T> SaveAsync<T>(T entity) where T : Entity =>
        await ExecuteAsync(async context =>

@@ -30,7 +30,7 @@ public sealed partial class OrgControllerTests : BaseTests<OrgController>
         Assert.Equal((int)HttpStatusCode.OK, response.StatusCode);
     }
 
-        [Fact]
+    [Fact]
     public async Task GetOrgByCodeAsync_NonExistent_UnprocessableEntity_422StatusCode()
     {
         //Arrange
@@ -108,6 +108,63 @@ public sealed partial class OrgControllerTests : BaseTests<OrgController>
         var response = actual as OkObjectResult;
         Assert.NotNull(response);
         Assert.Equal((int)HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetOrgListAsync_UnknownError_500StatusCode()
+    {
+        //Arrange
+        var sut = Setup();
+
+        _serviceMock!
+            .Setup(x => x.GetOrgListAsync())
+            .ReturnsAsync((ResponseStatus.UnknownError, null));
+        //Act
+        var actual = await sut.GetOrgListAsync();
+
+        //Assert
+        var response = actual as StatusCodeResult;
+        Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.InternalServerError, response.StatusCode);
+    }
+
+
+    [Fact]
+    public async Task GetOrgListAsync_SuccessProcessing_200StatusCode()
+    {
+        //Arrange
+        var sut = Setup();
+        var orgResponse = Fixture.Create<List<OrganizationResponse>>();
+
+        _serviceMock!
+            .Setup(x => x.GetOrgListAsync())
+            .ReturnsAsync((ResponseStatus.Successful, orgResponse));
+        //Act
+        var actual = await sut.GetOrgListAsync();
+
+        //Assert
+        var response = actual as OkObjectResult;
+        Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.OK, response.StatusCode);
+    }
+
+
+    [Fact]
+    public async Task GetOrgListAsync_NonExistent_UnprocessableEntity_422StatusCode()
+    {
+        //Arrange
+        var sut = Setup();
+
+        _serviceMock!
+            .Setup(x => x.GetOrgListAsync())
+            .ReturnsAsync((ResponseStatus.MissingInformation, null));
+        //Act
+        var actual = await sut.GetOrgListAsync();
+
+        //Assert
+        var response = actual as StatusCodeResult;
+        Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.UnprocessableEntity, response.StatusCode);
     }
 
     protected override OrgController Setup()

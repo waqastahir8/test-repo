@@ -20,6 +20,10 @@ public interface IRequestMapper
     Organization Map(OrganizationRequestModel requestModel);
     
     Project Map(ProjectRequestModel requestModel);
+
+    UserRole Map(Role role);
+
+    Access Map(AccessRequestModel requestModel);
 }
 
 public sealed class RequestMapper : IRequestMapper
@@ -38,6 +42,7 @@ public sealed class RequestMapper : IRequestMapper
         Suffix = requestModel.Suffix,
         Prefix = requestModel.Prefix,
         OrgCode = requestModel.OrgCode,
+        EncryptedSocialSecurityNumber =  requestModel.EncryptedSocialSecurityNumber,
 
         Attributes = MapperUtils.MapList<AttributeRequestModel, AmeriCorps.Users.Data.Core.Attribute>(
             requestModel.Attributes,
@@ -172,14 +177,13 @@ public sealed class RequestMapper : IRequestMapper
                     DateContacted = r.DateContacted
                 }),
 
-        Roles = MapperUtils.MapList<RoleRequestModel, Role>(
-            requestModel.Roles, c =>
-                new Role()
+        Roles = MapperUtils.MapList<UserRoleRequestModel, UserRole>(
+            requestModel.UserRoles, c =>
+                new UserRole()
                 {
                     //Id = c.Id,
                     RoleName = c.RoleName,
-                    FucntionalName = c.FucntionalName,
-                    Description = c.Description,
+                    FunctionalName = c.FunctionalName
                 }),
 
         UserProjects = MapperUtils.MapList<UserProjectRequestModel, UserProject>(
@@ -190,7 +194,9 @@ public sealed class RequestMapper : IRequestMapper
                     ProjectCode = p.ProjectCode,
                     ProjectType = p.ProjectType,
                     ProjectOrg = p.ProjectOrg,
-                    Active = p.Active
+                    Active = p.Active,
+                    ProjectRoles = Map(p.ProjectRoles),
+                    ProjectAccess = Map(p.ProjectAccess)
                 })
     };
 
@@ -198,7 +204,7 @@ public sealed class RequestMapper : IRequestMapper
     {
         //Id = roleRequestModel.Id,
         RoleName = roleRequestModel.RoleName,
-        FucntionalName = roleRequestModel.FucntionalName,
+        FunctionalName = roleRequestModel.FunctionalName,
         Description = roleRequestModel.Description
     };
 
@@ -267,4 +273,36 @@ public sealed class RequestMapper : IRequestMapper
         ProjectOrg = requestModel.ProjectOrg,
         Description = requestModel.Description
     };
+
+    public Access Map(AccessRequestModel requestModel) => new()
+    {
+        AccessName = requestModel.AccessName,
+        AccessLevel = requestModel.AccessLevel,
+        AccessType = requestModel.AccessType,
+        Description = requestModel.Description
+    };
+
+    public UserRole Map(Role role) => new()
+    {
+        RoleName = role.RoleName,
+        FunctionalName = role.FunctionalName
+    };
+
+    public List<ProjectRole> Map(List<ProjectRoleRequestModel> role) =>
+       MapperUtils.MapList<ProjectRoleRequestModel, ProjectRole>(
+                           role,
+                           a => new ProjectRole
+                           {
+                               RoleName = a.RoleName,
+                               FunctionalName = a.FunctionalName
+                           });
+
+    public List<ProjectAccess> Map(List<ProjectAccessRequestModel> access) =>
+       MapperUtils.MapList<ProjectAccessRequestModel, ProjectAccess>(
+                           access,
+                           a => new ProjectAccess
+                           {
+                               AccessName = a.AccessName,
+                               AccessLevel = a.AccessLevel
+                           });
 }

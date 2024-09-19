@@ -1,0 +1,87 @@
+name: Release Test
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - test-env
+
+env:
+  AZURE_WEBAPP_NAME: app-userservice-test-001
+  AZURE_FUNCTIONAPP_NAME: func-usersdbupdater-dev
+  AZURE_WEBAPP_PACKAGE_PATH: './publish'
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: './publish-func'
+  SOLUTION_FILE: ./AmeriCorpsUsers.sln
+  API_PROJECT: ./AmeriCorps.Users.Api
+  NUGET_PROJECT_FILE: ./AmeriCorps.Users.Models/AmeriCorps.Users.Models.csproj
+  FUNCTIONAPP_PROJECT: ./AmeriCorps.Users.Data.Deployment
+  AZURE_FUNCTIONAPP_URI: https://func-usersdbupdater-dev.azurewebsites.net/api/DatabaseUpdate
+  BUILD_CONFIGURATION: Release
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: Test
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4
+
+      - name: setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: .net restore
+        run: |
+          dotnet nuget update source github --username "${{ secrets.NUGET_USER }}" --password "${{ secrets.NUGET_PWD }}" --store-password-in-clear-text
+          dotnet restore ${{ env.SOLUTION_FILE }}
+
+      - name: .net test
+        run: dotnet test ${{ env.SOLUTION_FILE }} --no-restore --collect:"XPlat Code Coverage" --settings coverlet.runsettings.xml
+
+      - name: generate code coverage report
+        run: |
+          dotnet tool install -g dotnet-reportgenerator-globaltool
+          reportgenerator -reports:"*.Tests/TestResults/*/coverage.cobertura.xml" -targetdir:"coveragereport" -reporttypes:TextSummary
+          more coveragereport/Summary.txt
+
+      - name: upload code coverage report
+        uses: actions/upload-artifact@v3
+        with:
+          name: CodeCoverageReport
+          path: coveragereport/Summary.txt
+
+      - name: .net publish
+        run: dotnet publish ${{ env.API_PROJECT }} --configuration Release --no-restore --output '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}'
+
+      - name: publish nuget package
+        run: |
+          dotnet pack ${{ env.NUGET_PROJECT_FILE }} --configuration ${{ env.BUILD_CONFIGURATION }} --artifacts-path ./nuget
+          dotnet nuget update source github --username USERNAME --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text
+          dotnet nuget push "./nuget/package/release/*.nupkg" --source "github" --skip-duplicate
+
+      - name: build Azure Function
+        run: dotnet build ${{ env.FUNCTIONAPP_PROJECT }} --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore --output '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+
+      - name: publish Azure Function
+        uses: Azure/functions-action@v1
+        with:
+          app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+          package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+          publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+
+      - name: run Azure Function DB migration
+        uses: satak/webrequest-action@master
+        with:
+          url: ${{ env.AZURE_FUNCTIONAPP_URI }}?code=${{ secrets.AZURE_FUNCTIONAPP_API_KEY }}
+          method: POST
+
+      - name: release App Service
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE_TEST}}
+          package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}

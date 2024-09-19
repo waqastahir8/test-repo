@@ -10,12 +10,15 @@ namespace AmeriCorps.Users.Data;
 
 public interface IProjectRepository
 {
+
+
+    Task<Project?> GetAsync(int id);
     Task<Project?> GetProjectByCodeAsync(string projCode);
+
+    Task<List<Project>?> GetProjectListByOrgAsync(string orgCode);
 
     Task<T> SaveAsync<T>(T entity) where T : Entity;
 
-
-    UserProject FindExistingProject(string projectCode, User user);
 
 }
 
@@ -28,6 +31,14 @@ public sealed partial class ProjectRepository(
 {
     public async Task<Project?> GetProjectByCodeAsync(string projCode) =>
         await ExecuteAsync(async context => await context.Projects.FirstOrDefaultAsync(p => p.ProjectCode == projCode));
+
+
+    public async Task<Project?> GetAsync(int id) =>
+        await ExecuteAsync(async context => await context.Projects.FirstOrDefaultAsync(p =>p.Id == id));
+
+
+    public async Task<List<Project>?> GetProjectListByOrgAsync(string orgCode) =>
+        await ExecuteAsync(async context => await context.Projects.Where(o =>o.ProjectOrg == orgCode).ToListAsync());
 
     public async Task<T> SaveAsync<T>(T entity) where T : Entity =>
        await ExecuteAsync(async context =>
@@ -49,17 +60,4 @@ public sealed partial class ProjectRepository(
        });
 
 
-    public UserProject FindExistingProject(string projectCode, User user)
-    {
-        if(!String.IsNullOrEmpty(projectCode) && user != null){
-            for (int i = 0; i < user.UserProjects.Count; i++) 
-            {
-                var existingProject =  user.UserProjects[i];
-                if(existingProject.ProjectCode == projectCode && existingProject.Active){
-                    return existingProject;
-                }
-            }
-        }
-        return null;
-    }
 }

@@ -108,6 +108,66 @@ public sealed partial class ProjectControllerTests : BaseTests<ProjectController
         Assert.NotNull(response);
         Assert.Equal((int)HttpStatusCode.OK, response.StatusCode);
     }
+
+    [Fact]
+    public async Task GetProjectListByOrgAsync_UnknownError_500StatusCode()
+    {
+        //Arrange
+        var sut = Setup();
+        var org = Fixture.Create<string>();
+
+        _serviceMock!
+            .Setup(x => x.GetProjectListByOrgAsync(org))
+            .ReturnsAsync((ResponseStatus.UnknownError, null));
+        //Act
+        var actual = await sut.GetProjectListByOrgAsync(org);
+
+        //Assert
+        var response = actual as StatusCodeResult;
+        Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.InternalServerError, response.StatusCode);
+    }
+
+
+    [Fact]
+    public async Task GetProjectListByOrgAsync_SuccessProcessing_200StatusCode()
+    {
+        //Arrange
+        var sut = Setup();
+        var org = Fixture.Create<string>();
+        var projResponse = Fixture.Create<List<ProjectResponse>>();
+
+        _serviceMock!
+            .Setup(x => x.GetProjectListByOrgAsync(org))
+            .ReturnsAsync((ResponseStatus.Successful, projResponse));
+        //Act
+        var actual = await sut.GetProjectListByOrgAsync(org);
+
+        //Assert
+        var response = actual as OkObjectResult;
+        Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.OK, response.StatusCode);
+    }
+
+
+    [Fact]
+    public async Task GetProjectListByOrgAsync_NonExistent_UnprocessableEntity_422StatusCode()
+    {
+        //Arrange
+        var sut = Setup();
+        var org = Fixture.Create<string>();
+
+        _serviceMock!
+            .Setup(x => x.GetProjectListByOrgAsync(org))
+            .ReturnsAsync((ResponseStatus.MissingInformation, null));
+        //Act
+        var actual = await sut.GetProjectListByOrgAsync(org);
+
+        //Assert
+        var response = actual as StatusCodeResult;
+        Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.UnprocessableEntity, response.StatusCode);
+    }
     protected override ProjectController Setup()
     {
         _serviceMock = new();

@@ -132,6 +132,40 @@ public sealed partial class OrgControllerServiceTests : BaseTests<OrgControllerS
     }
 
 
+    [Fact]
+    public async Task GetOrgListAsync_Successful_Status()
+    {
+        // Arrange
+        var sut = Setup();
+        
+        _repositoryMock!
+            .Setup(x => x.GetOrgListAsync())
+            .ReturnsAsync(() => Fixture.Build<List<Organization>>()
+            .Create());
+
+        // Act
+        var (status, _) = await sut.GetOrgListAsync();
+
+        // Assert
+        Assert.Equal(ResponseStatus.Successful, status);
+    }
+
+    [Fact]
+    public async Task GetOrgListAsync_NonExistent_InformationMissing_Status()
+    {
+        // Arrange
+        var sut = Setup();
+        _repositoryMock!
+            .Setup(x => x.GetOrgListAsync())
+            .ReturnsAsync(() => null);
+
+        // Act
+        var (status, _) = await sut.GetOrgListAsync();
+
+        // Assert
+        Assert.Equal(ResponseStatus.MissingInformation, status);
+    }
+
 
     protected override OrgControllerService Setup()
     {

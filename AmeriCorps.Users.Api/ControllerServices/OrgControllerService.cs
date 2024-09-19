@@ -12,6 +12,8 @@ public interface IOrgControllerService
 
     Task<(ResponseStatus Status, OrganizationResponse? Response)> GetOrgByCodeAsync(string orgCode);
 
+    Task<(ResponseStatus Status, List<OrganizationResponse>? Response)> GetOrgListAsync();
+
     Task<(ResponseStatus Status, OrganizationResponse? Response)> CreateOrgAsync(OrganizationRequestModel? orgRequest);
 
 }
@@ -59,6 +61,31 @@ public sealed class OrgControllerService : IOrgControllerService
 
         return (ResponseStatus.Successful, response);
     }
+
+    public async Task<(ResponseStatus Status, List<OrganizationResponse>? Response)> GetOrgListAsync()
+    {
+        List<Organization>? organization;
+       
+        try
+        {
+            organization =  await _repository.GetOrgListAsync();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Could not retrieve org list.");
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        if (organization == null)
+        {
+            return (ResponseStatus.MissingInformation, null);
+        }
+
+        var response = _responseMapper.Map(organization);
+
+        return (ResponseStatus.Successful, response);
+    }
+
 
 
 
