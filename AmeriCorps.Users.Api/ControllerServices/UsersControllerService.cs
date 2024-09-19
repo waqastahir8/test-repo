@@ -69,19 +69,16 @@ public sealed class UsersControllerService : IUsersControllerService
 
     private readonly IAccessRepository _accessRepository;
 
-    private readonly IConfiguration _configuration;
-
     public UsersControllerService(
-    ILogger<UsersControllerService> logger,
-    IRequestMapper requestMapper,
-    IResponseMapper responseMapper,
-    IValidator validator,
-    IUserRepository repository,
-    IProjectRepository projectRepository,
-    IRoleRepository roleRepository,
-    IApiService apiService,
-    IAccessRepository accessRepository,
-    IConfiguration configuration)
+        ILogger<UsersControllerService> logger,
+        IRequestMapper requestMapper,
+        IResponseMapper responseMapper,
+        IValidator validator,
+        IUserRepository repository,
+        IProjectRepository projectRepository,
+        IRoleRepository roleRepository,
+        IApiService apiService,
+        IAccessRepository accessRepository)
     {
         _logger = logger;
         _requestMapper = requestMapper;
@@ -92,7 +89,6 @@ public sealed class UsersControllerService : IUsersControllerService
         _roleRepository = roleRepository;
         _apiService = apiService;
         _accessRepository = accessRepository;
-        _configuration = configuration;
     }
 
     public async Task<(ResponseStatus Status, UserResponse? Response)> GetAsync(int id)
@@ -486,7 +482,9 @@ public sealed class UsersControllerService : IUsersControllerService
     {
         var (isValidRequest, response) = await IsValidCollectionRequest(collectionRequest);
         if (!isValidRequest)
+        {
             return (response, null);
+        }
         var collection = _requestMapper.Map(collectionRequest!);
 
         return await SaveCollectionAsync(collection);
@@ -508,7 +506,9 @@ public sealed class UsersControllerService : IUsersControllerService
 
         var (isValidRequest, response) = await IsValidCollectionRequest(collectionRequest);
         if (!isValidRequest)
+        {
             return (response, null);
+        }
 
         var collection = _requestMapper.Map(collectionRequest);
 
@@ -535,7 +535,9 @@ public sealed class UsersControllerService : IUsersControllerService
         };
         var (isValidRequest, response) = await IsValidCollectionRequest(collectionRequest);
         if (!isValidRequest)
+        {
             return (response, false);
+        }
 
         var collection = _requestMapper.Map(collectionListRequestModel);
         var isDeletedSuccessful = await _repository.DeleteCollectionAsync(collection);
@@ -564,8 +566,7 @@ public sealed class UsersControllerService : IUsersControllerService
 
     public async Task<(ResponseStatus Status, bool Response)> DeleteReferenceAsync(int userId, int referenceId)
     {
-        var referenceExists = await _repository.ExistsAsync<Reference>(r => r.UserId == userId &&
-                                                   r.Id == referenceId);
+        var referenceExists = await _repository.ExistsAsync<Reference>(r => r.UserId == userId && r.Id == referenceId);
 
         if (!referenceExists)
         {
@@ -686,11 +687,6 @@ public sealed class UsersControllerService : IUsersControllerService
             return (ResponseStatus.MissingInformation, null);
         }
 
-        // if (user.Roles.Contains(role))
-        // {
-        //     return (ResponseStatus.Successful, null);
-        // }
-
         user.Roles.Add(_requestMapper.Map(role));
 
         try
@@ -729,13 +725,6 @@ public sealed class UsersControllerService : IUsersControllerService
         {
             return (ResponseStatus.MissingInformation, null);
         }
-
-        // if (user.Roles.Contains(role))
-        // {
-        //     return (ResponseStatus.Successful, null);
-        // }
-
-        // user.Roles.Add(role);
 
         try
         {
@@ -840,11 +829,11 @@ public sealed class UsersControllerService : IUsersControllerService
         return (ResponseStatus.Successful, _responseMapper.Map(user));
     }
 
-    public async Task<(ResponseStatus Status, UserListResponse? Response)> FetchUserListByOrgCodeAsync(String orgCode)
+    public async Task<(ResponseStatus Status, UserListResponse? Response)> FetchUserListByOrgCodeAsync(string orgCode)
     {
         UserList? userList;
 
-        if (orgCode == null || String.IsNullOrEmpty(orgCode))
+        if (string.IsNullOrWhiteSpace(orgCode))
         {
             return (ResponseStatus.MissingInformation, null);
         }
@@ -977,7 +966,7 @@ public sealed class UsersControllerService : IUsersControllerService
                         }
                     }
 
-                    if (!String.IsNullOrEmpty(project.ProjectCode))
+                    if (!string.IsNullOrEmpty(project.ProjectCode))
                     {
                         var orgProj = await _projectRepository.GetProjectByCodeAsync(project.ProjectCode);
                         if (orgProj != null)
