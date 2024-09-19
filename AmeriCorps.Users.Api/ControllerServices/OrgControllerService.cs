@@ -4,18 +4,15 @@ using AmeriCorps.Users.Models;
 using AmeriCorps.Users.Api.Services;
 using System.Data;
 
-
 namespace AmeriCorps.Users.Api;
 
 public interface IOrgControllerService
 {
-
     Task<(ResponseStatus Status, OrganizationResponse? Response)> GetOrgByCodeAsync(string orgCode);
 
     Task<(ResponseStatus Status, List<OrganizationResponse>? Response)> GetOrgListAsync();
 
     Task<(ResponseStatus Status, OrganizationResponse? Response)> CreateOrgAsync(OrganizationRequestModel? orgRequest);
-
 }
 
 public sealed class OrgControllerService : IOrgControllerService
@@ -37,14 +34,13 @@ public sealed class OrgControllerService : IOrgControllerService
         _repository = repository;
     }
 
-
     public async Task<(ResponseStatus Status, OrganizationResponse? Response)> GetOrgByCodeAsync(string orgCode)
     {
         Organization? organization;
-       
+
         try
         {
-            organization =  await _repository.GetOrgByCodeAsync(orgCode);
+            organization = await _repository.GetOrgByCodeAsync(orgCode);
         }
         catch (Exception e)
         {
@@ -65,10 +61,10 @@ public sealed class OrgControllerService : IOrgControllerService
     public async Task<(ResponseStatus Status, List<OrganizationResponse>? Response)> GetOrgListAsync()
     {
         List<Organization>? organization;
-       
+
         try
         {
-            organization =  await _repository.GetOrgListAsync();
+            organization = await _repository.GetOrgListAsync();
         }
         catch (Exception e)
         {
@@ -86,9 +82,6 @@ public sealed class OrgControllerService : IOrgControllerService
         return (ResponseStatus.Successful, response);
     }
 
-
-
-
     public async Task<(ResponseStatus Status, OrganizationResponse? Response)> CreateOrgAsync(OrganizationRequestModel? orgRequest)
     {
         if (orgRequest == null)
@@ -100,7 +93,7 @@ public sealed class OrgControllerService : IOrgControllerService
 
         try
         {
-            var foundOrg =  await _repository.GetOrgByCodeAsync(org.OrgCode);
+            var foundOrg = await _repository.GetOrgByCodeAsync(org.OrgCode);
             if (foundOrg == null)
             {
                 org = await _repository.SaveAsync(org);
@@ -116,5 +109,4 @@ public sealed class OrgControllerService : IOrgControllerService
 
         return (ResponseStatus.Successful, response);
     }
-
 }

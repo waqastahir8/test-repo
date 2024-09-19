@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AmeriCorps.Users.Data.Core"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AmeriCorps.Users.Data", "AmeriCorps.Users.Data\AmeriCorps.Users.Data.csproj", "{AED60B06-38F3-40ED-84C4-EB1EE64250FA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AmeriCorps_Users_Data_Deployment", "AmeriCorps.Users.Data.Deployment\AmeriCorps_Users_Data_Deployment.csproj", "{A9E5B91E-0B9D-41BB-9A3F-F12CDBA51912}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AmeriCorps.Users.Data.Deployment", "AmeriCorps.Users.Data.Deployment\AmeriCorps.Users.Data.Deployment.csproj", "{A9E5B91E-0B9D-41BB-9A3F-F12CDBA51912}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D43FE499-41C6-47DD-92E8-7439A713CD37}"
 	ProjectSection(SolutionItems) = preProject

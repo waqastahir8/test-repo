@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AmeriCorps.Users.Data\AmeriCorps.Users.Data.csproj" />
+    <ProjectReference Include="..\AmeriCorps.Users.Models\AmeriCorps.Users.Models.csproj" />
   </ItemGroup>
 
 </Project>

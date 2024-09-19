@@ -1,21 +1,14 @@
 using AmeriCorps.Users.Data.Core;
-using AmeriCorps.Users.Data;
-using AmeriCorps.Users.Models;
-using AmeriCorps.Users.Api.Services;
-using System.Data;
-
 
 namespace AmeriCorps.Users.Api;
 
 public interface IProjectControllerService
 {
-
     Task<(ResponseStatus Status, ProjectResponse? Response)> GetProjectByCodeAsync(string projCode);
 
     Task<(ResponseStatus Status, List<ProjectResponse>? Response)> GetProjectListByOrgAsync(string orgCode);
 
     Task<(ResponseStatus Status, ProjectResponse? Response)> CreateProjectAsync(ProjectRequestModel? projRequest);
-
 }
 
 public sealed class ProjectControllerService : IProjectControllerService
@@ -37,14 +30,13 @@ public sealed class ProjectControllerService : IProjectControllerService
         _repository = repository;
     }
 
-
     public async Task<(ResponseStatus Status, ProjectResponse? Response)> GetProjectByCodeAsync(string projCode)
     {
         Project? project;
-       
+
         try
         {
-            project =  await _repository.GetProjectByCodeAsync(projCode);
+            project = await _repository.GetProjectByCodeAsync(projCode);
         }
         catch (Exception e)
         {
@@ -62,10 +54,10 @@ public sealed class ProjectControllerService : IProjectControllerService
         return (ResponseStatus.Successful, response);
     }
 
-    public async  Task<(ResponseStatus Status, List<ProjectResponse>? Response)> GetProjectListByOrgAsync(string orgCode)
+    public async Task<(ResponseStatus Status, List<ProjectResponse>? Response)> GetProjectListByOrgAsync(string orgCode)
     {
         List<Project>? projList;
-       
+
         try
         {
             projList = await _repository.GetProjectListByOrgAsync(orgCode);
@@ -86,8 +78,6 @@ public sealed class ProjectControllerService : IProjectControllerService
         return (ResponseStatus.Successful, response);
     }
 
-
-
     public async Task<(ResponseStatus Status, ProjectResponse? Response)> CreateProjectAsync(ProjectRequestModel? projRequest)
     {
         if (projRequest == null)
@@ -103,9 +93,6 @@ public sealed class ProjectControllerService : IProjectControllerService
             if (foundProj == null)
             {
                 project = await _repository.SaveAsync(project);
-            }else
-            {
-
             }
         }
         catch (Exception e)
@@ -118,5 +105,4 @@ public sealed class ProjectControllerService : IProjectControllerService
 
         return (ResponseStatus.Successful, response);
     }
-
 }

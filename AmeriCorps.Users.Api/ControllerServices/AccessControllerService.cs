@@ -1,15 +1,9 @@
 using AmeriCorps.Users.Data.Core;
-using AmeriCorps.Users.Data;
-using AmeriCorps.Users.Models;
-using AmeriCorps.Users.Api.Services;
-using System.Data;
-
 
 namespace AmeriCorps.Users.Api;
 
 public interface IAccessControllerService
 {
-
     Task<(ResponseStatus Status, AccessResponse? Response)> GetAccessByNameAsync(string accessName);
 
     Task<(ResponseStatus Status, List<AccessResponse>? Response)> GetAccessListAsync();
@@ -17,7 +11,6 @@ public interface IAccessControllerService
     Task<(ResponseStatus Status, List<AccessResponse>? Response)> GetAccessListByTypeAsync(string accessType);
 
     Task<(ResponseStatus Status, AccessResponse? Response)> CreateAccessAsync(AccessRequestModel? accessRequest);
-
 }
 
 public sealed class AccessControllerService : IAccessControllerService
@@ -39,14 +32,13 @@ public sealed class AccessControllerService : IAccessControllerService
         _repository = repository;
     }
 
-
     public async Task<(ResponseStatus Status, AccessResponse? Response)> GetAccessByNameAsync(string accessName)
     {
         Access? access;
-       
+
         try
         {
-            access =  await _repository.GetAccessByNameAsync(accessName);
+            access = await _repository.GetAccessByNameAsync(accessName);
         }
         catch (Exception e)
         {
@@ -67,7 +59,7 @@ public sealed class AccessControllerService : IAccessControllerService
     public async Task<(ResponseStatus Status, List<AccessResponse>? Response)> GetAccessListByTypeAsync(string accessType)
     {
         List<Access>? accessList;
-       
+
         try
         {
             accessList = await _repository.GetAccessListByTypeAsync(accessType);
@@ -91,7 +83,7 @@ public sealed class AccessControllerService : IAccessControllerService
     public async Task<(ResponseStatus Status, List<AccessResponse>? Response)> GetAccessListAsync()
     {
         List<Access>? accessList;
-       
+
         try
         {
             accessList = await _repository.GetAccessListAsync();
@@ -112,8 +104,6 @@ public sealed class AccessControllerService : IAccessControllerService
         return (ResponseStatus.Successful, response);
     }
 
-
-
     public async Task<(ResponseStatus Status, AccessResponse? Response)> CreateAccessAsync(AccessRequestModel? accessRequest)
     {
         if (accessRequest == null)
@@ -125,7 +115,7 @@ public sealed class AccessControllerService : IAccessControllerService
 
         try
         {
-            var found =  await _repository.GetAccessByNameAsync(access.AccessName);
+            var found = await _repository.GetAccessByNameAsync(access.AccessName);
             if (found == null)
             {
                 access = await _repository.SaveAsync(access);
@@ -141,5 +131,4 @@ public sealed class AccessControllerService : IAccessControllerService
 
         return (ResponseStatus.Successful, response);
     }
-
 }

@@ -1,6 +1,5 @@
 using AmeriCorps.Users.Data.Core;
 using AmeriCorps.Users.Data.Migrations;
-using Grpc.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
@@ -26,7 +25,6 @@ public class DatabaseUpdater
     }
 
     [Function("DatabaseUpdate")]
-#pragma warning disable IDE0060 // Remove unused parameter
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest request)
 #pragma warning restore IDE0060 // Remove unused parameter
     {
