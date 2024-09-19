@@ -1,10 +1,6 @@
-﻿using System.Configuration;
+﻿using AmeriCorps.Users.Data.Core;
 using System.Data;
 using System.Security.Cryptography;
-using AmeriCorps.Users.Api.Services;
-using AmeriCorps.Users.Data.Core;
-
-
 
 namespace AmeriCorps.Users.Api;
 
@@ -41,13 +37,16 @@ public interface IUsersControllerService
     Task<(ResponseStatus Status, bool Response)> DeleteReferenceAsync(int userId, int referenceId);
 
     Task<(ResponseStatus Status, UserResponse? Response)> AssociateRoleAsync(int userId, int roleId);
+
     Task<(ResponseStatus Status, UserResponse? Response)> AddRoleToUserAsync(int userId, RoleRequestModel roleRequest);
+
     Task<(ResponseStatus Status, UserListResponse? Response)> FetchUserListByOrgCodeAsync(String orgCode);
+
     Task<(ResponseStatus Status, UserResponse? Response)> AddUserToProjectAsync(int userId, string projCode);
 
     Task<(ResponseStatus Status, UserResponse? Response)> UpdateUserProjectAndRoleDataAsync(UserProjectRoleUpdateRequestModel toUpdate);
 
-    Task<(ResponseStatus Status, UserResponse? Response)> InviteUserToOrgAsync( UserRequestModel toInvite);
+    Task<(ResponseStatus Status, UserResponse? Response)> InviteUserToOrgAsync(UserRequestModel toInvite);
 }
 
 public sealed class UsersControllerService : IUsersControllerService
@@ -69,32 +68,27 @@ public sealed class UsersControllerService : IUsersControllerService
     private readonly IApiService _apiService;
 
     private readonly IAccessRepository _accessRepository;
-    
-    private readonly IConfiguration _configuration;
-
 
     public UsersControllerService(
-    ILogger<UsersControllerService> logger,
-    IRequestMapper requestMapper,
-    IResponseMapper responseMapper,
-    IValidator validator,
-    IUserRepository repository,
-    IProjectRepository projectRepository,
-    IRoleRepository roleRepository,
-    IApiService apiService,
-    IAccessRepository accessRepository,
-    IConfiguration configuration)
+        ILogger<UsersControllerService> logger,
+        IRequestMapper requestMapper,
+        IResponseMapper responseMapper,
+        IValidator validator,
+        IUserRepository repository,
+        IProjectRepository projectRepository,
+        IRoleRepository roleRepository,
+        IApiService apiService,
+        IAccessRepository accessRepository)
     {
         _logger = logger;
         _requestMapper = requestMapper;
         _responseMapper = responseMapper;
         _validator = validator;
         _repository = repository;
-        _projectRepository =  projectRepository;
+        _projectRepository = projectRepository;
         _roleRepository = roleRepository;
         _apiService = apiService;
         _accessRepository = accessRepository;
-        _configuration = configuration;
     }
 
     public async Task<(ResponseStatus Status, UserResponse? Response)> GetAsync(int id)
@@ -143,7 +137,7 @@ public sealed class UsersControllerService : IUsersControllerService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Could not retrieve users with attribute {AttributeType} = {AttributeValue}",attributeType.Replace(Environment.NewLine, ""),attributeValue.Replace(Environment.NewLine, ""));
+            _logger.LogError(e, "Could not retrieve users with attribute {AttributeType} = {AttributeValue}", attributeType.Replace(Environment.NewLine, ""), attributeValue.Replace(Environment.NewLine, ""));
             return (ResponseStatus.UnknownError, []);
         }
 
@@ -167,7 +161,7 @@ public sealed class UsersControllerService : IUsersControllerService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Could not retrieve user with external account {ExternalAccountId}.",externalAccountId.Replace(Environment.NewLine, ""));
+            _logger.LogError(e, "Could not retrieve user with external account {ExternalAccountId}.", externalAccountId.Replace(Environment.NewLine, ""));
             return (ResponseStatus.UnknownError, null);
         }
 
@@ -287,7 +281,7 @@ public sealed class UsersControllerService : IUsersControllerService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Unable to create user for {LastName}, {FirstName}.",userRequest.LastName.Replace(Environment.NewLine, ""),userRequest.FirstName.Replace(Environment.NewLine, ""));
+            _logger.LogError(e, "Unable to create user for {LastName}, {FirstName}.", userRequest.LastName.Replace(Environment.NewLine, ""), userRequest.FirstName.Replace(Environment.NewLine, ""));
             return (ResponseStatus.UnknownError, null);
         }
 
@@ -361,8 +355,7 @@ public sealed class UsersControllerService : IUsersControllerService
         }
         catch (Exception e)
         {
-            
-            _logger.LogError(e, "Unable to save search with exception: {ExceptionMessage}.",e.Message);
+            _logger.LogError(e, "Unable to save search with exception: {ExceptionMessage}.", e.Message);
             return (ResponseStatus.UnknownError, null);
         }
 
@@ -489,7 +482,9 @@ public sealed class UsersControllerService : IUsersControllerService
     {
         var (isValidRequest, response) = await IsValidCollectionRequest(collectionRequest);
         if (!isValidRequest)
+        {
             return (response, null);
+        }
         var collection = _requestMapper.Map(collectionRequest!);
 
         return await SaveCollectionAsync(collection);
@@ -511,7 +506,9 @@ public sealed class UsersControllerService : IUsersControllerService
 
         var (isValidRequest, response) = await IsValidCollectionRequest(collectionRequest);
         if (!isValidRequest)
+        {
             return (response, null);
+        }
 
         var collection = _requestMapper.Map(collectionRequest);
 
@@ -538,7 +535,9 @@ public sealed class UsersControllerService : IUsersControllerService
         };
         var (isValidRequest, response) = await IsValidCollectionRequest(collectionRequest);
         if (!isValidRequest)
+        {
             return (response, false);
+        }
 
         var collection = _requestMapper.Map(collectionListRequestModel);
         var isDeletedSuccessful = await _repository.DeleteCollectionAsync(collection);
@@ -567,8 +566,7 @@ public sealed class UsersControllerService : IUsersControllerService
 
     public async Task<(ResponseStatus Status, bool Response)> DeleteReferenceAsync(int userId, int referenceId)
     {
-        var referenceExists = await _repository.ExistsAsync<Reference>(r => r.UserId == userId &&
-                                                   r.Id == referenceId);
+        var referenceExists = await _repository.ExistsAsync<Reference>(r => r.UserId == userId && r.Id == referenceId);
 
         if (!referenceExists)
         {
@@ -600,7 +598,7 @@ public sealed class UsersControllerService : IUsersControllerService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Unable to save search {SaveReuest}",saveRequest?.Name.Replace(Environment.NewLine, "") ?? "");
+            _logger.LogError(e, "Unable to save search {SaveReuest}", saveRequest?.Name.Replace(Environment.NewLine, "") ?? "");
             return (ResponseStatus.UnknownError, null);
         }
 
@@ -689,12 +687,7 @@ public sealed class UsersControllerService : IUsersControllerService
             return (ResponseStatus.MissingInformation, null);
         }
 
-        // if (user.Roles.Contains(role))
-        // {
-        //     return (ResponseStatus.Successful, null);
-        // }
-
-        user.Roles.Add( _requestMapper.Map(role));
+        user.Roles.Add(_requestMapper.Map(role));
 
         try
         {
@@ -707,7 +700,6 @@ public sealed class UsersControllerService : IUsersControllerService
         }
         return (ResponseStatus.Successful, _responseMapper.Map(user));
     }
-
 
     public async Task<(ResponseStatus Status, UserResponse? Response)> AddRoleToUserAsync(int userId, RoleRequestModel roleRequest)
     {
@@ -729,18 +721,10 @@ public sealed class UsersControllerService : IUsersControllerService
         Role? role;
         role = _requestMapper.Map(roleRequest);
 
-
         if (role == null)
         {
             return (ResponseStatus.MissingInformation, null);
         }
-
-        // if (user.Roles.Contains(role))
-        // {
-        //     return (ResponseStatus.Successful, null);
-        // }
-
-        // user.Roles.Add(role);
 
         try
         {
@@ -753,7 +737,6 @@ public sealed class UsersControllerService : IUsersControllerService
         }
 
         return (ResponseStatus.Successful, _responseMapper.Map(user));
-
     }
 
     public async Task<(ResponseStatus Status, RoleResponse? Response)> GetRoleAsync(int id)
@@ -779,7 +762,6 @@ public sealed class UsersControllerService : IUsersControllerService
 
         return (ResponseStatus.Successful, response);
     }
-
 
     public async Task<(ResponseStatus Status, UserResponse? Response)> AddUserToProjectAsync(int userId, string projCode)
     {
@@ -816,7 +798,7 @@ public sealed class UsersControllerService : IUsersControllerService
             return (ResponseStatus.MissingInformation, null);
         }
 
-        UserProject userProject =  new UserProject()
+        UserProject userProject = new UserProject()
         {
             ProjectName = project.ProjectName,
             ProjectCode = project.ProjectCode,
@@ -829,7 +811,9 @@ public sealed class UsersControllerService : IUsersControllerService
         if (user.UserProjects.Contains(userProject))
         {
             return (ResponseStatus.Successful, null);
-        }else{
+        }
+        else
+        {
             user.UserProjects.Add(userProject);
         }
 
@@ -845,21 +829,18 @@ public sealed class UsersControllerService : IUsersControllerService
         return (ResponseStatus.Successful, _responseMapper.Map(user));
     }
 
-
-    public async Task<(ResponseStatus Status, UserListResponse? Response)> FetchUserListByOrgCodeAsync(String orgCode)
+    public async Task<(ResponseStatus Status, UserListResponse? Response)> FetchUserListByOrgCodeAsync(string orgCode)
     {
-
         UserList? userList;
 
-        if(orgCode == null || String.IsNullOrEmpty(orgCode))
+        if (string.IsNullOrWhiteSpace(orgCode))
         {
             return (ResponseStatus.MissingInformation, null);
         }
-        
 
         try
         {
-            userList = await  _repository.FetchUserListByOrgCodeAsync(orgCode);
+            userList = await _repository.FetchUserListByOrgCodeAsync(orgCode);
         }
         catch (Exception e)
         {
@@ -869,12 +850,11 @@ public sealed class UsersControllerService : IUsersControllerService
 
         var response = _responseMapper.Map(userList);
         return (ResponseStatus.Successful, response);
-
     }
 
     public async Task<(ResponseStatus Status, UserResponse? Response)> UpdateUserProjectAndRoleDataAsync(UserProjectRoleUpdateRequestModel toUpdate)
     {
-        if(toUpdate == null || toUpdate.Id < 1)
+        if (toUpdate == null || toUpdate.Id < 1)
         {
             return (ResponseStatus.MissingInformation, null);
         }
@@ -883,7 +863,7 @@ public sealed class UsersControllerService : IUsersControllerService
 
         try
         {
-            existingUser = await  _repository.GetAsync(toUpdate.Id);
+            existingUser = await _repository.GetAsync(toUpdate.Id);
         }
         catch (Exception e)
         {
@@ -893,61 +873,68 @@ public sealed class UsersControllerService : IUsersControllerService
 
         User? updatedUser = new User();
 
-        if(existingUser != null)
-        {   
-
+        if (existingUser != null)
+        {
             updatedUser = existingUser;
 
-            if(toUpdate.UserRoles != null && toUpdate.UserRoles.Count > 0){
+            if (toUpdate.UserRoles != null && toUpdate.UserRoles.Count > 0)
+            {
                 List<UserRole> userRoleList = new List<UserRole>();
-                for (int i = 0; i < toUpdate.UserRoles.Count; i++) 
+                for (int i = 0; i < toUpdate.UserRoles.Count; i++)
                 {
                     var role = toUpdate.UserRoles[i];
                     var userRole = await _roleRepository.GetRoleByNameAsync(role.RoleName);
 
-                    if(userRole != null){
+                    if (userRole != null)
+                    {
                         UserRole uRole = new UserRole()
                         {
                             RoleName = userRole.RoleName,
                             FunctionalName = userRole.FunctionalName
                         };
                         userRoleList.Add(uRole);
-                    }else{
+                    }
+                    else
+                    {
                         _logger.LogError("Could not add user role to user with role name {Identifier}.", role.RoleName.ToString().Replace(Environment.NewLine, ""));
                         return (ResponseStatus.UnknownError, null);
                     }
                 }
                 updatedUser.Roles = userRoleList;
-            }else{
+            }
+            else
+            {
                 updatedUser.Roles = existingUser.Roles;
             }
 
-            
-
-            if(toUpdate.UserProjects != null && toUpdate.UserProjects.Count > 0){
+            if (toUpdate.UserProjects != null && toUpdate.UserProjects.Count > 0)
+            {
                 List<UserProject> projectList = new List<UserProject>();
-                for (int i = 0; i < toUpdate.UserProjects.Count; i++) 
+                for (int i = 0; i < toUpdate.UserProjects.Count; i++)
                 {
                     var project = toUpdate.UserProjects[i];
                     var roles = toUpdate.UserProjects[i].ProjectRoles;
                     var accesses = toUpdate.UserProjects[i].ProjectAccess;
 
-
                     List<ProjectRole> roleList = new List<ProjectRole>();
-                    if(roles != null){
-                        for (int j = 0; j < roles.Count; j++) 
+                    if (roles != null)
+                    {
+                        for (int j = 0; j < roles.Count; j++)
                         {
                             var role = roles[i];
                             var projRole = await _roleRepository.GetRoleByNameAsync(role.RoleName);
 
-                            if(projRole != null){
+                            if (projRole != null)
+                            {
                                 ProjectRole uRole = new ProjectRole()
-                                { 
+                                {
                                     RoleName = projRole.RoleName,
                                     FunctionalName = projRole.FunctionalName
                                 };
                                 roleList.Add(uRole);
-                            }else{
+                            }
+                            else
+                            {
                                 _logger.LogError("Could not add user role to user with role id {Identifier}.", role.RoleName.ToString().Replace(Environment.NewLine, ""));
                                 return (ResponseStatus.UnknownError, null);
                             }
@@ -955,54 +942,63 @@ public sealed class UsersControllerService : IUsersControllerService
                     }
 
                     List<ProjectAccess> accessList = new List<ProjectAccess>();
-                    if(accesses != null){
-                        for (int j = 0; j < accesses.Count; j++) 
+                    if (accesses != null)
+                    {
+                        for (int j = 0; j < accesses.Count; j++)
                         {
                             var access = accesses[i];
                             var projAccess = await _accessRepository.GetAccessByNameAsync(access.AccessName);
 
-                            if(projAccess != null){
-                                ProjectAccess uAccess= new ProjectAccess()
+                            if (projAccess != null)
+                            {
+                                ProjectAccess uAccess = new ProjectAccess()
                                 {
                                     AccessName = projAccess.AccessName,
                                     AccessLevel = projAccess.AccessLevel
                                 };
                                 accessList.Add(uAccess);
-                            }else{
+                            }
+                            else
+                            {
                                 _logger.LogError("Could not add project access to user with access id {Identifier}.", access.AccessName.ToString().Replace(Environment.NewLine, ""));
                                 return (ResponseStatus.UnknownError, null);
                             }
                         }
                     }
 
-
-                    if(!String.IsNullOrEmpty(project.ProjectCode)){
+                    if (!string.IsNullOrEmpty(project.ProjectCode))
+                    {
                         var orgProj = await _projectRepository.GetProjectByCodeAsync(project.ProjectCode);
-                            if(orgProj != null){
-                                UserProject uProject =  new UserProject()
-                                {
-                                    ProjectName = orgProj.ProjectName,
-                                    ProjectCode = orgProj.ProjectCode,
-                                    ProjectType = orgProj.ProjectType,
-                                    ProjectOrg = orgProj.ProjectOrg,
-                                    Active = true,
-                                    ProjectRoles = roleList,
-                                    ProjectAccess = accessList
-                                };
-                                projectList.Add(uProject);
-                            }else{
-                                _logger.LogError("Could not add project to user with project id {Identifier}.", project.ProjectCode.ToString().Replace(Environment.NewLine, ""));
-                                return (ResponseStatus.UnknownError, null);
-                            }
-                    } 
-
+                        if (orgProj != null)
+                        {
+                            UserProject uProject = new UserProject()
+                            {
+                                ProjectName = orgProj.ProjectName,
+                                ProjectCode = orgProj.ProjectCode,
+                                ProjectType = orgProj.ProjectType,
+                                ProjectOrg = orgProj.ProjectOrg,
+                                Active = true,
+                                ProjectRoles = roleList,
+                                ProjectAccess = accessList
+                            };
+                            projectList.Add(uProject);
+                        }
+                        else
+                        {
+                            _logger.LogError("Could not add project to user with project id {Identifier}.", project.ProjectCode.ToString().Replace(Environment.NewLine, ""));
+                            return (ResponseStatus.UnknownError, null);
+                        }
+                    }
                 }
                 updatedUser.UserProjects = projectList;
-            }else{
+            }
+            else
+            {
                 updatedUser.UserProjects = existingUser.UserProjects;
             }
 
-            try{
+            try
+            {
                 updatedUser = await _repository.UpdateUserAsync(updatedUser);
             }
             catch (Exception e)
@@ -1017,37 +1013,37 @@ public sealed class UsersControllerService : IUsersControllerService
         return (ResponseStatus.Successful, response);
     }
 
-
-
     public async Task<(ResponseStatus Status, UserResponse? Response)> InviteUserToOrgAsync(UserRequestModel toInvite)
     {
-
-        if(toInvite == null || String.IsNullOrEmpty(toInvite.Email))
+        if (toInvite == null || String.IsNullOrEmpty(toInvite.Email))
         {
             return (ResponseStatus.MissingInformation, null);
         }
 
-
         var user = _requestMapper.Map(toInvite);
-        if(user != null){
+        if (user != null)
+        {
             user.UserName = "InviteHold";
 
             user = await _repository.SaveAsync(user);
-        }else{
-             return (ResponseStatus.UnknownError, null);
+        }
+        else
+        {
+            return (ResponseStatus.UnknownError, null);
         }
 
-
-
-        if(toInvite.UserProjects != null){
+        if (toInvite.UserProjects != null)
+        {
             List<UserProject> projectList = new List<UserProject>();
-            for (int i = 0; i < toInvite.UserProjects.Count; i++) 
+            for (int i = 0; i < toInvite.UserProjects.Count; i++)
             {
-                var project =  toInvite.UserProjects[i];
-                if(!String.IsNullOrEmpty(project.ProjectCode)){
-                var orgProj = await _projectRepository.GetProjectByCodeAsync(project.ProjectCode);
-                    if(orgProj != null){
-                        UserProject uProject =  new UserProject()
+                var project = toInvite.UserProjects[i];
+                if (!String.IsNullOrEmpty(project.ProjectCode))
+                {
+                    var orgProj = await _projectRepository.GetProjectByCodeAsync(project.ProjectCode);
+                    if (orgProj != null)
+                    {
+                        UserProject uProject = new UserProject()
                         {
                             ProjectName = orgProj.ProjectName,
                             ProjectCode = orgProj.ProjectCode,
@@ -1059,7 +1055,6 @@ public sealed class UsersControllerService : IUsersControllerService
                         projectList.Add(uProject);
                     }
                 }
-
             }
             user.UserProjects = projectList;
         }
@@ -1073,7 +1068,6 @@ public sealed class UsersControllerService : IUsersControllerService
         var response = _responseMapper.Map(user);
 
         return (ResponseStatus.Successful, response);
-
     }
 
     private string Encrypt(string plainText)
@@ -1121,6 +1115,4 @@ public sealed class UsersControllerService : IUsersControllerService
             }
         }
     }
-
-
 }

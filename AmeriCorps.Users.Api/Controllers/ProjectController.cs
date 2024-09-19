@@ -11,7 +11,6 @@ public sealed class ProjectController(IProjectControllerService service) : Contr
 {
     private readonly IProjectControllerService _service = service;
 
-
     [HttpGet("{projCode}")]
     public async Task<IActionResult> GetProjectByCodeAsync(string projCode) =>
         await ServeAsync(async () => await _service.GetProjectByCodeAsync(projCode));
@@ -20,13 +19,9 @@ public sealed class ProjectController(IProjectControllerService service) : Contr
     public async Task<IActionResult> CreateProjectAsync([FromBody] ProjectRequestModel projRequest) =>
         await ServeAsync(async () => await _service.CreateProjectAsync(projRequest));
 
-
     [HttpGet("list/{orgCode}")]
     public async Task<IActionResult> GetProjectListByOrgAsync(string orgCode) =>
         await ServeAsync(async () => await _service.GetProjectListByOrgAsync(orgCode));
-
-
-
 
     private async Task<IActionResult> ServeAsync<T>(Func<Task<(ResponseStatus, T)>> callAsync)
     {

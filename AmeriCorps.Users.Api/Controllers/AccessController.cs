@@ -11,15 +11,13 @@ public sealed class AccessController(IAccessControllerService service) : Control
 {
     private readonly IAccessControllerService _service = service;
 
-
     [HttpGet("get/{accessName}")]
     public async Task<IActionResult> GetAccessByNameAsync(string accessName) =>
         await ServeAsync(async () => await _service.GetAccessByNameAsync(accessName));
-    
+
     [HttpGet("list-all")]
     public async Task<IActionResult> GetAccessListAsync() =>
         await ServeAsync(async () => await _service.GetAccessListAsync());
-
 
     [HttpGet("list/{accessType}")]
     public async Task<IActionResult> GetAccessListByTypeAsync(string accessType) =>
@@ -28,7 +26,6 @@ public sealed class AccessController(IAccessControllerService service) : Control
     [HttpPost("create")]
     public async Task<IActionResult> CreateAccessAsync([FromBody] AccessRequestModel accessRequest) =>
         await ServeAsync(async () => await _service.CreateAccessAsync(accessRequest));
-
 
     private async Task<IActionResult> ServeAsync<T>(Func<Task<(ResponseStatus, T)>> callAsync)
     {

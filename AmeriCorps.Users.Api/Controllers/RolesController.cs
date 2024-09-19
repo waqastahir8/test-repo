@@ -3,7 +3,6 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using AmeriCorps.Users.Models;
 
-
 namespace AmeriCorps.Users.Controllers;
 
 [ApiController]
@@ -17,11 +16,9 @@ public sealed class RolesController(IRolesControllerService service) : Controlle
     public async Task<IActionResult> GetRoleAsync(int id) =>
       await ServeAsync(async () => await _service.GetAsync(id));
 
-
     [HttpPost]
     public async Task<IActionResult> CreateRoleAsync([FromBody] RoleRequestModel roleRequest) =>
         await ServeAsync(async () => await _service.CreateOrPatchAsync(roleRequest));
-
 
     [HttpPatch]
     public async Task<IActionResult> PatchUserAsync([FromBody] RoleRequestModel roleRequest) =>
@@ -30,8 +27,6 @@ public sealed class RolesController(IRolesControllerService service) : Controlle
     [HttpGet("list/{roleType}")]
     public async Task<IActionResult> GetRoleListByTypeAsync(string roleType) =>
         await ServeAsync(async () => await _service.GetRoleListByTypeAsync(roleType));
-
-
 
     private async Task<IActionResult> ServeAsync<T>(Func<Task<(ResponseStatus, T)>> callAsync)
     {
@@ -44,5 +39,4 @@ public sealed class RolesController(IRolesControllerService service) : Controlle
             _ => Ok()
         };
     }
-
 }

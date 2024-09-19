@@ -1,9 +1,7 @@
 ﻿using AmeriCorps.Users.Api.Services;
 using AmeriCorps.Users.Data;
 using AmeriCorps.Users.Data.Core;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-
 
 namespace AmeriCorps.Users.Api.Tests;
 
@@ -13,14 +11,9 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
     private Mock<IRequestMapper>? _requestMapperMock;
     private Mock<IResponseMapper>? _responseMapperMock;
     private Mock<IValidator>? _validatorMock;
-
     private Mock<IProjectRepository>? _projectRepository;
-
     private Mock<IRoleRepository>? _roleRepository;
-
     private Mock<IApiService>? _apiService;
-    private Mock<IConfiguration>? _configuration;
-
     private Mock<IAccessRepository>? _accessRepository;
 
     [Theory]
@@ -32,7 +25,6 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
     {
         // Arrange
         var sut = Setup();
-
 
         _repositoryMock!
             .Setup(x => x.GetAsync(userId))
@@ -172,7 +164,6 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         Assert.Equal(ResponseStatus.UnknownError, status);
     }
 
-
     [Fact]
     public async Task CreateAsync_RepositoryThrowsException_UnknownErrorStatus()
     {
@@ -238,7 +229,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         _repositoryMock?.Verify(x => x.SaveAsync(It.IsAny<User>()), Times.Once);
     }
 
- [Fact]
+    [Fact]
     public async Task CreateAsync_UpdateCalled_WhenUserIsNotNew()
     {
         // Arrange
@@ -308,7 +299,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
     {
         // Arrange
         var sut = Setup();
-   
+
         var model =
             Fixture
             .Create<UserRequestModel>();
@@ -1052,7 +1043,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
     [Fact]
     public async Task GetReferencesAsync_RepositoryThrowsException_UnknownErrorStatus()
     {
-               // Arrange
+        // Arrange
         var sut = Setup();
         var userId =
             Fixture
@@ -1067,7 +1058,6 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         // Assert
         Assert.Equal(ResponseStatus.UnknownError, status);
     }
-
 
     [Fact]
     public async Task UpdateReference_NullReference_MissingInformationStatus()
@@ -1495,7 +1485,6 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         // Arrange
         var sut = Setup();
 
-       
         var users =
             Fixture
             .Build<User>()
@@ -1542,7 +1531,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
     }
 
     [Theory]
-    [InlineData(1,"proj")]    
+    [InlineData(1, "proj")]
     public async Task AddUserToProjectAsync_Successful_Status(int userId, string projCode)
     {
         // Arrange
@@ -1550,7 +1539,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         var model = Fixture.Build<ProjectRequestModel>()
                               .With(p => p.ProjectCode, projCode)
                               .Create();
-        
+
         var project =
             Fixture
             .Build<Project>()
@@ -1573,20 +1562,20 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             .Create());
 
         // Act
-        var (status, _) = await sut.AddUserToProjectAsync(userId,projCode);
+        var (status, _) = await sut.AddUserToProjectAsync(userId, projCode);
 
         // Assert
         Assert.Equal(ResponseStatus.Successful, status);
     }
 
     [Theory]
-    [InlineData(1,"proj")]    
+    [InlineData(1, "proj")]
     public async Task AddUserToProjectAsync_InformationMissing_Status(int userId, string projCode)
     {
         // Arrange
         var sut = Setup();
 
-        var (status, _) = await sut.AddUserToProjectAsync(userId,projCode);
+        var (status, _) = await sut.AddUserToProjectAsync(userId, projCode);
 
         // Assert
         Assert.Equal(ResponseStatus.MissingInformation, status);
@@ -1599,14 +1588,14 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             .Create());
 
         // Act
-        var (status2, _) = await sut.AddUserToProjectAsync(userId,projCode);
+        var (status2, _) = await sut.AddUserToProjectAsync(userId, projCode);
 
         // Assert
         Assert.Equal(ResponseStatus.MissingInformation, status2);
     }
 
     [Theory]
-    [InlineData("org")]    
+    [InlineData("org")]
     public async Task FetchUserListByOrgCodeAsync_Successful_Status(string orgCode)
     {
         // Arrange
@@ -1615,7 +1604,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         var userId =
             Fixture
             .Create<int>();
-        
+
         _repositoryMock!
             .Setup(x => x.GetAsync(userId))
             .ReturnsAsync(() => Fixture.Build<User>()
@@ -1632,7 +1621,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
     }
 
     [Theory]
-    [InlineData("")]    
+    [InlineData("")]
     public async Task FetchUserListByOrgCodeAsync_Missing_Status(string orgCode)
     {
         // Arrange
@@ -1646,13 +1635,11 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
     }
 
     [Theory]
-    [InlineData(1)]    
+    [InlineData(1)]
     public async Task UpdateUserProjectAndRoleDataAsync_Successful_Status(int userId)
     {
         // Arrange
         var sut = Setup();
-        
-
 
         var roles = Fixture.Build<List<UserRoleRequestModel>>()
                         .Create();
@@ -1660,13 +1647,11 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         var projs = Fixture.Build<List<UserProjectRequestModel>>()
                         .Create();
 
-
         var model = Fixture.Build<UserProjectRoleUpdateRequestModel>()
                         .With(p => p.Id, userId)
                         .With(p => p.UserRoles, roles)
                         .With(p => p.UserProjects, projs)
                         .Create();
-
 
         _repositoryMock!
             .Setup(x => x.GetAsync(userId))
@@ -1697,7 +1682,6 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
 
         // Assert
         Assert.Equal(ResponseStatus.MissingInformation, status);
-
     }
 
     [Fact]
@@ -1731,7 +1715,6 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         Assert.Equal(ResponseStatus.Successful, status);
     }
 
-
     [Fact]
     public async Task InviteUserToOrgAsync_Missing_Status()
     {
@@ -1747,16 +1730,14 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
 
         // Assert
         Assert.Equal(ResponseStatus.MissingInformation, status);
-
     }
 
-    
     [Fact]
     public async Task InviteUserToOrgAsync_Unkown_Error()
     {
         // Arrange
         var sut = Setup();
-        
+
         var user = Fixture.Build<UserRequestModel>()
                 .Create();
 
@@ -1765,10 +1746,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
 
         // Assert
         Assert.Equal(ResponseStatus.UnknownError, status);
-
     }
-
-
 
     protected override UsersControllerService Setup()
     {
@@ -1778,9 +1756,8 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         _validatorMock = new();
         _projectRepository = new();
         _roleRepository = new();
-        _apiService = new ();
-        _accessRepository = new ();
-        _configuration = new ();
+        _apiService = new();
+        _accessRepository = new();
 
         Fixture = new Fixture();
         Fixture.Customize<DateOnly>(x => x.FromFactory<DateTime>(DateOnly.FromDateTime));
@@ -1793,7 +1770,6 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             _projectRepository.Object,
             _roleRepository.Object,
             _apiService.Object,
-            _accessRepository.Object,
-            _configuration.Object);
+            _accessRepository.Object);
     }
 }

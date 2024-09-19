@@ -1,9 +1,4 @@
 ﻿using AmeriCorps.Users.Data.Core;
-using AmeriCorps.Users.Data;
-using AmeriCorps.Users.Models;
-using AmeriCorps.Users.Api.Services;
-using System.Data;
-
 
 namespace AmeriCorps.Users.Api;
 
@@ -18,7 +13,6 @@ public interface IRolesControllerService
 
 public sealed class RolesControllerService : IRolesControllerService
 {
-
     private readonly ILogger<RolesControllerService> _logger;
 
     private readonly IRequestMapper _reqMapper;
@@ -50,7 +44,7 @@ public sealed class RolesControllerService : IRolesControllerService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Could not retrieve role with id {Identifier}.",id.ToString().Replace(Environment.NewLine, ""));
+            _logger.LogError(e, "Could not retrieve role with id {Identifier}.", id.ToString().Replace(Environment.NewLine, ""));
             return (ResponseStatus.UnknownError, null);
         }
 
@@ -67,7 +61,7 @@ public sealed class RolesControllerService : IRolesControllerService
     public async Task<(ResponseStatus Status, List<RoleResponse>? Response)> GetRoleListByTypeAsync(string roleType)
     {
         List<Role>? roleList;
-       
+
         try
         {
             roleList = await _repository.GetRoleListByTypeAsync(roleType);
@@ -111,7 +105,7 @@ public sealed class RolesControllerService : IRolesControllerService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Unable to create or update role for {Identifier}.",roleRequest.RoleName.Replace(Environment.NewLine, ""));
+            _logger.LogError(e, "Unable to create or update role for {Identifier}.", roleRequest.RoleName.Replace(Environment.NewLine, ""));
             return (ResponseStatus.UnknownError, null);
         }
 
@@ -119,5 +113,4 @@ public sealed class RolesControllerService : IRolesControllerService
 
         return (ResponseStatus.Successful, response);
     }
-
 }
