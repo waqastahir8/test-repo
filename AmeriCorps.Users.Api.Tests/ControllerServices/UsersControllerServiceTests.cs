@@ -75,6 +75,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             .ReturnsAsync(() => Fixture.Build<User>()
              .Without(u => u.Roles)
              .Without(u => u.UserProjects)
+             .Without(u => u.EncryptedSocialSecurityNumber)
              .Create());
 
         // Act
