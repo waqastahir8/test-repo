@@ -877,6 +877,23 @@ public sealed class UsersControllerService : IUsersControllerService
         {
             updatedUser = existingUser;
 
+            if(!string.IsNullOrWhiteSpace(toUpdate.AccountStatus)){
+                switch (toUpdate.AccountStatus) {
+                    case "INVITED":
+                        updatedUser.AccountStatus = ConstanstsService.Invited;
+                        //re send invite
+                        break;
+                    case "ACTIVE":
+                        updatedUser.AccountStatus = ConstanstsService.Active;
+                        break;
+                    case "DEACTIVE":
+                        updatedUser.AccountStatus = ConstanstsService.Deactive;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            
             if (toUpdate.UserRoles != null && toUpdate.UserRoles.Count > 0)
             {
                 List<UserRole> userRoleList = new List<UserRole>();

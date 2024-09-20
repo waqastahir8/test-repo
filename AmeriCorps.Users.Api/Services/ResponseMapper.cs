@@ -23,7 +23,6 @@ public interface IResponseMapper
     List<AccessResponse> Map(List<Access> access);
     List<OrganizationResponse> Map(List<Organization> orgList);
     List<ProjectResponse> Map(List<Project> projList);
-    // List<RoleResponse> Map(List<Role> roleList);
 }
 public sealed class ResponseMapper : IResponseMapper
 {
@@ -136,6 +135,7 @@ public sealed class ResponseMapper : IResponseMapper
         CitzenShipStatus = (global::AmeriCorps.Users.Models.CitizenshipStatusRequestModel)user.CitzenShipStatus,
         CountryOfBirth = user.CountryOfBirth,
         CityOfBirth = user.CityOfBirth,
+        AccountStatus = user.AccountStatus,
         Attributes = MapperUtils.MapList<AmeriCorps.Users.Data.Core.Attribute, AttributeRequestModel>(
                         user.Attributes,
                         a => new AttributeRequestModel
@@ -410,6 +410,7 @@ public sealed class ResponseMapper : IResponseMapper
                 CitzenShipStatus = (global::AmeriCorps.Users.Models.CitizenshipStatusRequestModel)user.CitzenShipStatus,
                 CountryOfBirth = user.CountryOfBirth,
                 CityOfBirth = user.CityOfBirth,
+                AccountStatus = user.AccountStatus,
                 Attributes = MapperUtils.MapList<AmeriCorps.Users.Data.Core.Attribute, AttributeRequestModel>(
                                 user.Attributes,
                                 a => new AttributeRequestModel

@@ -218,6 +218,46 @@ public sealed class RequestMapperTests : RequestMapperSetup
 
     }
 
+    [Fact]
+    public void Map_CorrectlyMapsAccessRequest()
+    {
+        // Arrange
+        var sut = Setup();
+        var model = Fixture.Create<AccessRequestModel>();
+
+        IRequestMapper mapper = new RequestMapper();
+
+        // Act
+        var result = mapper.Map(model);
+
+        // Assert
+
+        Assert.Equal(model.AccessName, result.AccessName);
+        Assert.Equal(model.AccessLevel, result.AccessLevel);
+        Assert.Equal(model.AccessType, result.AccessType);
+        Assert.Equal(model.Description, result.Description);
+    }
+
+    [Fact]
+    public void Map_CorrectlyMapsRoleRequest()
+    {
+        // Arrange
+        var sut = Setup();
+        var model = Fixture.Create<RoleRequestModel>();
+
+        IRequestMapper mapper = new RequestMapper();
+
+        // Act
+        var result = mapper.Map(model);
+
+        // Assert
+
+        Assert.Equal(model.RoleName, result.RoleName);
+        Assert.Equal(model.FunctionalName, result.FunctionalName);
+        Assert.Equal(model.Description, result.Description);
+
+    }
+
     private void TestUserCollectionRequestMapper(User result, UserRequestModel model)
     {
         Assert.Equal(model.Collection.Count, result.Collection.Count);

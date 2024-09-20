@@ -42,6 +42,7 @@ public sealed class RequestMapper : IRequestMapper
         Suffix = requestModel.Suffix,
         Prefix = requestModel.Prefix,
         OrgCode = requestModel.OrgCode,
+        AccountStatus = requestModel.AccountStatus,
         EncryptedSocialSecurityNumber =  requestModel.EncryptedSocialSecurityNumber,
 
         Attributes = MapperUtils.MapList<AttributeRequestModel, AmeriCorps.Users.Data.Core.Attribute>(
