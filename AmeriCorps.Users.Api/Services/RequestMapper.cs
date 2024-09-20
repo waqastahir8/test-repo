@@ -39,6 +39,9 @@ public sealed class RequestMapper : IRequestMapper
         Prefix = requestModel.Prefix,
         OrgCode = requestModel.OrgCode,
         EncryptedSocialSecurityNumber =  requestModel.EncryptedSocialSecurityNumber,
+        CountryOfBirth = requestModel.CountryOfBirth,
+        CityOfBirth = requestModel.CityOfBirth,
+        CitzenShipStatus = (Data.Core.Model.CitizenshipStatus)requestModel.CitzenShipStatus,
 
         Attributes = MapperUtils.MapList<AttributeRequestModel, AmeriCorps.Users.Data.Core.Attribute>(
             requestModel.Attributes,

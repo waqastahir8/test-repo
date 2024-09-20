@@ -167,9 +167,15 @@ public sealed class UsersControllerService : IUsersControllerService
             return (ResponseStatus.UnknownError, null);
         }
 
+
         if (user == null)
         {
             return (ResponseStatus.MissingInformation, null);
+        }
+
+        if (!string.IsNullOrWhiteSpace(user.EncryptedSocialSecurityNumber))
+        {
+            user.EncryptedSocialSecurityNumber = Decrypt(user.EncryptedSocialSecurityNumber);
         }
 
         var response = _responseMapper.Map(user);
