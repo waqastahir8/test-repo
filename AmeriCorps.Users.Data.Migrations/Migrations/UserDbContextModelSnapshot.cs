@@ -721,8 +721,6 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                         .HasColumnType("date")
                         .HasColumnName("date_of_birth");
 
-<<<<<<< HEAD
-=======
                     b.Property<DateOnly?>("DocumentExpirationDate")
                         .HasColumnType("date")
                         .HasColumnName("document_expiration_date");
@@ -732,7 +730,6 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                         .HasColumnType("text")
                         .HasColumnName("encrypted_social_security_number");
 
->>>>>>> upstream/dev
                     b.Property<string>("ExternalAccountId")
                         .IsRequired()
                         .HasColumnType("text")
