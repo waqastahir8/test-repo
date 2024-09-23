@@ -36,4 +36,5 @@ public sealed class User : Entity
     public string CountryOfBirth { get; set; } = string.Empty;
     public string CityOfBirth { get; set; } = string.Empty;
     public string AccountStatus { get; set; } = string.Empty;
+    public DateTime UpdatedDate { get; set; }
 }

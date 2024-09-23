@@ -1686,7 +1686,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
     }
 
     [Fact]
-    public async Task InviteUserToOrgAsync_Successful_Status()
+    public async Task InviteUserAsync_Successful_Status()
     {
         // Arrange
         var sut = Setup();
@@ -1710,14 +1710,14 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             .Setup(x => x.SaveAsync(user))
             .ReturnsAsync(user);
 
-        var (status, _) = await sut.InviteUserToOrgAsync(model);
+        var (status, _) = await sut.InviteUserAsync(model);
 
         // Assert
         Assert.Equal(ResponseStatus.Successful, status);
     }
 
     [Fact]
-    public async Task InviteUserToOrgAsync_Missing_Status()
+    public async Task InviteUserAsync_Missing_Status()
     {
         // Arrange
         var sut = Setup();
@@ -1727,14 +1727,14 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
                 .Create();
 
         // Act
-        var (status, _) = await sut.InviteUserToOrgAsync(user);
+        var (status, _) = await sut.InviteUserAsync(user);
 
         // Assert
         Assert.Equal(ResponseStatus.MissingInformation, status);
     }
 
     [Fact]
-    public async Task InviteUserToOrgAsync_Unkown_Error()
+    public async Task InviteUserAsync_Unkown_Error()
     {
         // Arrange
         var sut = Setup();
@@ -1743,7 +1743,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
                 .Create();
 
         // Act
-        var (status, _) = await sut.InviteUserToOrgAsync(user);
+        var (status, _) = await sut.InviteUserAsync(user);
 
         // Assert
         Assert.Equal(ResponseStatus.UnknownError, status);

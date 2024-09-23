@@ -717,33 +717,9 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AccountStatus")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("account_status");
-
-                    b.Property<string>("CityOfBirth")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("city_of_birth");
-
-                    b.Property<int>("CitzenShipStatus")
-                        .HasColumnType("integer")
-                        .HasColumnName("citzen_ship_status");
-
-                    b.Property<string>("CountryOfBirth")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("country_of_birth");
-
                     b.Property<DateOnly>("DateOfBirth")
                         .HasColumnType("date")
                         .HasColumnName("date_of_birth");
-
-                    b.Property<string>("EncryptedSocialSecurityNumber")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("encrypted_social_security_number");
 
                     b.Property<string>("ExternalAccountId")
                         .IsRequired()

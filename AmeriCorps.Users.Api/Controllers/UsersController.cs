@@ -114,6 +114,6 @@ public sealed class UsersController(IUsersControllerService service) : Controlle
 
     //Invite user to org
     [HttpPost("org/users/invite")]
-    public async Task<IActionResult> InviteUserToOrgAsync([FromBody] UserRequestModel toInvite) =>
-        await ServeAsync(async () => await _service.InviteUserToOrgAsync(toInvite));
+    public async Task<IActionResult> InviteUserAsync([FromBody] UserRequestModel toInvite) =>
+        await ServeAsync(async () => await _service.InviteUserAsync(toInvite));
 }
