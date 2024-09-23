@@ -3,6 +3,7 @@ using System;
 using AmeriCorps.Users.Data.Migrations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AmeriCorps.Users.Data.Migrations.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    partial class UserDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240923173700_UserModelUpdate")]
+    partial class UserModelUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -717,12 +720,24 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("CityOfBirth")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("city_of_birth");
+
+                    b.Property<int>("CitzenShipStatus")
+                        .HasColumnType("integer")
+                        .HasColumnName("citzen_ship_status");
+
+                    b.Property<string>("CountryOfBirth")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("country_of_birth");
+
                     b.Property<DateOnly>("DateOfBirth")
                         .HasColumnType("date")
                         .HasColumnName("date_of_birth");
 
-<<<<<<< HEAD
-=======
                     b.Property<DateOnly?>("DocumentExpirationDate")
                         .HasColumnType("date")
                         .HasColumnName("document_expiration_date");
@@ -732,7 +747,6 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                         .HasColumnType("text")
                         .HasColumnName("encrypted_social_security_number");
 
->>>>>>> upstream/dev
                     b.Property<string>("ExternalAccountId")
                         .IsRequired()
                         .HasColumnType("text")

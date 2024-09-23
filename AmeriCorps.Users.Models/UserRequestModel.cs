@@ -33,5 +33,8 @@ public class UserRequestModel
 	public CitizenshipStatusRequestModel CitzenShipStatus { get; set; }
 	public string CountryOfBirth { get; set; } = string.Empty;
 	public string CityOfBirth { get; set; } = string.Empty;
+    public string? StateOfBirth { get; set; } = string.Empty;
+    public string? ResidentRegistrationNumber { get; set; } = string.Empty;
+    public DateOnly? DocumentExpirationDate { get; set; }
     public string AccountStatus { get; set; } = string.Empty;
 }
