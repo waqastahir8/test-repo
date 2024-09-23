@@ -39,5 +39,5 @@ public sealed class User : Entity
     public string? ResidentRegistrationNumber { get; set; } = string.Empty;
     public DateOnly? DocumentExpirationDate { get; set; }
     public string AccountStatus { get; set; } = string.Empty;
-    public DateTime UpdatedDate { get; set; }
+    public DateTime? UpdatedDate { get; set; }
 }

@@ -272,7 +272,7 @@ public sealed class UsersControllerService : IUsersControllerService
             return (ResponseStatus.UnknownError, null);
         }
 
-        user.UpdatedDate = DateTime.Now;
+        user.UpdatedDate = DateTime.UtcNow;
 
         try
         {
@@ -897,7 +897,7 @@ public sealed class UsersControllerService : IUsersControllerService
                 return (ResponseStatus.UnknownError, null);
             }
 
-            updatedUser.UpdatedDate = DateTime.Now;
+            updatedUser.UpdatedDate = DateTime.UtcNow;
 
             try
             {
@@ -929,7 +929,7 @@ public sealed class UsersControllerService : IUsersControllerService
 
             user.AccountStatus = ConstanstsService.Invited;
 
-            user.UpdatedDate = DateTime.Now;
+            user.UpdatedDate = DateTime.UtcNow;
         }
         else
         {
