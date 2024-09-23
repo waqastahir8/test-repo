@@ -32,5 +32,8 @@ public class UserRequestModel
 	public string EncryptedSocialSecurityNumber { get; set; } = string.Empty;
 	public CitizenshipStatusRequestModel CitzenShipStatus { get; set; }
 	public string CountryOfBirth { get; set; } = string.Empty;
-	public string CityOfBirth { get; set; } = string.Empty;
+    public string? StateOfBirth { get; set; } = string.Empty;
+    public string CityOfBirth { get; set; } = string.Empty;
+    public string? ResidentRegistrationNumber { get; set; } = string.Empty;
+    public DateOnly? DocumentExpirationDate { get; set; }
 }
