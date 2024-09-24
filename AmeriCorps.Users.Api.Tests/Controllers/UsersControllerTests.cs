@@ -111,7 +111,6 @@ public sealed partial class UsersControllerTests : BaseTests<UsersController>
     [Fact]
     public async Task CreateUserAsync_UnknownError_500StatusCode()
     {
-
         //Arrange
         var sut = Setup();
         var model = Fixture.Create<UserRequestModel>();
@@ -148,8 +147,7 @@ public sealed partial class UsersControllerTests : BaseTests<UsersController>
         Assert.Equal((int)HttpStatusCode.OK, response.StatusCode);
     }
 
-    /// 
-
+    ///
 
     [Fact]
     public async Task PatchUserAsync_InformationMissing_422StatusCode()
@@ -174,7 +172,6 @@ public sealed partial class UsersControllerTests : BaseTests<UsersController>
     [Fact]
     public async Task PatchUserAsync_UnknownError_500StatusCode()
     {
-
         //Arrange
         var sut = Setup();
         var model = Fixture.Create<UserRequestModel>();
@@ -484,6 +481,7 @@ public sealed partial class UsersControllerTests : BaseTests<UsersController>
         Assert.NotNull(response);
         Assert.Equal((int)HttpStatusCode.OK, response.StatusCode);
     }
+
     [Fact]
     public async Task AddUserToProjectAsync_SuccessProcessing_200StatusCode()
     {
@@ -494,10 +492,10 @@ public sealed partial class UsersControllerTests : BaseTests<UsersController>
         var userResponse = Fixture.Create<UserResponse>();
 
         _serviceMock!
-            .Setup(x => x.AddUserToProjectAsync(userId,projCode))
+            .Setup(x => x.AddUserToProjectAsync(userId, projCode))
             .ReturnsAsync((ResponseStatus.Successful, userResponse));
         //Act
-        var actual = await sut.AddUserToProjectAsync(userId,projCode);
+        var actual = await sut.AddUserToProjectAsync(userId, projCode);
 
         //Assert
         var response = actual as OkObjectResult;
@@ -514,10 +512,10 @@ public sealed partial class UsersControllerTests : BaseTests<UsersController>
         var projCode = Fixture.Create<string>();
 
         _serviceMock!
-            .Setup(x => x.AddUserToProjectAsync(userId,projCode))
+            .Setup(x => x.AddUserToProjectAsync(userId, projCode))
             .ReturnsAsync((ResponseStatus.MissingInformation, null));
         //Act
-        var actual = await sut.AddUserToProjectAsync(userId,projCode);
+        var actual = await sut.AddUserToProjectAsync(userId, projCode);
 
         //Assert
         var response = actual as StatusCodeResult;
@@ -602,7 +600,6 @@ public sealed partial class UsersControllerTests : BaseTests<UsersController>
         Assert.NotNull(response);
         Assert.Equal((int)HttpStatusCode.UnprocessableEntity, response.StatusCode);
     }
-
 
     [Fact]
     public async Task InviteUserAsync_SuccessProcessing_200StatusCode()

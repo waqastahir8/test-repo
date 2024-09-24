@@ -165,7 +165,6 @@ public sealed class UsersControllerService : IUsersControllerService
             return (ResponseStatus.UnknownError, null);
         }
 
-
         if (user == null)
         {
             return (ResponseStatus.MissingInformation, null);
@@ -886,13 +885,14 @@ public sealed class UsersControllerService : IUsersControllerService
         {
             updatedUser = existingUser;
 
-            UpdateUserAccountStatus(updatedUser,toUpdate.AccountStatus);
+            UpdateUserAccountStatus(updatedUser, toUpdate.AccountStatus);
 
             updatedUser.Roles = await UpdateUserRolesAsync(toUpdate.UserRoles);
-            
+
             updatedUser.UserProjects = await UpdateUserProjectsAsync(toUpdate.UserProjects);
 
-            if(updatedUser.Roles.Count != toUpdate.UserRoles.Count || updatedUser.UserProjects.Count != toUpdate.UserProjects.Count){
+            if (updatedUser.Roles.Count != toUpdate.UserRoles.Count || updatedUser.UserProjects.Count != toUpdate.UserProjects.Count)
+            {
                 _logger.LogError("Unable to update Roles or Project for update {Identifier}.", toUpdate.Id.ToString().Replace(Environment.NewLine, ""));
                 return (ResponseStatus.UnknownError, null);
             }
@@ -937,7 +937,7 @@ public sealed class UsersControllerService : IUsersControllerService
         }
 
         user.Roles = await UpdateUserRolesAsync(toInvite.UserRoles);
-        
+
         user.UserProjects = await UpdateUserProjectsAsync(toInvite.UserProjects);
 
         try
@@ -1005,28 +1005,30 @@ public sealed class UsersControllerService : IUsersControllerService
         }
     }
 
-
-
-
     private static void UpdateUserAccountStatus(User updatedUser, string newStatus)
     {
         string updatedStatus = newStatus.ToUpper();
-        if(!string.IsNullOrWhiteSpace(updatedStatus)){
-            switch (updatedStatus) {
+        if (!string.IsNullOrWhiteSpace(updatedStatus))
+        {
+            switch (updatedStatus)
+            {
                 case "INVITED":
                     updatedUser.AccountStatus = ConstanstsService.Invited;
                     //re send invite
                     break;
+
                 case "ACTIVE":
                     updatedUser.AccountStatus = ConstanstsService.Active;
                     break;
+
                 case "DEACTIVE":
                     updatedUser.AccountStatus = ConstanstsService.Deactive;
                     break;
+
                 default:
                     break;
             }
-        }   
+        }
     }
 
     private async Task<List<UserRole>> UpdateUserRolesAsync(List<UserRoleRequestModel> updatedRoles)

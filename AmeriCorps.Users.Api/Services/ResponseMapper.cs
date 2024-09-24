@@ -7,23 +7,38 @@ namespace AmeriCorps.Users.Api.Services;
 public interface IResponseMapper
 {
     UserResponse? Map(User? user);
+
     RoleResponse? Map(Role? role);
 
     SavedSearchResponseModel Map(SavedSearch search);
+
     ReferenceResponseModel Map(Reference reference);
+
     List<SavedSearchResponseModel> Map(List<SavedSearch> searches);
+
     CollectionResponseModel Map(Collection collection);
+
     CollectionListResponseModel Map(List<Collection>? collection);
+
     List<ReferenceResponseModel> Map(List<Reference> references);
+
     List<RoleResponse> Map(List<Role> role);
+
     OrganizationResponse? Map(Organization? organization);
+
     ProjectResponse? Map(Project? project);
+
     UserListResponse? Map(UserList? userList);
+
     AccessResponse? Map(Access? access);
+
     List<AccessResponse> Map(List<Access> access);
+
     List<OrganizationResponse> Map(List<Organization> orgList);
+
     List<ProjectResponse> Map(List<Project> projList);
 }
+
 public sealed class ResponseMapper : IResponseMapper
 {
     public SavedSearchResponseModel Map(SavedSearch search) => new()
@@ -47,7 +62,6 @@ public sealed class ResponseMapper : IResponseMapper
                                 NotificationsOn = a.NotificationsOn
                             });
 
-
     public CollectionResponseModel Map(Collection collection)
     {
         return new CollectionResponseModel()
@@ -56,13 +70,11 @@ public sealed class ResponseMapper : IResponseMapper
             ListingId = collection.ListingId,
             UserId = collection.UserId,
             Type = collection.Type
-
         };
     }
 
     public CollectionListResponseModel Map(List<Collection>? collection)
     {
-
         var collectionResponseList = new CollectionListResponseModel();
         if (collection == null || collection.Count == 0)
             return collectionResponseList;
@@ -73,9 +85,7 @@ public sealed class ResponseMapper : IResponseMapper
 
         collectionResponseList.Listings = collection.Select(c => c.ListingId).ToList();
         return collectionResponseList;
-
     }
-
 
     public List<ReferenceResponseModel> Map(List<Reference> references) =>
         MapperUtils.MapList<AmeriCorps.Users.Data.Core.Reference, ReferenceResponseModel>(
@@ -117,7 +127,8 @@ public sealed class ResponseMapper : IResponseMapper
         Contacted = reference.Contacted,
         DateContacted = reference.DateContacted
     };
-    public UserResponse? Map(User? user) =>  user == null ? null : new()
+
+    public UserResponse? Map(User? user) => user == null ? null : new()
     {
         Id = user.Id,
         FirstName = user.FirstName,
@@ -144,7 +155,6 @@ public sealed class ResponseMapper : IResponseMapper
                             Type = a.Type,
                             Value = a.Value
                         }),
-
 
         Languages = MapperUtils.MapList<Language, LanguageRequestModel>(
                         user.Languages, l =>
@@ -262,7 +272,7 @@ public sealed class ResponseMapper : IResponseMapper
                     Type = c.Type,
                     ListingId = c.ListingId,
                 }),
-        
+
         UserRoles = MapperUtils.MapList<UserRole, UserRoleRequestModel>(
             user.Roles, r =>
                 new UserRoleRequestModel()
@@ -303,7 +313,7 @@ public sealed class ResponseMapper : IResponseMapper
                                RoleName = a.RoleName,
                                FunctionalName = a.FunctionalName,
                                Description = a.Description,
-                               RoleType =  a.RoleType
+                               RoleType = a.RoleType
                            });
 
     public List<ProjectRoleRequestModel> Map(List<ProjectRole> role) =>
@@ -311,7 +321,7 @@ public sealed class ResponseMapper : IResponseMapper
                            role,
                            a => new ProjectRoleRequestModel
                            {
-                            //    Id = a.Id,
+                               //    Id = a.Id,
                                RoleName = a.RoleName,
                                FunctionalName = a.FunctionalName
                            });
@@ -353,12 +363,12 @@ public sealed class ResponseMapper : IResponseMapper
                            projList,
                            p => new ProjectResponse
                            {
-                                Id = p.Id,
-                                ProjectName = p.ProjectName,
-                                ProjectCode = p.ProjectCode,
-                                ProjectType = p.ProjectType,
-                                ProjectOrg = p.ProjectOrg,
-                                Description = p.Description
+                               Id = p.Id,
+                               ProjectName = p.ProjectName,
+                               ProjectCode = p.ProjectCode,
+                               ProjectType = p.ProjectType,
+                               ProjectOrg = p.ProjectOrg,
+                               Description = p.Description
                            });
 
     public OrganizationResponse? Map(Organization? organization) => organization == null ? null : new()
@@ -367,7 +377,6 @@ public sealed class ResponseMapper : IResponseMapper
         OrgName = organization.OrgName,
         OrgCode = organization.OrgCode,
         Description = organization.Description
-
     };
 
     public ProjectResponse? Map(Project? project) => project == null ? null : new()
@@ -420,7 +429,6 @@ public sealed class ResponseMapper : IResponseMapper
                                     Type = a.Type,
                                     Value = a.Value
                                 }),
-
 
                 Languages = MapperUtils.MapList<Language, LanguageRequestModel>(
                                 user.Languages, l =>
@@ -563,5 +571,4 @@ public sealed class ResponseMapper : IResponseMapper
             }
         )
     };
-    
 }

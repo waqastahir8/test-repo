@@ -18,14 +18,14 @@ public sealed class ResponseMapperTests : ResponseMapperSetup
         var model = Fixture.Build<User>()
               .Create();
 
-
         IResponseMapper mapper = new ResponseMapper();
 
         // Act
         var result = mapper.Map(model);
 
         // Assert
-        if(model == null) {
+        if (model == null)
+        {
             Assert.Null(result);
             return;
         }
@@ -42,7 +42,6 @@ public sealed class ResponseMapperTests : ResponseMapperSetup
         Assert.Equal(model.Pronouns, result.Pronouns);
         Assert.Equal(model.OrgCode, result.OrgCode);
         Assert.Equal(model.AccountStatus, result.AccountStatus);
-
 
         //Assert attributes
         Assert.Equal(model.Attributes.Count, result.Attributes.Count);
@@ -147,7 +146,6 @@ public sealed class ResponseMapperTests : ResponseMapperSetup
                 Assert.Equal(pair.source.CanContact, pair.mapped.CanContact);
                 Assert.Equal(pair.source.Contacted, pair.mapped.Contacted);
                 Assert.Equal(pair.source.DateContacted, pair.mapped.DateContacted);
-
             });
 
         //Assert Relatives
@@ -197,7 +195,6 @@ public sealed class ResponseMapperTests : ResponseMapperSetup
         TestUserCollectionResponseMapper(result, model);
     }
 
-
     [Fact]
     public void Map_CorrectlyMapsPropertiesOrganizationResponse()
     {
@@ -207,14 +204,14 @@ public sealed class ResponseMapperTests : ResponseMapperSetup
         var model = Fixture.Build<Organization>()
               .Create();
 
-
         IResponseMapper mapper = new ResponseMapper();
 
         // Act
         var result = mapper.Map(model);
 
         // Assert
-        if(model == null) {
+        if (model == null)
+        {
             Assert.Null(result);
             return;
         }
@@ -234,14 +231,14 @@ public sealed class ResponseMapperTests : ResponseMapperSetup
         var model = Fixture.Build<Project>()
               .Create();
 
-
         IResponseMapper mapper = new ResponseMapper();
 
         // Act
         var result = mapper.Map(model);
 
         // Assert
-        if(model == null) {
+        if (model == null)
+        {
             Assert.Null(result);
             return;
         }
@@ -263,14 +260,14 @@ public sealed class ResponseMapperTests : ResponseMapperSetup
         var model = Fixture.Build<Access>()
               .Create();
 
-
         IResponseMapper mapper = new ResponseMapper();
 
         // Act
         var result = mapper.Map(model);
 
         // Assert
-        if(model == null) {
+        if (model == null)
+        {
             Assert.Null(result);
             return;
         }
@@ -291,14 +288,14 @@ public sealed class ResponseMapperTests : ResponseMapperSetup
         var model = Fixture.Build<Role>()
               .Create();
 
-
         IResponseMapper mapper = new ResponseMapper();
 
         // Act
         var result = mapper.Map(model);
 
         // Assert
-        if(model == null) {
+        if (model == null)
+        {
             Assert.Null(result);
             return;
         }
@@ -309,7 +306,6 @@ public sealed class ResponseMapperTests : ResponseMapperSetup
         Assert.Equal(model.Description, result.Description);
     }
 
-
     [Fact]
     public void Map_CorrectlyMapsPropertiesRoleResponseList()
     {
@@ -319,14 +315,14 @@ public sealed class ResponseMapperTests : ResponseMapperSetup
         var model = Fixture.Build<List<Role>>()
               .Create();
 
-
         IResponseMapper mapper = new ResponseMapper();
 
         // Act
         var result = mapper.Map(model);
 
         // Assert
-        if(model == null) {
+        if (model == null)
+        {
             Assert.Null(result);
             return;
         }
@@ -353,14 +349,14 @@ public sealed class ResponseMapperTests : ResponseMapperSetup
         var model = Fixture.Build<List<Access>>()
               .Create();
 
-
         IResponseMapper mapper = new ResponseMapper();
 
         // Act
         var result = mapper.Map(model);
 
         // Assert
-        if(model == null) {
+        if (model == null)
+        {
             Assert.Null(result);
             return;
         }
@@ -388,14 +384,14 @@ public sealed class ResponseMapperTests : ResponseMapperSetup
         var model = Fixture.Build<List<Project>>()
               .Create();
 
-
         IResponseMapper mapper = new ResponseMapper();
 
         // Act
         var result = mapper.Map(model);
 
         // Assert
-        if(model == null) {
+        if (model == null)
+        {
             Assert.Null(result);
             return;
         }
@@ -424,14 +420,14 @@ public sealed class ResponseMapperTests : ResponseMapperSetup
         var model = Fixture.Build<List<Organization>>()
               .Create();
 
-
         IResponseMapper mapper = new ResponseMapper();
 
         // Act
         var result = mapper.Map(model);
 
         // Assert
-        if(model == null) {
+        if (model == null)
+        {
             Assert.Null(result);
             return;
         }
@@ -458,14 +454,14 @@ public sealed class ResponseMapperTests : ResponseMapperSetup
         var model = Fixture.Build<UserList>()
               .Create();
 
-
         IResponseMapper mapper = new ResponseMapper();
 
         // Act
         var result = mapper.Map(model);
 
         // Assert
-        if(model == null) {
+        if (model == null)
+        {
             Assert.Null(result);
             return;
         }
@@ -492,8 +488,6 @@ public sealed class ResponseMapperTests : ResponseMapperSetup
                 Assert.Equal(pair.source.AccountStatus, pair.mapped.AccountStatus);
             });
     }
-
-
 
     private void TestUserCollectionResponseMapper(UserResponse result, User model)
     {

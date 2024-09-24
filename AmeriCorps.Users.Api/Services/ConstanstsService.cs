@@ -1,6 +1,5 @@
 namespace AmeriCorps.Users.Api.Services;
 
-
 public static class ConstanstsService
 {
     public static string Invited => "INVITED";

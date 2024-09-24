@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
-using AmeriCorps.Users.Data.Core.Model;
+﻿using AmeriCorps.Users.Data.Core.Model;
 
 namespace AmeriCorps.Users.Data.Core;
 

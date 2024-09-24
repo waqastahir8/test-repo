@@ -1,6 +1,6 @@
-﻿using Asp.Versioning;
+﻿using System.Net;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
 
 namespace AmeriCorps.Users.Controllers;
 
