@@ -135,7 +135,6 @@ public sealed class RequestMapperTests : RequestMapperSetup
                 Assert.Equal(pair.source.CanContact, pair.mapped.CanContact);
                 Assert.Equal(pair.source.Contacted, pair.mapped.Contacted);
                 Assert.Equal(pair.source.DateContacted, pair.mapped.DateContacted);
-
             });
 
         //Assert Relatives
@@ -173,9 +172,7 @@ public sealed class RequestMapperTests : RequestMapperSetup
                 Assert.Equal(pair.source.Active, pair.mapped.Active);
             });
 
-
         TestUserCollectionRequestMapper(result, model);
-
     }
 
     [Fact]
@@ -196,6 +193,7 @@ public sealed class RequestMapperTests : RequestMapperSetup
         Assert.Equal(model.OrgCode, result.OrgCode);
         Assert.Equal(model.Description, result.Description);
     }
+
     [Fact]
     public void Map_CorrectlyMapsProjecRequest()
     {
@@ -215,7 +213,45 @@ public sealed class RequestMapperTests : RequestMapperSetup
         Assert.Equal(model.ProjectType, result.ProjectType);
         Assert.Equal(model.ProjectOrg, result.ProjectOrg);
         Assert.Equal(model.Description, result.Description);
+    }
 
+    [Fact]
+    public void Map_CorrectlyMapsAccessRequest()
+    {
+        // Arrange
+        var sut = Setup();
+        var model = Fixture.Create<AccessRequestModel>();
+
+        IRequestMapper mapper = new RequestMapper();
+
+        // Act
+        var result = mapper.Map(model);
+
+        // Assert
+
+        Assert.Equal(model.AccessName, result.AccessName);
+        Assert.Equal(model.AccessLevel, result.AccessLevel);
+        Assert.Equal(model.AccessType, result.AccessType);
+        Assert.Equal(model.Description, result.Description);
+    }
+
+    [Fact]
+    public void Map_CorrectlyMapsRoleRequest()
+    {
+        // Arrange
+        var sut = Setup();
+        var model = Fixture.Create<RoleRequestModel>();
+
+        IRequestMapper mapper = new RequestMapper();
+
+        // Act
+        var result = mapper.Map(model);
+
+        // Assert
+
+        Assert.Equal(model.RoleName, result.RoleName);
+        Assert.Equal(model.FunctionalName, result.FunctionalName);
+        Assert.Equal(model.Description, result.Description);
     }
 
     private void TestUserCollectionRequestMapper(User result, UserRequestModel model)

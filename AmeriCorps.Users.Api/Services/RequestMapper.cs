@@ -7,6 +7,7 @@ namespace AmeriCorps.Users.Api.Services;
 public interface IRequestMapper
 {
     User Map(UserRequestModel requestModel);
+
     Role Map(RoleRequestModel roleRequestModel);
 
     SavedSearch Map(SavedSearchRequestModel requestModel);
@@ -18,7 +19,7 @@ public interface IRequestMapper
     Reference Map(ReferenceRequestModel requestModel);
 
     Organization Map(OrganizationRequestModel requestModel);
-    
+
     Project Map(ProjectRequestModel requestModel);
 
     UserRole Map(Role role);
@@ -30,7 +31,6 @@ public sealed class RequestMapper : IRequestMapper
 {
     public User Map(UserRequestModel requestModel) => new()
     {
-
         FirstName = requestModel.FirstName,
         LastName = requestModel.LastName,
         MiddleName = requestModel.MiddleName,
@@ -42,7 +42,8 @@ public sealed class RequestMapper : IRequestMapper
         Suffix = requestModel.Suffix,
         Prefix = requestModel.Prefix,
         OrgCode = requestModel.OrgCode,
-        EncryptedSocialSecurityNumber =  requestModel.EncryptedSocialSecurityNumber,
+        AccountStatus = requestModel.AccountStatus,
+        EncryptedSocialSecurityNumber = requestModel.EncryptedSocialSecurityNumber,
         CountryOfBirth = requestModel.CountryOfBirth,
         CityOfBirth = requestModel.CityOfBirth,
         CitzenShipStatus = (Data.Core.Model.CitizenshipStatus)requestModel.CitzenShipStatus,
@@ -54,9 +55,7 @@ public sealed class RequestMapper : IRequestMapper
                 Id = a.Id,
                 Type = a.Type,
                 Value = a.Value,
-
             }),
-
 
         Languages = MapperUtils.MapList<LanguageRequestModel, Language>(
             requestModel.Languages, l =>
@@ -153,18 +152,15 @@ public sealed class RequestMapper : IRequestMapper
             requestModel.Collection, c =>
                 new Collection()
                 {
-
                     UserId = c.UserId,
                     Type = c.Type,
                     ListingId = c.ListingId,
                 }),
 
-
         References = MapperUtils.MapList<ReferenceRequestModel, Reference>(
             requestModel.References, r =>
                 new Reference
                 {
-
                     TypeId = r.TypeId,
                     Relationship = r.Relationship,
                     RelationshipLength = r.RelationshipLength,
@@ -259,7 +255,6 @@ public sealed class RequestMapper : IRequestMapper
         Contacted = requestModel.Contacted,
         DateContacted = requestModel.DateContacted
     };
-
 
     public Organization Map(OrganizationRequestModel requestModel) => new()
     {

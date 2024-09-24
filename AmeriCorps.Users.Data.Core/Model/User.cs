@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
-using AmeriCorps.Users.Data.Core.Model;
+﻿using AmeriCorps.Users.Data.Core.Model;
 
 namespace AmeriCorps.Users.Data.Core;
 
@@ -38,4 +36,6 @@ public sealed class User : Entity
     public string CityOfBirth { get; set; } = string.Empty;
     public string? ResidentRegistrationNumber { get; set; } = string.Empty;
     public DateOnly? DocumentExpirationDate { get; set; }
+    public string AccountStatus { get; set; } = string.Empty;
+    public DateTime? UpdatedDate { get; set; }
 }

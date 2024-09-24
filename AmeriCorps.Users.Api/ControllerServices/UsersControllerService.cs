@@ -46,7 +46,7 @@ public interface IUsersControllerService
 
     Task<(ResponseStatus Status, UserResponse? Response)> UpdateUserProjectAndRoleDataAsync(UserProjectRoleUpdateRequestModel toUpdate);
 
-    Task<(ResponseStatus Status, UserResponse? Response)> InviteUserToOrgAsync(UserRequestModel toInvite);
+    Task<(ResponseStatus Status, UserResponse? Response)> InviteUserAsync(UserRequestModel toInvite);
 }
 
 public sealed class UsersControllerService : IUsersControllerService
@@ -165,7 +165,6 @@ public sealed class UsersControllerService : IUsersControllerService
             return (ResponseStatus.UnknownError, null);
         }
 
-
         if (user == null)
         {
             return (ResponseStatus.MissingInformation, null);
@@ -272,11 +271,14 @@ public sealed class UsersControllerService : IUsersControllerService
             return (ResponseStatus.UnknownError, null);
         }
 
+        user.UpdatedDate = DateTime.UtcNow;
+
         try
         {
             if (userId <= 0)
             {
                 user.Id = 0;
+                user.AccountStatus = ConstanstsService.Active;
                 user = await _repository.SaveAsync(user);
             }
             else
@@ -883,125 +885,19 @@ public sealed class UsersControllerService : IUsersControllerService
         {
             updatedUser = existingUser;
 
-            if (toUpdate.UserRoles != null && toUpdate.UserRoles.Count > 0)
-            {
-                List<UserRole> userRoleList = new List<UserRole>();
-                for (int i = 0; i < toUpdate.UserRoles.Count; i++)
-                {
-                    var role = toUpdate.UserRoles[i];
-                    var userRole = await _roleRepository.GetRoleByNameAsync(role.RoleName);
+            UpdateUserAccountStatus(updatedUser, toUpdate.AccountStatus);
 
-                    if (userRole != null)
-                    {
-                        UserRole uRole = new UserRole()
-                        {
-                            RoleName = userRole.RoleName,
-                            FunctionalName = userRole.FunctionalName
-                        };
-                        userRoleList.Add(uRole);
-                    }
-                    else
-                    {
-                        _logger.LogError("Could not add user role to user with role name {Identifier}.", role.RoleName.ToString().Replace(Environment.NewLine, ""));
-                        return (ResponseStatus.UnknownError, null);
-                    }
-                }
-                updatedUser.Roles = userRoleList;
-            }
-            else
+            updatedUser.Roles = await UpdateUserRolesAsync(toUpdate.UserRoles);
+
+            updatedUser.UserProjects = await UpdateUserProjectsAsync(toUpdate.UserProjects);
+
+            if (updatedUser.Roles.Count != toUpdate.UserRoles.Count || updatedUser.UserProjects.Count != toUpdate.UserProjects.Count)
             {
-                updatedUser.Roles = existingUser.Roles;
+                _logger.LogError("Unable to update Roles or Project for update {Identifier}.", toUpdate.Id.ToString().Replace(Environment.NewLine, ""));
+                return (ResponseStatus.UnknownError, null);
             }
 
-            if (toUpdate.UserProjects != null && toUpdate.UserProjects.Count > 0)
-            {
-                List<UserProject> projectList = new List<UserProject>();
-                for (int i = 0; i < toUpdate.UserProjects.Count; i++)
-                {
-                    var project = toUpdate.UserProjects[i];
-                    var roles = toUpdate.UserProjects[i].ProjectRoles;
-                    var accesses = toUpdate.UserProjects[i].ProjectAccess;
-
-                    List<ProjectRole> roleList = new List<ProjectRole>();
-                    if (roles != null)
-                    {
-                        for (int j = 0; j < roles.Count; j++)
-                        {
-                            var role = roles[i];
-                            var projRole = await _roleRepository.GetRoleByNameAsync(role.RoleName);
-
-                            if (projRole != null)
-                            {
-                                ProjectRole uRole = new ProjectRole()
-                                {
-                                    RoleName = projRole.RoleName,
-                                    FunctionalName = projRole.FunctionalName
-                                };
-                                roleList.Add(uRole);
-                            }
-                            else
-                            {
-                                _logger.LogError("Could not add user role to user with role id {Identifier}.", role.RoleName.ToString().Replace(Environment.NewLine, ""));
-                                return (ResponseStatus.UnknownError, null);
-                            }
-                        }
-                    }
-
-                    List<ProjectAccess> accessList = new List<ProjectAccess>();
-                    if (accesses != null)
-                    {
-                        for (int j = 0; j < accesses.Count; j++)
-                        {
-                            var access = accesses[i];
-                            var projAccess = await _accessRepository.GetAccessByNameAsync(access.AccessName);
-
-                            if (projAccess != null)
-                            {
-                                ProjectAccess uAccess = new ProjectAccess()
-                                {
-                                    AccessName = projAccess.AccessName,
-                                    AccessLevel = projAccess.AccessLevel
-                                };
-                                accessList.Add(uAccess);
-                            }
-                            else
-                            {
-                                _logger.LogError("Could not add project access to user with access id {Identifier}.", access.AccessName.ToString().Replace(Environment.NewLine, ""));
-                                return (ResponseStatus.UnknownError, null);
-                            }
-                        }
-                    }
-
-                    if (!string.IsNullOrEmpty(project.ProjectCode))
-                    {
-                        var orgProj = await _projectRepository.GetProjectByCodeAsync(project.ProjectCode);
-                        if (orgProj != null)
-                        {
-                            UserProject uProject = new UserProject()
-                            {
-                                ProjectName = orgProj.ProjectName,
-                                ProjectCode = orgProj.ProjectCode,
-                                ProjectType = orgProj.ProjectType,
-                                ProjectOrg = orgProj.ProjectOrg,
-                                Active = true,
-                                ProjectRoles = roleList,
-                                ProjectAccess = accessList
-                            };
-                            projectList.Add(uProject);
-                        }
-                        else
-                        {
-                            _logger.LogError("Could not add project to user with project id {Identifier}.", project.ProjectCode.ToString().Replace(Environment.NewLine, ""));
-                            return (ResponseStatus.UnknownError, null);
-                        }
-                    }
-                }
-                updatedUser.UserProjects = projectList;
-            }
-            else
-            {
-                updatedUser.UserProjects = existingUser.UserProjects;
-            }
+            updatedUser.UpdatedDate = DateTime.UtcNow;
 
             try
             {
@@ -1009,7 +905,7 @@ public sealed class UsersControllerService : IUsersControllerService
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Unable to save reference for user {updatedUser}.");
+                _logger.LogError(e, "Unable to save reference for user {Identifier}.", toUpdate.Id.ToString().Replace(Environment.NewLine, ""));
                 return (ResponseStatus.UnknownError, null);
             }
         }
@@ -1019,7 +915,7 @@ public sealed class UsersControllerService : IUsersControllerService
         return (ResponseStatus.Successful, response);
     }
 
-    public async Task<(ResponseStatus Status, UserResponse? Response)> InviteUserToOrgAsync(UserRequestModel toInvite)
+    public async Task<(ResponseStatus Status, UserResponse? Response)> InviteUserAsync(UserRequestModel toInvite)
     {
         if (toInvite == null || String.IsNullOrEmpty(toInvite.Email))
         {
@@ -1031,41 +927,28 @@ public sealed class UsersControllerService : IUsersControllerService
         {
             user.UserName = "InviteHold";
 
-            user = await _repository.SaveAsync(user);
+            user.AccountStatus = ConstanstsService.Invited;
+
+            user.UpdatedDate = DateTime.UtcNow;
         }
         else
         {
             return (ResponseStatus.UnknownError, null);
         }
 
-        if (toInvite.UserProjects != null)
-        {
-            List<UserProject> projectList = new List<UserProject>();
-            for (int i = 0; i < toInvite.UserProjects.Count; i++)
-            {
-                var project = toInvite.UserProjects[i];
-                if (!String.IsNullOrEmpty(project.ProjectCode))
-                {
-                    var orgProj = await _projectRepository.GetProjectByCodeAsync(project.ProjectCode);
-                    if (orgProj != null)
-                    {
-                        UserProject uProject = new UserProject()
-                        {
-                            ProjectName = orgProj.ProjectName,
-                            ProjectCode = orgProj.ProjectCode,
-                            ProjectType = orgProj.ProjectType,
-                            ProjectOrg = orgProj.ProjectOrg,
-                            Active = true,
-                            UserId = user.Id
-                        };
-                        projectList.Add(uProject);
-                    }
-                }
-            }
-            user.UserProjects = projectList;
-        }
+        user.Roles = await UpdateUserRolesAsync(toInvite.UserRoles);
 
-        user = await _repository.SaveAsync(user);
+        user.UserProjects = await UpdateUserProjectsAsync(toInvite.UserProjects);
+
+        try
+        {
+            user = await _repository.SaveAsync(user);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Unable to save reference for user {Identifier}.", toInvite.UserName.ToString().Replace(Environment.NewLine, ""));
+            return (ResponseStatus.UnknownError, null);
+        }
 
         //Add call for email invite
 
@@ -1120,5 +1003,149 @@ public sealed class UsersControllerService : IUsersControllerService
                 }
             }
         }
+    }
+
+    private static void UpdateUserAccountStatus(User updatedUser, string newStatus)
+    {
+        string updatedStatus = newStatus.ToUpper();
+        if (!string.IsNullOrWhiteSpace(updatedStatus))
+        {
+            switch (updatedStatus)
+            {
+                case "INVITED":
+                    updatedUser.AccountStatus = ConstanstsService.Invited;
+                    //re send invite
+                    break;
+
+                case "ACTIVE":
+                    updatedUser.AccountStatus = ConstanstsService.Active;
+                    break;
+
+                case "DEACTIVE":
+                    updatedUser.AccountStatus = ConstanstsService.Deactive;
+                    break;
+
+                default:
+                    break;
+            }
+        }
+    }
+
+    private async Task<List<UserRole>> UpdateUserRolesAsync(List<UserRoleRequestModel> updatedRoles)
+    {
+        List<UserRole> userRoleList = new List<UserRole>();
+        if (updatedRoles != null && updatedRoles.Count > 0)
+        {
+            for (int i = 0; i < updatedRoles.Count; i++)
+            {
+                var role = updatedRoles[i];
+                var userRole = await _roleRepository.GetRoleByNameAsync(role.RoleName);
+
+                if (userRole != null)
+                {
+                    UserRole uRole = new UserRole()
+                    {
+                        RoleName = userRole.RoleName,
+                        FunctionalName = userRole.FunctionalName
+                    };
+                    userRoleList.Add(uRole);
+                }
+                else
+                {
+                    _logger.LogError("Could not add user role to user with role name {Identifier}.", role.RoleName.ToString().Replace(Environment.NewLine, ""));
+                    // return ResponseStatus.UnknownError;
+                }
+            }
+        }
+        return userRoleList;
+    }
+
+    private async Task<List<UserProject>> UpdateUserProjectsAsync(List<UserProjectRequestModel> updatedProjects)
+    {
+        List<UserProject> projectList = new List<UserProject>();
+        if (updatedProjects != null && updatedProjects.Count > 0)
+        {
+            for (int i = 0; i < updatedProjects.Count; i++)
+            {
+                var project = updatedProjects[i];
+                var roles = updatedProjects[i].ProjectRoles;
+                var accesses = updatedProjects[i].ProjectAccess;
+
+                List<ProjectRole> roleList = new List<ProjectRole>();
+                if (roles != null)
+                {
+                    for (int j = 0; j < roles.Count; j++)
+                    {
+                        var role = roles[i];
+                        var projRole = await _roleRepository.GetRoleByNameAsync(role.RoleName);
+
+                        if (projRole != null)
+                        {
+                            ProjectRole uRole = new ProjectRole()
+                            {
+                                RoleName = projRole.RoleName,
+                                FunctionalName = projRole.FunctionalName
+                            };
+                            roleList.Add(uRole);
+                        }
+                        else
+                        {
+                            _logger.LogError("Could not add user role to user with role id {Identifier}.", role.RoleName.ToString().Replace(Environment.NewLine, ""));
+                            // return (ResponseStatus.UnknownError, null);
+                        }
+                    }
+                }
+
+                List<ProjectAccess> accessList = new List<ProjectAccess>();
+                if (accesses != null)
+                {
+                    for (int j = 0; j < accesses.Count; j++)
+                    {
+                        var access = accesses[i];
+                        var projAccess = await _accessRepository.GetAccessByNameAsync(access.AccessName);
+
+                        if (projAccess != null)
+                        {
+                            ProjectAccess uAccess = new ProjectAccess()
+                            {
+                                AccessName = projAccess.AccessName,
+                                AccessLevel = projAccess.AccessLevel
+                            };
+                            accessList.Add(uAccess);
+                        }
+                        else
+                        {
+                            _logger.LogError("Could not add project access to user with access id {Identifier}.", access.AccessName.ToString().Replace(Environment.NewLine, ""));
+                            // return (ResponseStatus.UnknownError, null);
+                        }
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(project.ProjectCode))
+                {
+                    var orgProj = await _projectRepository.GetProjectByCodeAsync(project.ProjectCode);
+                    if (orgProj != null)
+                    {
+                        UserProject uProject = new UserProject()
+                        {
+                            ProjectName = orgProj.ProjectName,
+                            ProjectCode = orgProj.ProjectCode,
+                            ProjectType = orgProj.ProjectType,
+                            ProjectOrg = orgProj.ProjectOrg,
+                            Active = true,
+                            ProjectRoles = roleList,
+                            ProjectAccess = accessList
+                        };
+                        projectList.Add(uProject);
+                    }
+                    else
+                    {
+                        _logger.LogError("Could not add project to user with project id {Identifier}.", project.ProjectCode.ToString().Replace(Environment.NewLine, ""));
+                        // return (ResponseStatus.UnknownError, null);
+                    }
+                }
+            }
+        }
+        return projectList;
     }
 }
