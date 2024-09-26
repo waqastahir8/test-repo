@@ -4,7 +4,7 @@ namespace AmeriCorps.Users.Api.Services;
 
 public interface IApiService
 {
-    Task<(bool, UserResponse?)> SendInviteEmailAsync(User toInvite);
+    Task<(bool, UserResponse?)> SendInviteEmailAsync(EmailModel toInvite);
 }
 
 public class ApiService(
@@ -14,7 +14,7 @@ public class ApiService(
 {
     private readonly INotificationApiClient _notificationApiClient = notificationApiClient;
 
-    public async Task<(bool, UserResponse?)> SendInviteEmailAsync(User toInvite)
+    public async Task<(bool, UserResponse?)> SendInviteEmailAsync(EmailModel toInvite)
     {
         return await GetContentAsync(async () => await _notificationApiClient.SendInviteEmailAsync(toInvite));
     }

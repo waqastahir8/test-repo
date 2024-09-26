@@ -204,7 +204,8 @@ public sealed class RequestMapper : IRequestMapper
         //Id = roleRequestModel.Id,
         RoleName = roleRequestModel.RoleName,
         FunctionalName = roleRequestModel.FunctionalName,
-        Description = roleRequestModel.Description
+        Description = roleRequestModel.Description,
+        RoleType = roleRequestModel.RoleType
     };
 
     public SavedSearch Map(SavedSearchRequestModel requestModel) => new()

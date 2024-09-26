@@ -65,7 +65,7 @@ public sealed class UsersControllerService : IUsersControllerService
 
     private readonly IRoleRepository _roleRepository;
 
-    private readonly IApiService _apiService;
+    private readonly IUserHelperService _userHelperService;
 
     private readonly IAccessRepository _accessRepository;
 
@@ -77,8 +77,8 @@ public sealed class UsersControllerService : IUsersControllerService
         IUserRepository repository,
         IProjectRepository projectRepository,
         IRoleRepository roleRepository,
-        IApiService apiService,
-        IAccessRepository accessRepository)
+        IAccessRepository accessRepository,
+        IUserHelperService userHelperService)
     {
         _logger = logger;
         _requestMapper = requestMapper;
@@ -87,8 +87,8 @@ public sealed class UsersControllerService : IUsersControllerService
         _repository = repository;
         _projectRepository = projectRepository;
         _roleRepository = roleRepository;
-        _apiService = apiService;
         _accessRepository = accessRepository;
+        _userHelperService = userHelperService;
     }
 
     public async Task<(ResponseStatus Status, UserResponse? Response)> GetAsync(int id)
@@ -885,7 +885,7 @@ public sealed class UsersControllerService : IUsersControllerService
         {
             updatedUser = existingUser;
 
-            UpdateUserAccountStatus(updatedUser, toUpdate.AccountStatus);
+            await UpdateUserAccountStatus(updatedUser, toUpdate.AccountStatus);
 
             updatedUser.Roles = await UpdateUserRolesAsync(toUpdate.UserRoles);
 
@@ -930,6 +930,8 @@ public sealed class UsersControllerService : IUsersControllerService
             user.AccountStatus = ConstanstsService.Invited;
 
             user.UpdatedDate = DateTime.UtcNow;
+
+            user.InviteDate = DateTime.UtcNow;
         }
         else
         {
@@ -950,9 +952,8 @@ public sealed class UsersControllerService : IUsersControllerService
             return (ResponseStatus.UnknownError, null);
         }
 
-        //Add call for email invite
 
-        // await _apiService.SendInviteEmailAsync(user);
+        await _userHelperService.ResendUserInvite(user);
 
         var response = _responseMapper.Map(user);
 
@@ -1005,26 +1006,32 @@ public sealed class UsersControllerService : IUsersControllerService
         }
     }
 
-    private static void UpdateUserAccountStatus(User updatedUser, string newStatus)
+    private async Task UpdateUserAccountStatus(User updatedUser, string newStatus)
     {
         string updatedStatus = newStatus.ToUpper();
         if (!string.IsNullOrWhiteSpace(updatedStatus))
         {
             switch (updatedStatus)
             {
+                case "PENDING":
+                    var sent = await _userHelperService.ResendUserInvite(updatedUser);
+                    if(sent){
+                        updatedUser.AccountStatus = ConstanstsService.Pending;
+                    }
+                    else
+                    {
+                        updatedUser.AccountStatus = ConstanstsService.Invited;
+                    }
+                    break;
                 case "INVITED":
                     updatedUser.AccountStatus = ConstanstsService.Invited;
-                    //re send invite
                     break;
-
                 case "ACTIVE":
                     updatedUser.AccountStatus = ConstanstsService.Active;
                     break;
-
                 case "DEACTIVE":
                     updatedUser.AccountStatus = ConstanstsService.Deactive;
                     break;
-
                 default:
                     break;
             }

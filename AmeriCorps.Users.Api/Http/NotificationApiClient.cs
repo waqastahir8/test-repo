@@ -6,7 +6,7 @@ namespace AmeriCorps.Users.Http;
 
 public interface INotificationApiClient
 {
-    Task<ServiceResponse<UserResponse>> SendInviteEmailAsync(User toInvite);
+    Task<ServiceResponse<UserResponse>> SendInviteEmailAsync(EmailModel email);
 }
 
 public sealed class NotificationApiClient(
@@ -17,10 +17,10 @@ public sealed class NotificationApiClient(
 {
     private readonly NotificationOptions _options = options?.Value ?? new();
 
-    public async Task<ServiceResponse<UserResponse>> SendInviteEmailAsync(User toInvite)
+    public async Task<ServiceResponse<UserResponse>> SendInviteEmailAsync(EmailModel email)
     {
-        var uri = new Uri(_options.ApiUrl, $"").ToString();
-        var response = await PostAsync<UserResponse>(uri, toInvite);
+        var uri = new Uri(_options.ApiUrl, $"/api/Email/send").ToString();
+        var response = await PostAsync<UserResponse>(uri, email);
         return response;
     }
 }

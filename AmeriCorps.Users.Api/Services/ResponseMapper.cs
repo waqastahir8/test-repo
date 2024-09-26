@@ -301,7 +301,8 @@ public sealed class ResponseMapper : IResponseMapper
         Id = role.Id,
         RoleName = role.RoleName,
         FunctionalName = role.FunctionalName,
-        Description = role.Description
+        Description = role.Description,
+        RoleType = role.RoleType
     };
 
     public List<RoleResponse> Map(List<Role> role) =>

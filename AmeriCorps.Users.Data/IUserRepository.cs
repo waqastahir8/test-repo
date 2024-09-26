@@ -34,4 +34,6 @@ public interface IUserRepository
 
     Task<UserList> FetchUserListByOrgCodeAsync(string orgCode);
 
+    Task<List<User>> FetchInvitedUsersForReminder();
+
 }
