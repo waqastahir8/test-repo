@@ -1076,7 +1076,7 @@ public sealed class UsersControllerService : IUsersControllerService
                 {
                     for (int j = 0; j < roles.Count; j++)
                     {
-                        var role = roles[i];
+                        var role = roles[j];
                         var projRole = await _roleRepository.GetRoleByNameAsync(role.RoleName);
 
                         if (projRole != null)
@@ -1099,9 +1099,9 @@ public sealed class UsersControllerService : IUsersControllerService
                 List<ProjectAccess> accessList = new List<ProjectAccess>();
                 if (accesses != null)
                 {
-                    for (int j = 0; j < accesses.Count; j++)
+                    for (int k = 0; k < accesses.Count; k++)
                     {
-                        var access = accesses[i];
+                        var access = accesses[k];
                         var projAccess = await _accessRepository.GetAccessByNameAsync(access.AccessName);
 
                         if (projAccess != null)
