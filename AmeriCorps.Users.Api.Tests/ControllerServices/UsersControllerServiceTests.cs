@@ -13,8 +13,9 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
     private Mock<IValidator>? _validatorMock;
     private Mock<IProjectRepository>? _projectRepository;
     private Mock<IRoleRepository>? _roleRepository;
-    private Mock<IApiService>? _apiService;
     private Mock<IAccessRepository>? _accessRepository;
+
+    private Mock<IUserHelperService>? _userHelperService;
 
     [Theory]
     [InlineData(5)]
@@ -1685,8 +1686,9 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         Assert.Equal(ResponseStatus.MissingInformation, status);
     }
 
-    [Fact]
-    public async Task InviteUserAsync_Successful_Status()
+    [Theory]
+    [InlineData(5)]
+    public async Task InviteUserAsync_Successful_Status(int inviterId)
     {
         // Arrange
         var sut = Setup();
@@ -1710,14 +1712,15 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             .Setup(x => x.SaveAsync(user))
             .ReturnsAsync(user);
 
-        var (status, _) = await sut.InviteUserAsync(model);
+        var (status, _) = await sut.InviteUserAsync(inviterId,model);
 
         // Assert
         Assert.Equal(ResponseStatus.Successful, status);
     }
 
-    [Fact]
-    public async Task InviteUserAsync_Missing_Status()
+    [Theory]
+    [InlineData(5)]    
+    public async Task InviteUserAsync_Missing_Status(int inviterId)
     {
         // Arrange
         var sut = Setup();
@@ -1727,14 +1730,16 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
                 .Create();
 
         // Act
-        var (status, _) = await sut.InviteUserAsync(user);
+        var (status, _) = await sut.InviteUserAsync(inviterId, user);
 
         // Assert
         Assert.Equal(ResponseStatus.MissingInformation, status);
     }
 
-    [Fact]
-    public async Task InviteUserAsync_Unkown_Error()
+
+    [Theory]
+    [InlineData(5)]
+    public async Task InviteUserAsync_Unkown_Error(int inviterId)
     {
         // Arrange
         var sut = Setup();
@@ -1743,7 +1748,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
                 .Create();
 
         // Act
-        var (status, _) = await sut.InviteUserAsync(user);
+        var (status, _) = await sut.InviteUserAsync(inviterId,user);
 
         // Assert
         Assert.Equal(ResponseStatus.UnknownError, status);
@@ -1757,8 +1762,8 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         _validatorMock = new();
         _projectRepository = new();
         _roleRepository = new();
-        _apiService = new();
         _accessRepository = new();
+        _userHelperService = new();
 
         Fixture = new Fixture();
         Fixture.Customize<DateOnly>(x => x.FromFactory<DateTime>(DateOnly.FromDateTime));
@@ -1770,7 +1775,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             _repositoryMock.Object,
             _projectRepository.Object,
             _roleRepository.Object,
-            _apiService.Object,
-            _accessRepository.Object);
+            _accessRepository.Object,
+            _userHelperService.Object);
     }
 }

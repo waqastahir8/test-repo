@@ -27,7 +27,8 @@ builder.Services
     .AddScoped<IProjectControllerService, ProjectControllerService>()
     .AddScoped<IAccessControllerService, AccessControllerService>()
     .AddScoped<IApiService, ApiService>()
-    .AddScoped<IUserHelperService, UserHelperService>();
+    .AddScoped<IUserHelperService, UserHelperService>()
+    .AddScoped<IEmailTemplates, EmailTemplates>();
 
 builder.Services.AddHttpClient()
             .AddTransient<INotificationApiClient, NotificationApiClient>();

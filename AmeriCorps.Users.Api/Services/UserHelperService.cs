@@ -7,6 +7,8 @@ namespace AmeriCorps.Users.Api.Services;
 
 public interface IUserHelperService
 {
+    Task<bool> SendUserInvite(User toInvite);
+
     Task<bool> ResendUserInvite(User toInvite);
 
     Task ResendAllUserInvites();
@@ -20,14 +22,44 @@ public class UserHelperService : IUserHelperService
 
     private readonly IApiService _apiService;
 
+    private readonly IEmailTemplates _templates;
+
     public UserHelperService(
         ILogger<UserHelperService> logger,
         IUserRepository repository,
-        IApiService apiService)
+        IApiService apiService,
+        IEmailTemplates templates)
     {
         _logger = logger;
         _repository = repository;
         _apiService = apiService;
+        _templates = templates;
+    }
+
+    public async Task<bool> SendUserInvite(User toInvite)
+    {
+
+        if(toInvite != null)
+        {
+
+            EmailModel email = await FormatInviteEmail(toInvite);
+
+            try
+            {
+                await _apiService.SendInviteEmailAsync(email);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Unable to send invite email for {Identifier}.", toInvite.UserName.ToString().Replace(Environment.NewLine, ""));
+                return false;
+            }
+
+            _logger.LogInformation("Reminder email sent for {Identifier}.", toInvite.UserName.ToString().Replace(Environment.NewLine, ""));
+            return true;
+        }else
+        {
+            return false;
+        }
     }
 
     public async Task<bool> ResendUserInvite(User toInvite)
@@ -36,10 +68,10 @@ public class UserHelperService : IUserHelperService
         DateTime dateInvited = toInvite.InviteDate.GetValueOrDefault();
 
         if(toInvite.Id.ToString() != null && toInvite.AccountStatus != null && toInvite.AccountStatus.Equals("invited", StringComparison.OrdinalIgnoreCase) 
-            && dateInvited != DateTime.MinValue && DateTime.Compare(currentDate, dateInvited.AddDays(14)) > 0)
+            && dateInvited != DateTime.MinValue && DateTime.Compare(currentDate, dateInvited.AddDays(14)) < 0)
         {
 
-            EmailModel email = FormatInviteEmail(toInvite);
+            EmailModel email = await FormatInviteEmail(toInvite);
 
             try
             {
@@ -61,11 +93,20 @@ public class UserHelperService : IUserHelperService
 
     public async Task ResendAllUserInvites()
     {
-        List<User> userList = _repository.FetchInvitedUsersForReminder();
+        List<User> userList = new List<User>();
+
+        try
+        {
+            userList = await _repository.FetchInvitedUsersForReminder();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error fetching users for invite reminder.");
+        }
 
         var errorCount = 0;
 
-        if(userList.Count > 0){
+        if(userList != null && userList.Count > 0){
             for (int i = 0; i < userList.Count; i++)
             {
                 var success = await ResendUserInvite(userList[i]);
@@ -80,26 +121,54 @@ public class UserHelperService : IUserHelperService
     }
 
 
-    public static EmailModel FormatInviteEmail(User toInvite)
+    public async Task<EmailModel> FormatInviteEmail(User toInvite)
     {
         EmailModel email =  new EmailModel();
 
-        // string htmlTemplate = _templates.ReferenceEmailTemplate();
+        string htmlTemplate = _templates.InviteUserTemplate();
 
         List<string> recipients =  new List<string>();
 
-        if(String.IsNullOrEmpty(toInvite.UserName)) //String.IsNullOrEmpty(toInvite.Email)
+        if(toInvite.CommunicationMethods != null)
         {
-            recipients.Add(toInvite.UserName);
+            for (int i = 0; i < toInvite.CommunicationMethods.Count; i++)
+            {
+                if(toInvite.CommunicationMethods[i].Type == "email" && toInvite.CommunicationMethods[i].IsPreferred )
+                {
+                    recipients.Add(toInvite.CommunicationMethods[i].Value);
+                }
+            }
         }
 
-        string subject = "You're Invited"; // Example reference link
-        // string htmlContent = string.Format(htmlTemplate, recipientName, applicantFullName, referenceLink);
+        string subject = "You're Invited";
+        string inviteeFullName = toInvite.FirstName + ' ' + toInvite.LastName;
+        string inviter = "";
+
+        int x = Int32.Parse(toInvite.UserName.Substring(toInvite.UserName.LastIndexOf('=')+1));
+        User? inviterUser = new User();
+
+        try
+        {
+            inviterUser = await _repository.GetAsync(x);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Unable to find invitee for {Identifier}.", toInvite.UserName.ToString().Replace(Environment.NewLine, ""));
+        }
+
+        if(inviterUser != null && !string.IsNullOrEmpty(inviterUser.FirstName) && !string.IsNullOrEmpty(inviterUser.LastName))
+        {
+            inviter = "by " + inviterUser.FirstName + ' ' + inviterUser.LastName;
+        }
+
+
+        string link = "";
+        string htmlContent = string.Format(htmlTemplate, inviteeFullName, inviter, link);
 
 
         email.Recipients = recipients;
         email.Subject = subject;
-        // email.Conent = htmlContent;
+        email.Content = htmlContent;
 
         return email;
     }

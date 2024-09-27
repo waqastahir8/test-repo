@@ -46,7 +46,7 @@ public interface IUsersControllerService
 
     Task<(ResponseStatus Status, UserResponse? Response)> UpdateUserProjectAndRoleDataAsync(UserProjectRoleUpdateRequestModel toUpdate);
 
-    Task<(ResponseStatus Status, UserResponse? Response)> InviteUserAsync(UserRequestModel toInvite);
+    Task<(ResponseStatus Status, UserResponse? Response)> InviteUserAsync(int inviterId, UserRequestModel toInvite);
 }
 
 public sealed class UsersControllerService : IUsersControllerService
@@ -915,7 +915,7 @@ public sealed class UsersControllerService : IUsersControllerService
         return (ResponseStatus.Successful, response);
     }
 
-    public async Task<(ResponseStatus Status, UserResponse? Response)> InviteUserAsync(UserRequestModel toInvite)
+    public async Task<(ResponseStatus Status, UserResponse? Response)> InviteUserAsync(int inviterId, UserRequestModel toInvite)
     {
         if (toInvite == null || String.IsNullOrEmpty(toInvite.Email))
         {
@@ -925,7 +925,7 @@ public sealed class UsersControllerService : IUsersControllerService
         var user = _requestMapper.Map(toInvite);
         if (user != null)
         {
-            user.UserName = "InviteHold";
+            user.UserName = "InviteHold="+inviterId;
 
             user.AccountStatus = ConstanstsService.Invited;
 
@@ -942,6 +942,17 @@ public sealed class UsersControllerService : IUsersControllerService
 
         user.UserProjects = await UpdateUserProjectsAsync(toInvite.UserProjects);
 
+        CommunicationMethod email = new CommunicationMethod()
+        {
+            Type = "email",
+            Value = toInvite.Email,
+            IsPreferred = true
+        };
+
+        List<CommunicationMethod> commList = new List<CommunicationMethod>();
+        commList.Add(email);
+        user.CommunicationMethods = commList;
+
         try
         {
             user = await _repository.SaveAsync(user);
@@ -952,8 +963,7 @@ public sealed class UsersControllerService : IUsersControllerService
             return (ResponseStatus.UnknownError, null);
         }
 
-
-        await _userHelperService.ResendUserInvite(user);
+        await _userHelperService.SendUserInvite(user);
 
         var response = _responseMapper.Map(user);
 
@@ -1018,10 +1028,6 @@ public sealed class UsersControllerService : IUsersControllerService
                     if(sent){
                         updatedUser.AccountStatus = ConstanstsService.Pending;
                     }
-                    else
-                    {
-                        updatedUser.AccountStatus = ConstanstsService.Invited;
-                    }
                     break;
                 case "INVITED":
                     updatedUser.AccountStatus = ConstanstsService.Invited;
@@ -1060,7 +1066,6 @@ public sealed class UsersControllerService : IUsersControllerService
                 else
                 {
                     _logger.LogError("Could not add user role to user with role name {Identifier}.", role.RoleName.ToString().Replace(Environment.NewLine, ""));
-                    // return ResponseStatus.UnknownError;
                 }
             }
         }
@@ -1098,7 +1103,6 @@ public sealed class UsersControllerService : IUsersControllerService
                         else
                         {
                             _logger.LogError("Could not add user role to user with role id {Identifier}.", role.RoleName.ToString().Replace(Environment.NewLine, ""));
-                            // return (ResponseStatus.UnknownError, null);
                         }
                     }
                 }
@@ -1123,7 +1127,6 @@ public sealed class UsersControllerService : IUsersControllerService
                         else
                         {
                             _logger.LogError("Could not add project access to user with access id {Identifier}.", access.AccessName.ToString().Replace(Environment.NewLine, ""));
-                            // return (ResponseStatus.UnknownError, null);
                         }
                     }
                 }
@@ -1148,7 +1151,6 @@ public sealed class UsersControllerService : IUsersControllerService
                     else
                     {
                         _logger.LogError("Could not add project to user with project id {Identifier}.", project.ProjectCode.ToString().Replace(Environment.NewLine, ""));
-                        // return (ResponseStatus.UnknownError, null);
                     }
                 }
             }

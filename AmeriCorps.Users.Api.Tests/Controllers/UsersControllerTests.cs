@@ -606,14 +606,15 @@ public sealed partial class UsersControllerTests : BaseTests<UsersController>
     {
         //Arrange
         var sut = Setup();
+        var inviterId = Fixture.Create<int>();
         var toInvite = Fixture.Create<UserRequestModel>();
         var userResponse = Fixture.Create<UserResponse>();
 
         _serviceMock!
-            .Setup(x => x.InviteUserAsync(toInvite))
+            .Setup(x => x.InviteUserAsync(inviterId,toInvite))
             .ReturnsAsync((ResponseStatus.Successful, userResponse));
         //Act
-        var actual = await sut.InviteUserAsync(toInvite);
+        var actual = await sut.InviteUserAsync(inviterId,toInvite);
 
         //Assert
         var response = actual as OkObjectResult;
@@ -626,13 +627,14 @@ public sealed partial class UsersControllerTests : BaseTests<UsersController>
     {
         //Arrange
         var sut = Setup();
+        var inviterId = Fixture.Create<int>();
         var toInvite = Fixture.Create<UserRequestModel>();
 
         _serviceMock!
-            .Setup(x => x.InviteUserAsync(toInvite))
+            .Setup(x => x.InviteUserAsync(inviterId,toInvite))
             .ReturnsAsync((ResponseStatus.MissingInformation, null));
         //Act
-        var actual = await sut.InviteUserAsync(toInvite);
+        var actual = await sut.InviteUserAsync(inviterId,toInvite);
 
         //Assert
         var response = actual as StatusCodeResult;
