@@ -5,7 +5,7 @@
          <Configuration>
             <Exclude>
             [AmeriCorps.Users.Api]*Program,
-            [AmeriCorps.Users.Data]*UserRepository,
+            [AmeriCorps.Users.Data]*Repository,
             [AmeriCorps.Users.Data.Core]*NpgsqlContext
             </Exclude>
           </Configuration>
