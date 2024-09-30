@@ -1,4 +1,5 @@
 ﻿using AmeriCorps.Users.Data.Core;
+using AmeriCorps.Users.Data.Core.Model;
 using System.Data;
 using System.Security.Cryptography;
 
@@ -278,7 +279,7 @@ public sealed class UsersControllerService : IUsersControllerService
             if (userId <= 0)
             {
                 user.Id = 0;
-                user.AccountStatus = ConstanstsService.Active;
+                user.UserAccountStatus =  UserAccountStatus.ACTIVE;
                 user = await _repository.SaveAsync(user);
             }
             else
@@ -885,7 +886,7 @@ public sealed class UsersControllerService : IUsersControllerService
         {
             updatedUser = existingUser;
 
-            await UpdateUserAccountStatus(updatedUser, toUpdate.AccountStatus);
+            await UpdateUserAccountStatusAsync(updatedUser, (UserAccountStatus)toUpdate.AccountStatus);
 
             updatedUser.Roles = await UpdateUserRolesAsync(toUpdate.UserRoles);
 
@@ -925,7 +926,7 @@ public sealed class UsersControllerService : IUsersControllerService
         var user = _requestMapper.Map(toInvite);
         if (user != null)
         {
-            user.AccountStatus = ConstanstsService.Invited;
+            user.UserAccountStatus = UserAccountStatus.INVITED;
 
             user.UpdatedDate = DateTime.UtcNow;
 
@@ -961,7 +962,7 @@ public sealed class UsersControllerService : IUsersControllerService
             return (ResponseStatus.UnknownError, null);
         }
 
-        await _userHelperService.SendUserInvite(user);
+        await _userHelperService.SendUserInviteAsync(user);
 
         var response = _responseMapper.Map(user);
 
@@ -1014,36 +1015,32 @@ public sealed class UsersControllerService : IUsersControllerService
         }
     }
 
-    private async Task UpdateUserAccountStatus(User updatedUser, string newStatus)
+    private async Task UpdateUserAccountStatusAsync(User updatedUser, UserAccountStatus newStatus)
     {
-        string updatedStatus = newStatus.ToUpper();
-        if (!string.IsNullOrWhiteSpace(updatedStatus))
+        switch (newStatus)
         {
-            switch (updatedStatus)
-            {
-                case "PENDING":
-                    var sent = await _userHelperService.ResendUserInvite(updatedUser);
-                    if (sent)
-                    {
-                        updatedUser.AccountStatus = ConstanstsService.Pending;
-                    }
-                    break;
+            case UserAccountStatus.PENDING:
+                var sent = await _userHelperService.ResendUserInviteAsync(updatedUser);
+                if (sent)
+                {
+                    updatedUser.UserAccountStatus = UserAccountStatus.PENDING;
+                }
+                break;
 
-                case "INVITED":
-                    updatedUser.AccountStatus = ConstanstsService.Invited;
-                    break;
+            case UserAccountStatus.INVITED:
+                updatedUser.UserAccountStatus = UserAccountStatus.INVITED;
+                break;
 
-                case "ACTIVE":
-                    updatedUser.AccountStatus = ConstanstsService.Active;
-                    break;
+            case UserAccountStatus.ACTIVE:
+                updatedUser.UserAccountStatus = UserAccountStatus.ACTIVE;
+                break;
 
-                case "DEACTIVE":
-                    updatedUser.AccountStatus = ConstanstsService.Deactive;
-                    break;
+            case UserAccountStatus.DEACTIVE:
+                updatedUser.UserAccountStatus = UserAccountStatus.DEACTIVE;
+                break;
 
-                default:
-                    break;
-            }
+            default:
+                break;
         }
     }
 

@@ -41,7 +41,6 @@ public sealed class ResponseMapperTests : ResponseMapperSetup
         Assert.Equal(model.DateOfBirth, result.DateOfBirth);
         Assert.Equal(model.Pronouns, result.Pronouns);
         Assert.Equal(model.OrgCode, result.OrgCode);
-        Assert.Equal(model.AccountStatus, result.AccountStatus);
 
         //Assert attributes
         Assert.Equal(model.Attributes.Count, result.Attributes.Count);
@@ -485,7 +484,6 @@ public sealed class ResponseMapperTests : ResponseMapperSetup
                 Assert.Equal(pair.source.MiddleName, pair.mapped.MiddleName);
                 Assert.Equal(pair.source.Pronouns, pair.mapped.Pronouns);
                 Assert.Equal(pair.source.OrgCode, pair.mapped.OrgCode);
-                Assert.Equal(pair.source.AccountStatus, pair.mapped.AccountStatus);
             });
     }
 

@@ -88,7 +88,7 @@ public class EmailTemplates() : IEmailTemplates
                                 <p class='greeting'>Dear</p>
                                 <p class='recipient-name'>{0}</p>
                                 <p>AmeriCorps engages more than 70,000 Americans each year in results-driven service opportunities sponsored by thousands of local and national non-profits, public agencies, and faith-based community organizations.</p>
-                                <p class='center-text'>The success of AmeriCorps largely depends upon an appropriate match between programs and members. Considerable value of your experiences and knowledge you have been invited by {1} to create and account and login to ( MAPRAPP ).</p>
+                                <p class='center-text'>The success of AmeriCorps largely depends upon an appropriate match between programs and members. Considerable value of your experiences and knowledge you have been invited {1} to create and account and login to ( MAPRAPP ).</p>
                                 <p class='center-text'>Please click on the link below to create an account and login to the MAPR APP. SIGN IN WITH ID.me LOGIN.GOV</p>
                                 <div style='text-align: center;'>
                                     <a href='{2}' class='email-button'>Click Here</a>

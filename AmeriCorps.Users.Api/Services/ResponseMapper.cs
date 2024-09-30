@@ -145,7 +145,7 @@ public sealed class ResponseMapper : IResponseMapper
         CitzenShipStatus = (global::AmeriCorps.Users.Models.CitizenshipStatusRequestModel)user.CitzenShipStatus,
         CountryOfBirth = user.CountryOfBirth,
         CityOfBirth = user.CityOfBirth,
-        AccountStatus = user.AccountStatus,
+        UserAccountStatus = (AccountStatusRequestModel)user.UserAccountStatus,
         InviteUserId = user.InviteUserId,
         Attributes = MapperUtils.MapList<AmeriCorps.Users.Data.Core.Attribute, AttributeRequestModel>(
                         user.Attributes,
@@ -421,7 +421,7 @@ public sealed class ResponseMapper : IResponseMapper
                 CitzenShipStatus = (global::AmeriCorps.Users.Models.CitizenshipStatusRequestModel)user.CitzenShipStatus,
                 CountryOfBirth = user.CountryOfBirth,
                 CityOfBirth = user.CityOfBirth,
-                AccountStatus = user.AccountStatus,
+                UserAccountStatus = (AccountStatusRequestModel)user.UserAccountStatus,
                 InviteUserId = user.InviteUserId,
                 Attributes = MapperUtils.MapList<AmeriCorps.Users.Data.Core.Attribute, AttributeRequestModel>(
                                 user.Attributes,

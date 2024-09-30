@@ -1,5 +1,6 @@
 ﻿using AmeriCorps.Data;
 using AmeriCorps.Users.Data.Core;
+using AmeriCorps.Users.Data.Core.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -252,6 +253,6 @@ public sealed partial class UserRepository(
     }
 
     public async Task<List<User>> FetchInvitedUsersForReminder() =>
-        await ExecuteAsync(async context => await context.Users.Where(u => u.AccountStatus == "INVITED").ToListAsync());
+        await ExecuteAsync(async context => await context.Users.Where(u => u.UserAccountStatus == UserAccountStatus.INVITED).ToListAsync());
 
 }

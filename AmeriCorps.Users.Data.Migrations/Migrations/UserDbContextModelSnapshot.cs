@@ -717,11 +717,6 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AccountStatus")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("account_status");
-
                     b.Property<string>("CityOfBirth")
                         .IsRequired()
                         .HasColumnType("text")
@@ -815,6 +810,10 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_date");
+
+                    b.Property<int>("UserAccountStatus")
+                        .HasColumnType("integer")
+                        .HasColumnName("user_account_status");
 
                     b.Property<string>("UserName")
                         .IsRequired()

@@ -1,4 +1,5 @@
 ﻿using AmeriCorps.Users.Data.Core;
+using AmeriCorps.Users.Data.Core.Model;
 
 namespace AmeriCorps.Users.Api.Services;
 
@@ -40,7 +41,7 @@ public sealed class RequestMapper : IRequestMapper
         Suffix = requestModel.Suffix,
         Prefix = requestModel.Prefix,
         OrgCode = requestModel.OrgCode,
-        AccountStatus = requestModel.AccountStatus,
+        UserAccountStatus = (UserAccountStatus)requestModel.UserAccountStatus,
         EncryptedSocialSecurityNumber = requestModel.EncryptedSocialSecurityNumber,
         CountryOfBirth = requestModel.CountryOfBirth,
         CityOfBirth = requestModel.CityOfBirth,

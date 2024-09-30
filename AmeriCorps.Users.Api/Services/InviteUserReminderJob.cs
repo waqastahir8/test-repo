@@ -5,8 +5,8 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace AmeriCorps.Users.Api.Services
-{
+namespace AmeriCorps.Users.Api.Services;
+
     public class InviteUserReminderJob(IUserHelperService service, ILogger<InviteUserReminderJob> logger)
     {
         private readonly IUserHelperService _userHelperService = service;
@@ -19,7 +19,7 @@ namespace AmeriCorps.Users.Api.Services
 
             try
             {
-                await _userHelperService.ResendAllUserInvites();
+                await _userHelperService.ResendAllUserInvitesAsync();
             }
             catch (Exception ex)
             {
@@ -32,4 +32,3 @@ namespace AmeriCorps.Users.Api.Services
             return new OkObjectResult(responseMessage);
         }
     }
-}

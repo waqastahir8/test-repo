@@ -4,7 +4,7 @@ public sealed class UserProjectRoleUpdateRequestModel
 {
     public int Id { get; set; }
 
-    public string AccountStatus { get; set; } = string.Empty;
+    public AccountStatusRequestModel AccountStatus { get; set; }
 
     public List<UserRoleRequestModel> UserRoles { get; set; } = new List<UserRoleRequestModel>();
 

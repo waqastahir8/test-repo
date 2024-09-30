@@ -11,6 +11,11 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropColumn(
+                name: "account_status",
+                schema: "users",
+                table: "user");
+
             migrationBuilder.AddColumn<DateTime>(
                 name: "invite_date",
                 schema: "users",
@@ -20,6 +25,14 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
 
             migrationBuilder.AddColumn<int>(
                 name: "invite_user_id",
+                schema: "users",
+                table: "user",
+                type: "integer",
+                nullable: false,
+                defaultValue: 0);
+
+            migrationBuilder.AddColumn<int>(
+                name: "user_account_status",
                 schema: "users",
                 table: "user",
                 type: "integer",
@@ -39,6 +52,19 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                 name: "invite_user_id",
                 schema: "users",
                 table: "user");
+
+            migrationBuilder.DropColumn(
+                name: "user_account_status",
+                schema: "users",
+                table: "user");
+
+            migrationBuilder.AddColumn<string>(
+                name: "account_status",
+                schema: "users",
+                table: "user",
+                type: "text",
+                nullable: false,
+                defaultValue: "");
         }
     }
 }

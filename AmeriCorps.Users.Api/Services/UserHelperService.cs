@@ -1,16 +1,17 @@
 using System.Data;
 using AmeriCorps.Users.Data.Core;
+using AmeriCorps.Users.Data.Core.Model;
 using AmeriCorps.Users.Models;
 
 namespace AmeriCorps.Users.Api.Services;
 
 public interface IUserHelperService
 {
-    Task<bool> SendUserInvite(User toInvite);
+    Task<bool> SendUserInviteAsync(User toInvite);
 
-    Task<bool> ResendUserInvite(User toInvite);
+    Task<bool> ResendUserInviteAsync(User toInvite);
 
-    Task ResendAllUserInvites();
+    Task ResendAllUserInvitesAsync();
 }
 
 public class UserHelperService : IUserHelperService
@@ -35,7 +36,7 @@ public class UserHelperService : IUserHelperService
         _templates = templates;
     }
 
-    public async Task<bool> SendUserInvite(User toInvite)
+    public async Task<bool> SendUserInviteAsync(User toInvite)
     {
         if (toInvite != null)
         {
@@ -60,12 +61,12 @@ public class UserHelperService : IUserHelperService
         }
     }
 
-    public async Task<bool> ResendUserInvite(User toInvite)
+    public async Task<bool> ResendUserInviteAsync(User toInvite)
     {
         var currentDate = DateTime.UtcNow;
         DateTime dateInvited = toInvite.InviteDate.GetValueOrDefault();
 
-        if (toInvite.Id.ToString() != null && toInvite.AccountStatus != null && toInvite.AccountStatus.Equals("invited", StringComparison.OrdinalIgnoreCase)
+        if (toInvite.Id.ToString() != null && toInvite.UserAccountStatus == UserAccountStatus.INVITED
             && dateInvited != DateTime.MinValue && DateTime.Compare(currentDate, dateInvited.AddDays(14)) > 0)
         {
             EmailModel email = await FormatInviteEmail(toInvite);
@@ -89,7 +90,7 @@ public class UserHelperService : IUserHelperService
         }
     }
 
-    public async Task ResendAllUserInvites()
+    public async Task ResendAllUserInvitesAsync()
     {
         List<User> userList = new List<User>();
 
@@ -108,7 +109,7 @@ public class UserHelperService : IUserHelperService
         {
             for (int i = 0; i < userList.Count; i++)
             {
-                var success = await ResendUserInvite(userList[i]);
+                var success = await ResendUserInviteAsync(userList[i]);
 
                 if (!success)
                 {
