@@ -886,7 +886,7 @@ public sealed class UsersControllerService : IUsersControllerService
         {
             updatedUser = existingUser;
 
-            await UpdateUserAccountStatusAsync(updatedUser, (UserAccountStatus)toUpdate.AccountStatus);
+            await UpdateUserAccountStatusAsync(updatedUser, (UserAccountStatus)toUpdate.UserAccountStatus);
 
             updatedUser.Roles = await UpdateUserRolesAsync(toUpdate.UserRoles);
 
