@@ -254,25 +254,4 @@ public sealed partial class UserRepository(
     public async Task<List<User>> FetchInvitedUsersForReminder() =>
         await ExecuteAsync(async context => await context.Users.Where(u => u.AccountStatus == "INVITED").ToListAsync());
 
-    // ConstanstsService.Invited
-    // public async Task<List<User> FetchInvitedUsersForReminder()
-    // {
-    //     return context.Users
-    //                 .AsNoTracking()
-    //                 .Include(u => u.Attributes)
-    //                 .Include(u => u.Languages)
-    //                 .Include(u => u.Addresses)
-    //                 .Include(u => u.Education)
-    //                 .Include(u => u.Skills)
-    //                 .Include(u => u.MilitaryService)
-    //                 .Include(u => u.SavedSearches)
-    //                 .Include(u => u.Relatives)
-    //                 .Include(u => u.CommunicationMethods)
-    //                 .Include(u => u.Roles)
-    //                 .Include(u => u.UserProjects).ThenInclude(p => p.ProjectRoles)
-    //                 .Include(u => u.UserProjects).ThenInclude(a => a.ProjectAccess)
-    //                 .Where(x => x.OrgCode == orgCode).ToListAsync());
-
-    //     // return users;
-    // }
 }
