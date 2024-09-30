@@ -1,4 +1,5 @@
 ﻿using AmeriCorps.Users.Data.Core;
+using AmeriCorps.Users.Data.Core.Model;
 using System.Data;
 using System.Security.Cryptography;
 
@@ -65,7 +66,7 @@ public sealed class UsersControllerService : IUsersControllerService
 
     private readonly IRoleRepository _roleRepository;
 
-    private readonly IApiService _apiService;
+    private readonly IUserHelperService _userHelperService;
 
     private readonly IAccessRepository _accessRepository;
 
@@ -77,8 +78,8 @@ public sealed class UsersControllerService : IUsersControllerService
         IUserRepository repository,
         IProjectRepository projectRepository,
         IRoleRepository roleRepository,
-        IApiService apiService,
-        IAccessRepository accessRepository)
+        IAccessRepository accessRepository,
+        IUserHelperService userHelperService)
     {
         _logger = logger;
         _requestMapper = requestMapper;
@@ -87,8 +88,8 @@ public sealed class UsersControllerService : IUsersControllerService
         _repository = repository;
         _projectRepository = projectRepository;
         _roleRepository = roleRepository;
-        _apiService = apiService;
         _accessRepository = accessRepository;
+        _userHelperService = userHelperService;
     }
 
     public async Task<(ResponseStatus Status, UserResponse? Response)> GetAsync(int id)
@@ -278,7 +279,7 @@ public sealed class UsersControllerService : IUsersControllerService
             if (userId <= 0)
             {
                 user.Id = 0;
-                user.AccountStatus = ConstanstsService.Active;
+                user.UserAccountStatus =  UserAccountStatus.ACTIVE;
                 user = await _repository.SaveAsync(user);
             }
             else
@@ -885,7 +886,7 @@ public sealed class UsersControllerService : IUsersControllerService
         {
             updatedUser = existingUser;
 
-            UpdateUserAccountStatus(updatedUser, toUpdate.AccountStatus);
+            await UpdateUserAccountStatusAsync(updatedUser, (UserAccountStatus)toUpdate.AccountStatus);
 
             updatedUser.Roles = await UpdateUserRolesAsync(toUpdate.UserRoles);
 
@@ -925,11 +926,11 @@ public sealed class UsersControllerService : IUsersControllerService
         var user = _requestMapper.Map(toInvite);
         if (user != null)
         {
-            user.UserName = "InviteHold";
-
-            user.AccountStatus = ConstanstsService.Invited;
+            user.UserAccountStatus = UserAccountStatus.INVITED;
 
             user.UpdatedDate = DateTime.UtcNow;
+
+            user.InviteDate = DateTime.UtcNow;
         }
         else
         {
@@ -939,6 +940,17 @@ public sealed class UsersControllerService : IUsersControllerService
         user.Roles = await UpdateUserRolesAsync(toInvite.UserRoles);
 
         user.UserProjects = await UpdateUserProjectsAsync(toInvite.UserProjects);
+
+        CommunicationMethod email = new CommunicationMethod()
+        {
+            Type = "email",
+            Value = toInvite.Email,
+            IsPreferred = true
+        };
+
+        List<CommunicationMethod> commList = new List<CommunicationMethod>();
+        commList.Add(email);
+        user.CommunicationMethods = commList;
 
         try
         {
@@ -950,9 +962,7 @@ public sealed class UsersControllerService : IUsersControllerService
             return (ResponseStatus.UnknownError, null);
         }
 
-        //Add call for email invite
-
-        // await _apiService.SendInviteEmailAsync(user);
+        await _userHelperService.SendUserInviteAsync(user);
 
         var response = _responseMapper.Map(user);
 
@@ -1005,29 +1015,32 @@ public sealed class UsersControllerService : IUsersControllerService
         }
     }
 
-    private static void UpdateUserAccountStatus(User updatedUser, string newStatus)
+    private async Task UpdateUserAccountStatusAsync(User updatedUser, UserAccountStatus newStatus)
     {
-        string updatedStatus = newStatus.ToUpper();
-        if (!string.IsNullOrWhiteSpace(updatedStatus))
+        switch (newStatus)
         {
-            switch (updatedStatus)
-            {
-                case "INVITED":
-                    updatedUser.AccountStatus = ConstanstsService.Invited;
-                    //re send invite
-                    break;
+            case UserAccountStatus.PENDING:
+                var sent = await _userHelperService.ResendUserInviteAsync(updatedUser);
+                if (sent)
+                {
+                    updatedUser.UserAccountStatus = UserAccountStatus.PENDING;
+                }
+                break;
 
-                case "ACTIVE":
-                    updatedUser.AccountStatus = ConstanstsService.Active;
-                    break;
+            case UserAccountStatus.INVITED:
+                updatedUser.UserAccountStatus = UserAccountStatus.INVITED;
+                break;
 
-                case "DEACTIVE":
-                    updatedUser.AccountStatus = ConstanstsService.Deactive;
-                    break;
+            case UserAccountStatus.ACTIVE:
+                updatedUser.UserAccountStatus = UserAccountStatus.ACTIVE;
+                break;
 
-                default:
-                    break;
-            }
+            case UserAccountStatus.DEACTIVE:
+                updatedUser.UserAccountStatus = UserAccountStatus.DEACTIVE;
+                break;
+
+            default:
+                break;
         }
     }
 
@@ -1053,7 +1066,6 @@ public sealed class UsersControllerService : IUsersControllerService
                 else
                 {
                     _logger.LogError("Could not add user role to user with role name {Identifier}.", role.RoleName.ToString().Replace(Environment.NewLine, ""));
-                    // return ResponseStatus.UnknownError;
                 }
             }
         }
@@ -1091,7 +1103,6 @@ public sealed class UsersControllerService : IUsersControllerService
                         else
                         {
                             _logger.LogError("Could not add user role to user with role id {Identifier}.", role.RoleName.ToString().Replace(Environment.NewLine, ""));
-                            // return (ResponseStatus.UnknownError, null);
                         }
                     }
                 }
@@ -1116,7 +1127,6 @@ public sealed class UsersControllerService : IUsersControllerService
                         else
                         {
                             _logger.LogError("Could not add project access to user with access id {Identifier}.", access.AccessName.ToString().Replace(Environment.NewLine, ""));
-                            // return (ResponseStatus.UnknownError, null);
                         }
                     }
                 }
@@ -1141,7 +1151,6 @@ public sealed class UsersControllerService : IUsersControllerService
                     else
                     {
                         _logger.LogError("Could not add project to user with project id {Identifier}.", project.ProjectCode.ToString().Replace(Environment.NewLine, ""));
-                        // return (ResponseStatus.UnknownError, null);
                     }
                 }
             }

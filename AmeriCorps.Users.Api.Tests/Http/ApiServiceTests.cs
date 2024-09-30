@@ -9,28 +9,21 @@ namespace AmeriCorps.Users.Api.Tests;
 
 public sealed partial class ApiServiceTests : BaseTests<ApiService>
 {
-
     private Mock<INotificationApiClient>? _apiClientMock;
-
 
     [Fact]
     public async Task SendInviteEmailAsync_ApiCallThrowsException_UnsuccessfulResponse()
     {
         // Arrange
         var sut = Setup();
-        var user =
-            Fixture
-            .Build<User>()
-            .Without(u => u.Roles)
-            .Without(u => u.UserProjects)
-            .Create();
+        var email = Fixture.Create<EmailModel>();
 
         _apiClientMock!
-            .Setup(x => x.SendInviteEmailAsync(user))
+            .Setup(x => x.SendInviteEmailAsync(email))
             .ThrowsAsync(new Exception());
 
         // Act
-        var actual = await sut.SendInviteEmailAsync(user);
+        var actual = await sut.SendInviteEmailAsync(email);
 
         // Assert
         Assert.False(actual.Item1);
@@ -42,15 +35,8 @@ public sealed partial class ApiServiceTests : BaseTests<ApiService>
     {
         var sut = Setup();
 
-        var user =
-            Fixture
-            .Build<User>()
-            .Without(u => u.Roles)
-            .Without(u => u.UserProjects)
-            .Create();
+        var email = Fixture.Create<EmailModel>();
 
-
-        
         var successfulResponse =
             Fixture
                 .Build<ServiceResponse<UserResponse>>()
@@ -58,16 +44,15 @@ public sealed partial class ApiServiceTests : BaseTests<ApiService>
                 .Create();
 
         _apiClientMock!
-            .Setup(x => x.SendInviteEmailAsync(user))
+            .Setup(x => x.SendInviteEmailAsync(email))
             .ReturnsAsync(successfulResponse);
 
         // Act
-        var actual = await sut.SendInviteEmailAsync(user);
+        var actual = await sut.SendInviteEmailAsync(email);
 
         // Assert
         Assert.True(actual.Item1);
     }
-
 
     protected override ApiService Setup()
     {

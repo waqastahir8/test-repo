@@ -1,6 +1,5 @@
 ﻿using System.Data;
 using AmeriCorps.Users.Data.Core;
-using AmeriCorps.Users.Models;
 
 namespace AmeriCorps.Users.Api.Services;
 
@@ -146,7 +145,8 @@ public sealed class ResponseMapper : IResponseMapper
         CitzenShipStatus = (global::AmeriCorps.Users.Models.CitizenshipStatusRequestModel)user.CitzenShipStatus,
         CountryOfBirth = user.CountryOfBirth,
         CityOfBirth = user.CityOfBirth,
-        AccountStatus = user.AccountStatus,
+        UserAccountStatus = (AccountStatusRequestModel)user.UserAccountStatus,
+        InviteUserId = user.InviteUserId,
         Attributes = MapperUtils.MapList<AmeriCorps.Users.Data.Core.Attribute, AttributeRequestModel>(
                         user.Attributes,
                         a => new AttributeRequestModel
@@ -301,7 +301,8 @@ public sealed class ResponseMapper : IResponseMapper
         Id = role.Id,
         RoleName = role.RoleName,
         FunctionalName = role.FunctionalName,
-        Description = role.Description
+        Description = role.Description,
+        RoleType = role.RoleType
     };
 
     public List<RoleResponse> Map(List<Role> role) =>
@@ -420,7 +421,8 @@ public sealed class ResponseMapper : IResponseMapper
                 CitzenShipStatus = (global::AmeriCorps.Users.Models.CitizenshipStatusRequestModel)user.CitzenShipStatus,
                 CountryOfBirth = user.CountryOfBirth,
                 CityOfBirth = user.CityOfBirth,
-                AccountStatus = user.AccountStatus,
+                UserAccountStatus = (AccountStatusRequestModel)user.UserAccountStatus,
+                InviteUserId = user.InviteUserId,
                 Attributes = MapperUtils.MapList<AmeriCorps.Users.Data.Core.Attribute, AttributeRequestModel>(
                                 user.Attributes,
                                 a => new AttributeRequestModel

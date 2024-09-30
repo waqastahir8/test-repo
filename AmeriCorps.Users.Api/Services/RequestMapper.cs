@@ -1,6 +1,5 @@
-﻿using System.Data;
-using AmeriCorps.Users.Data.Core;
-using AmeriCorps.Users.Models;
+﻿using AmeriCorps.Users.Data.Core;
+using AmeriCorps.Users.Data.Core.Model;
 
 namespace AmeriCorps.Users.Api.Services;
 
@@ -42,11 +41,12 @@ public sealed class RequestMapper : IRequestMapper
         Suffix = requestModel.Suffix,
         Prefix = requestModel.Prefix,
         OrgCode = requestModel.OrgCode,
-        AccountStatus = requestModel.AccountStatus,
+        UserAccountStatus = (UserAccountStatus)requestModel.UserAccountStatus,
         EncryptedSocialSecurityNumber = requestModel.EncryptedSocialSecurityNumber,
         CountryOfBirth = requestModel.CountryOfBirth,
         CityOfBirth = requestModel.CityOfBirth,
         CitzenShipStatus = (Data.Core.Model.CitizenshipStatus)requestModel.CitzenShipStatus,
+        InviteUserId = requestModel.InviteUserId,
 
         Attributes = MapperUtils.MapList<AttributeRequestModel, AmeriCorps.Users.Data.Core.Attribute>(
             requestModel.Attributes,
@@ -204,7 +204,8 @@ public sealed class RequestMapper : IRequestMapper
         //Id = roleRequestModel.Id,
         RoleName = roleRequestModel.RoleName,
         FunctionalName = roleRequestModel.FunctionalName,
-        Description = roleRequestModel.Description
+        Description = roleRequestModel.Description,
+        RoleType = roleRequestModel.RoleType
     };
 
     public SavedSearch Map(SavedSearchRequestModel requestModel) => new()

@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace AmeriCorps.Users.Models;
+﻿namespace AmeriCorps.Users.Models;
 
 public class UserRequestModel
 {
@@ -36,5 +34,6 @@ public class UserRequestModel
     public string? StateOfBirth { get; set; } = string.Empty;
     public string? ResidentRegistrationNumber { get; set; } = string.Empty;
     public DateOnly? DocumentExpirationDate { get; set; }
-    public string AccountStatus { get; set; } = string.Empty;
+    public AccountStatusRequestModel UserAccountStatus { get; set; } 
+    public int InviteUserId { get; set; }
 }

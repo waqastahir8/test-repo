@@ -36,6 +36,8 @@ public sealed class User : Entity
     public string CityOfBirth { get; set; } = string.Empty;
     public string? ResidentRegistrationNumber { get; set; } = string.Empty;
     public DateOnly? DocumentExpirationDate { get; set; }
-    public string AccountStatus { get; set; } = string.Empty;
+    public UserAccountStatus UserAccountStatus { get; set; } 
+    public DateTime? InviteDate { get; set; }
+    public int InviteUserId { get; set; }
     public DateTime? UpdatedDate { get; set; }
 }

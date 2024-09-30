@@ -13,8 +13,9 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
     private Mock<IValidator>? _validatorMock;
     private Mock<IProjectRepository>? _projectRepository;
     private Mock<IRoleRepository>? _roleRepository;
-    private Mock<IApiService>? _apiService;
     private Mock<IAccessRepository>? _accessRepository;
+
+    private Mock<IUserHelperService>? _userHelperService;
 
     [Theory]
     [InlineData(5)]
@@ -1757,8 +1758,8 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         _validatorMock = new();
         _projectRepository = new();
         _roleRepository = new();
-        _apiService = new();
         _accessRepository = new();
+        _userHelperService = new();
 
         Fixture = new Fixture();
         Fixture.Customize<DateOnly>(x => x.FromFactory<DateTime>(DateOnly.FromDateTime));
@@ -1770,7 +1771,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             _repositoryMock.Object,
             _projectRepository.Object,
             _roleRepository.Object,
-            _apiService.Object,
-            _accessRepository.Object);
+            _accessRepository.Object,
+            _userHelperService.Object);
     }
 }
