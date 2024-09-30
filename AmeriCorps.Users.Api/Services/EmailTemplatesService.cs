@@ -4,9 +4,9 @@ public interface IEmailTemplates
 {
     string InviteUserTemplate();
 }
+
 public class EmailTemplates() : IEmailTemplates
 {
-
     public string InviteUserTemplate()
     {
         string htmlTemplate = @"
@@ -99,10 +99,7 @@ public class EmailTemplates() : IEmailTemplates
                         </div>
                     </body>
                     </html>";
-        
-        return htmlTemplate; 
+
+        return htmlTemplate;
     }
-
-    
 }
-

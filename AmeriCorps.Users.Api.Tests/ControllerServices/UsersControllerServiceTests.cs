@@ -1717,7 +1717,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         Assert.Equal(ResponseStatus.Successful, status);
     }
 
-    [Fact] 
+    [Fact]
     public async Task InviteUserAsync_Missing_Status()
     {
         // Arrange
@@ -1733,7 +1733,6 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         // Assert
         Assert.Equal(ResponseStatus.MissingInformation, status);
     }
-
 
     [Fact]
     public async Task InviteUserAsync_Unkown_Error()

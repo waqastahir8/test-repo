@@ -15,11 +15,11 @@ namespace AmeriCorps.Users.Api.Services
         [Function("InviteUserReminderJob")]
         public async Task<IActionResult> Run([TimerTrigger("0 1 0 * * *")] TimerInfo myTimer)
         {
-            _logger.LogInformation("C# Timer trigger function executed at: {TimeNow}",DateTime.Now);
+            _logger.LogInformation("C# Timer trigger function executed at: {TimeNow}", DateTime.Now);
 
             try
             {
-               await _userHelperService.ResendAllUserInvites();
+                await _userHelperService.ResendAllUserInvites();
             }
             catch (Exception ex)
             {

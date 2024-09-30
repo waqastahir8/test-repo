@@ -186,7 +186,6 @@ public sealed partial class UserRepository(
         UpdateEntities(user.Roles, context, userId);
         UpdateEntities(user.UserProjects, context, userId);
 
-        
         return user;
     }
 
@@ -218,19 +217,15 @@ public sealed partial class UserRepository(
 
     private Role? UpdateRole(Role role, RepositoryContext context)
 
-
     {
         var roleId = role.Id;
-
-
 
         return role;
     }
 
-
     public async Task<UserList> FetchUserListByOrgCodeAsync(string orgCode)
     {
-        List<User> users = await ExecuteAsync (async context =>
+        List<User> users = await ExecuteAsync(async context =>
                 await context.Users
                     .AsNoTracking()
                     .Include(u => u.Attributes)
@@ -247,18 +242,17 @@ public sealed partial class UserRepository(
                     .Include(u => u.UserProjects).ThenInclude(a => a.ProjectAccess)
                     .Where(x => x.OrgCode == orgCode).ToListAsync());
 
-
-        UserList? userList = new UserList(){
+        UserList? userList = new UserList()
+        {
             OrgCode = orgCode,
             Users = users
         };
 
-        return userList;      
+        return userList;
     }
 
     public async Task<List<User>> FetchInvitedUsersForReminder() =>
-        await ExecuteAsync(async context => await context.Users.Where(u =>u.AccountStatus == "INVITED").ToListAsync());
-
+        await ExecuteAsync(async context => await context.Users.Where(u => u.AccountStatus == "INVITED").ToListAsync());
 
     // ConstanstsService.Invited
     // public async Task<List<User> FetchInvitedUsersForReminder()
@@ -281,6 +275,4 @@ public sealed partial class UserRepository(
 
     //     // return users;
     // }
-
-
 }

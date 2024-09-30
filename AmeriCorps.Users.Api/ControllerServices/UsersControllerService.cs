@@ -925,7 +925,6 @@ public sealed class UsersControllerService : IUsersControllerService
         var user = _requestMapper.Map(toInvite);
         if (user != null)
         {
-
             user.AccountStatus = ConstanstsService.Invited;
 
             user.UpdatedDate = DateTime.UtcNow;
@@ -1024,19 +1023,24 @@ public sealed class UsersControllerService : IUsersControllerService
             {
                 case "PENDING":
                     var sent = await _userHelperService.ResendUserInvite(updatedUser);
-                    if(sent){
+                    if (sent)
+                    {
                         updatedUser.AccountStatus = ConstanstsService.Pending;
                     }
                     break;
+
                 case "INVITED":
                     updatedUser.AccountStatus = ConstanstsService.Invited;
                     break;
+
                 case "ACTIVE":
                     updatedUser.AccountStatus = ConstanstsService.Active;
                     break;
+
                 case "DEACTIVE":
                     updatedUser.AccountStatus = ConstanstsService.Deactive;
                     break;
+
                 default:
                     break;
             }

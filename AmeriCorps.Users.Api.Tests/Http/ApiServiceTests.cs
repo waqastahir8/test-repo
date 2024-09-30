@@ -9,9 +9,7 @@ namespace AmeriCorps.Users.Api.Tests;
 
 public sealed partial class ApiServiceTests : BaseTests<ApiService>
 {
-
     private Mock<INotificationApiClient>? _apiClientMock;
-
 
     [Fact]
     public async Task SendInviteEmailAsync_ApiCallThrowsException_UnsuccessfulResponse()
@@ -39,7 +37,6 @@ public sealed partial class ApiServiceTests : BaseTests<ApiService>
 
         var email = Fixture.Create<EmailModel>();
 
-        
         var successfulResponse =
             Fixture
                 .Build<ServiceResponse<UserResponse>>()
@@ -56,7 +53,6 @@ public sealed partial class ApiServiceTests : BaseTests<ApiService>
         // Assert
         Assert.True(actual.Item1);
     }
-
 
     protected override ApiService Setup()
     {

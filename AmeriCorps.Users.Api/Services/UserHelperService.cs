@@ -4,7 +4,6 @@ using AmeriCorps.Users.Models;
 
 namespace AmeriCorps.Users.Api.Services;
 
-
 public interface IUserHelperService
 {
     Task<bool> SendUserInvite(User toInvite);
@@ -38,10 +37,8 @@ public class UserHelperService : IUserHelperService
 
     public async Task<bool> SendUserInvite(User toInvite)
     {
-
-        if(toInvite != null)
+        if (toInvite != null)
         {
-
             EmailModel email = await FormatInviteEmail(toInvite);
 
             try
@@ -56,7 +53,8 @@ public class UserHelperService : IUserHelperService
 
             _logger.LogInformation("Reminder email sent for {Identifier}.", toInvite.UserName.ToString().Replace(Environment.NewLine, ""));
             return true;
-        }else
+        }
+        else
         {
             return false;
         }
@@ -67,10 +65,9 @@ public class UserHelperService : IUserHelperService
         var currentDate = DateTime.UtcNow;
         DateTime dateInvited = toInvite.InviteDate.GetValueOrDefault();
 
-        if(toInvite.Id.ToString() != null && toInvite.AccountStatus != null && toInvite.AccountStatus.Equals("invited", StringComparison.OrdinalIgnoreCase) 
+        if (toInvite.Id.ToString() != null && toInvite.AccountStatus != null && toInvite.AccountStatus.Equals("invited", StringComparison.OrdinalIgnoreCase)
             && dateInvited != DateTime.MinValue && DateTime.Compare(currentDate, dateInvited.AddDays(14)) > 0)
         {
-
             EmailModel email = await FormatInviteEmail(toInvite);
 
             try
@@ -85,7 +82,8 @@ public class UserHelperService : IUserHelperService
 
             _logger.LogInformation("Reminder email sent for {Identifier}.", toInvite.UserName.ToString().Replace(Environment.NewLine, ""));
             return true;
-        }else
+        }
+        else
         {
             return false;
         }
@@ -106,34 +104,34 @@ public class UserHelperService : IUserHelperService
 
         var errorCount = 0;
 
-        if(userList != null && userList.Count > 0){
+        if (userList != null && userList.Count > 0)
+        {
             for (int i = 0; i < userList.Count; i++)
             {
                 var success = await ResendUserInvite(userList[i]);
 
-                if(!success)
+                if (!success)
                 {
-                   errorCount++; 
+                    errorCount++;
                 }
             }
         }
         _logger.LogInformation("Reminder email unsuccessful for {Identifier} number of users.", errorCount.ToString().Replace(Environment.NewLine, ""));
     }
 
-
     public async Task<EmailModel> FormatInviteEmail(User toInvite)
     {
-        EmailModel email =  new EmailModel();
+        EmailModel email = new EmailModel();
 
         string htmlTemplate = _templates.InviteUserTemplate();
 
-        List<string> recipients =  new List<string>();
+        List<string> recipients = new List<string>();
 
-        if(toInvite.CommunicationMethods != null)
+        if (toInvite.CommunicationMethods != null)
         {
             for (int i = 0; i < toInvite.CommunicationMethods.Count; i++)
             {
-                if(toInvite.CommunicationMethods[i].Type == "email" && toInvite.CommunicationMethods[i].IsPreferred )
+                if (toInvite.CommunicationMethods[i].Type == "email" && toInvite.CommunicationMethods[i].IsPreferred)
                 {
                     recipients.Add(toInvite.CommunicationMethods[i].Value);
                 }
@@ -155,15 +153,13 @@ public class UserHelperService : IUserHelperService
             _logger.LogError(e, "Unable to find invitee for {Identifier}.", toInvite.UserName.ToString().Replace(Environment.NewLine, ""));
         }
 
-        if(inviterUser != null && !string.IsNullOrEmpty(inviterUser.FirstName) && !string.IsNullOrEmpty(inviterUser.LastName))
+        if (inviterUser != null && !string.IsNullOrEmpty(inviterUser.FirstName) && !string.IsNullOrEmpty(inviterUser.LastName))
         {
             inviter = "by " + inviterUser.FirstName + ' ' + inviterUser.LastName;
         }
 
-
         string link = "";
         string htmlContent = string.Format(htmlTemplate, inviteeFullName, inviter, link);
-
 
         email.Recipients = recipients;
         email.Subject = subject;
@@ -171,5 +167,4 @@ public class UserHelperService : IUserHelperService
 
         return email;
     }
-
 }

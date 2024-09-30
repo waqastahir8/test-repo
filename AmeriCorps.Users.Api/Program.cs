@@ -1,4 +1,3 @@
-
 using AmeriCorps.Users.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);

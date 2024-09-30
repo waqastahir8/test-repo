@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace AmeriCorps.Users.Models;
+﻿namespace AmeriCorps.Users.Models;
 
 public class UserRequestModel
 {

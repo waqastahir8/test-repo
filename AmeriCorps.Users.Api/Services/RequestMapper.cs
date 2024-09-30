@@ -1,6 +1,4 @@
-﻿using System.Data;
-using AmeriCorps.Users.Data.Core;
-using AmeriCorps.Users.Models;
+﻿using AmeriCorps.Users.Data.Core;
 
 namespace AmeriCorps.Users.Api.Services;
 
