@@ -37,4 +37,5 @@ public class UserRequestModel
     public string? ResidentRegistrationNumber { get; set; } = string.Empty;
     public DateOnly? DocumentExpirationDate { get; set; }
     public string AccountStatus { get; set; } = string.Empty;
+    public int InviteUserId { get; set; }
 }

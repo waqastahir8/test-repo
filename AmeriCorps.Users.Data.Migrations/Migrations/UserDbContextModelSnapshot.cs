@@ -763,6 +763,10 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("invite_date");
 
+                    b.Property<int>("InviteUserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("invite_user_id");
+
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("text")

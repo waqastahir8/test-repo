@@ -47,6 +47,7 @@ public sealed class RequestMapper : IRequestMapper
         CountryOfBirth = requestModel.CountryOfBirth,
         CityOfBirth = requestModel.CityOfBirth,
         CitzenShipStatus = (Data.Core.Model.CitizenshipStatus)requestModel.CitzenShipStatus,
+        InviteUserId = requestModel.InviteUserId,
 
         Attributes = MapperUtils.MapList<AttributeRequestModel, AmeriCorps.Users.Data.Core.Attribute>(
             requestModel.Attributes,

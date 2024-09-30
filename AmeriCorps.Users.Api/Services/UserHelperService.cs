@@ -68,7 +68,7 @@ public class UserHelperService : IUserHelperService
         DateTime dateInvited = toInvite.InviteDate.GetValueOrDefault();
 
         if(toInvite.Id.ToString() != null && toInvite.AccountStatus != null && toInvite.AccountStatus.Equals("invited", StringComparison.OrdinalIgnoreCase) 
-            && dateInvited != DateTime.MinValue && DateTime.Compare(currentDate, dateInvited.AddDays(14)) < 0)
+            && dateInvited != DateTime.MinValue && DateTime.Compare(currentDate, dateInvited.AddDays(14)) > 0)
         {
 
             EmailModel email = await FormatInviteEmail(toInvite);
@@ -144,12 +144,11 @@ public class UserHelperService : IUserHelperService
         string inviteeFullName = toInvite.FirstName + ' ' + toInvite.LastName;
         string inviter = "";
 
-        int x = Int32.Parse(toInvite.UserName.Substring(toInvite.UserName.LastIndexOf('=')+1));
         User? inviterUser = new User();
 
         try
         {
-            inviterUser = await _repository.GetAsync(x);
+            inviterUser = await _repository.GetAsync(toInvite.InviteUserId);
         }
         catch (Exception e)
         {

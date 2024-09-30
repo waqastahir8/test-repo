@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AmeriCorps.Users.Data.Migrations.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20240924194845_InvitedDate")]
+    [Migration("20240930140717_InvitedDate")]
     partial class InvitedDate
     {
         /// <inheritdoc />
@@ -765,6 +765,10 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                     b.Property<DateTime?>("InviteDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("invite_date");
+
+                    b.Property<int>("InviteUserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("invite_user_id");
 
                     b.Property<string>("LastName")
                         .IsRequired()

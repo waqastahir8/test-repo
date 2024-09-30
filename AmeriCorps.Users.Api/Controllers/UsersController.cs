@@ -113,7 +113,7 @@ public sealed class UsersController(IUsersControllerService service) : Controlle
         await ServeAsync(async () => await _service.UpdateUserProjectAndRoleDataAsync(toUpdate));
 
     //Invite user to org
-    [HttpPost("org/users/invite/{inviterId}")]
-    public async Task<IActionResult> InviteUserAsync(int inviterId, [FromBody] UserRequestModel toInvite) =>
-        await ServeAsync(async () => await _service.InviteUserAsync(inviterId, toInvite));
+    [HttpPost("org/users/invite")]
+    public async Task<IActionResult> InviteUserAsync([FromBody] UserRequestModel toInvite) =>
+        await ServeAsync(async () => await _service.InviteUserAsync(toInvite));
 }

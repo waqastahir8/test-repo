@@ -46,7 +46,7 @@ public interface IUsersControllerService
 
     Task<(ResponseStatus Status, UserResponse? Response)> UpdateUserProjectAndRoleDataAsync(UserProjectRoleUpdateRequestModel toUpdate);
 
-    Task<(ResponseStatus Status, UserResponse? Response)> InviteUserAsync(int inviterId, UserRequestModel toInvite);
+    Task<(ResponseStatus Status, UserResponse? Response)> InviteUserAsync(UserRequestModel toInvite);
 }
 
 public sealed class UsersControllerService : IUsersControllerService
@@ -915,7 +915,7 @@ public sealed class UsersControllerService : IUsersControllerService
         return (ResponseStatus.Successful, response);
     }
 
-    public async Task<(ResponseStatus Status, UserResponse? Response)> InviteUserAsync(int inviterId, UserRequestModel toInvite)
+    public async Task<(ResponseStatus Status, UserResponse? Response)> InviteUserAsync(UserRequestModel toInvite)
     {
         if (toInvite == null || String.IsNullOrEmpty(toInvite.Email))
         {
@@ -925,7 +925,6 @@ public sealed class UsersControllerService : IUsersControllerService
         var user = _requestMapper.Map(toInvite);
         if (user != null)
         {
-            user.UserName = "InviteHold="+inviterId;
 
             user.AccountStatus = ConstanstsService.Invited;
 

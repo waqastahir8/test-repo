@@ -6,7 +6,8 @@
             <Exclude>
             [AmeriCorps.Users.Api]*Program,
             [AmeriCorps.Users.Data]*Repository,
-            [AmeriCorps.Users.Data.Core]*NpgsqlContext
+            [AmeriCorps.Users.Data.Core]*NpgsqlContext,
+            [AmeriCorps.Users.Api.Services]*EmailTemplatesService
             </Exclude>
           </Configuration>
       </DataCollector>

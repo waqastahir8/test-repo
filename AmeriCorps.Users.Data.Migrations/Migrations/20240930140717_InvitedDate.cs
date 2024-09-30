@@ -17,6 +17,14 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                 table: "user",
                 type: "timestamp with time zone",
                 nullable: true);
+
+            migrationBuilder.AddColumn<int>(
+                name: "invite_user_id",
+                schema: "users",
+                table: "user",
+                type: "integer",
+                nullable: false,
+                defaultValue: 0);
         }
 
         /// <inheritdoc />
@@ -24,6 +32,11 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
         {
             migrationBuilder.DropColumn(
                 name: "invite_date",
+                schema: "users",
+                table: "user");
+
+            migrationBuilder.DropColumn(
+                name: "invite_user_id",
                 schema: "users",
                 table: "user");
         }

@@ -38,5 +38,6 @@ public sealed class User : Entity
     public DateOnly? DocumentExpirationDate { get; set; }
     public string AccountStatus { get; set; } = string.Empty;
     public DateTime? InviteDate { get; set; }
+    public int InviteUserId { get; set; }
     public DateTime? UpdatedDate { get; set; }
 }
