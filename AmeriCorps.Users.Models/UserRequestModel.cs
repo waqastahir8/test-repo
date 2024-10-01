@@ -36,4 +36,5 @@ public class UserRequestModel
     public DateOnly? DocumentExpirationDate { get; set; }
     public AccountStatusRequestModel UserAccountStatus { get; set; } 
     public int InviteUserId { get; set; }
+    public DateTime? InviteDate { get; set; }
 }
