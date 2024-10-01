@@ -1,8 +1,8 @@
-using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 
 namespace AmeriCorps.Users.Data.Core;
 
+[Index(nameof(AccessName))]
 public sealed class Access : Entity
 {
     public string AccessName { get; set; }  = string.Empty;

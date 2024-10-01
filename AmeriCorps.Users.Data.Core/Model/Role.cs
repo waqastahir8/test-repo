@@ -1,6 +1,8 @@
-﻿﻿namespace AmeriCorps.Users.Data.Core;
+﻿﻿using Microsoft.EntityFrameworkCore;
 
+namespace AmeriCorps.Users.Data.Core;
 
+[Index(nameof(RoleName))]
 public sealed class Role : Entity
 {
     /**
