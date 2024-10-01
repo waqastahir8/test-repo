@@ -1,7 +1,9 @@
 ﻿using AmeriCorps.Users.Data.Core.Model;
+using Microsoft.EntityFrameworkCore;
 
 namespace AmeriCorps.Users.Data.Core;
 
+[Index(nameof(OrgCode), nameof(UserAccountStatus))]
 public sealed class User : Entity
 {
     public bool Searchable { get; set; }
