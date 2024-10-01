@@ -147,6 +147,7 @@ public sealed class ResponseMapper : IResponseMapper
         CityOfBirth = user.CityOfBirth,
         UserAccountStatus = (AccountStatusRequestModel)user.UserAccountStatus,
         InviteUserId = user.InviteUserId,
+        InviteDate = user.InviteDate,
         Attributes = MapperUtils.MapList<AmeriCorps.Users.Data.Core.Attribute, AttributeRequestModel>(
                         user.Attributes,
                         a => new AttributeRequestModel
@@ -423,6 +424,7 @@ public sealed class ResponseMapper : IResponseMapper
                 CityOfBirth = user.CityOfBirth,
                 UserAccountStatus = (AccountStatusRequestModel)user.UserAccountStatus,
                 InviteUserId = user.InviteUserId,
+                InviteDate = user.InviteDate,
                 Attributes = MapperUtils.MapList<AmeriCorps.Users.Data.Core.Attribute, AttributeRequestModel>(
                                 user.Attributes,
                                 a => new AttributeRequestModel
