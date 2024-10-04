@@ -175,14 +175,6 @@ public sealed partial class UserHelperServiceTests : BaseTests<UserHelperService
             .With(o => o.CommunicationMethods, userEmail)
             .Create();
 
-        // _repositoryMock!
-        //     .Setup(x => x.SaveAsync(userId))
-        //     .ReturnsAsync(() => Fixture.Build<User>()
-        //     .With(o => o.InviteDate, dateInvited)
-        //     .With(o => o.UserAccountStatus, UserAccountStatus.INVITED)
-        //     .With(o => o.CommunicationMethods, userEmail)
-        //     .Create());
-
         _repositoryMock!
             .Setup(x => x.SaveAsync(user))
             .ReturnsAsync(user);
