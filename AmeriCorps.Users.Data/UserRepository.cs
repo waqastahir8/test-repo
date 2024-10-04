@@ -252,7 +252,13 @@ public sealed partial class UserRepository(
         return userList;
     }
 
-    public async Task<List<User>> FetchInvitedUsersForReminder() =>
-        await ExecuteAsync(async context => await context.Users.Where(u => u.UserAccountStatus == UserAccountStatus.INVITED).ToListAsync());
+    public async Task<List<User>> FetchInvitedUsersForReminder(){
+
+        var inviteCheckDate = DateTime.UtcNow.AddDays(-14);
+
+        return await ExecuteAsync(async context => await context.Users
+            .Where(u => u.UserAccountStatus == UserAccountStatus.INVITED
+                && DateTime.Compare(u.InviteDate ?? DateTime.MaxValue, inviteCheckDate) <= 0).ToListAsync());
+    }
 
 }
