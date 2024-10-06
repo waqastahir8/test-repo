@@ -5,7 +5,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace AmeriCorps.Users.Api.Services;
+namespace AmeriCorps.Users.Api.Scheduler;
 
     public class InviteUserReminderJob(IUserHelperService service, ILogger<InviteUserReminderJob> logger)
     {
@@ -23,7 +23,7 @@ namespace AmeriCorps.Users.Api.Services;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Failed to run a auto reminder job");
+                _logger.LogError(ex, $"Failed to run User Invite reminder notification job");
                 return new StatusCodeResult(500);
             }
 

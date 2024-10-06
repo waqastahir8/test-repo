@@ -7,7 +7,9 @@
             [AmeriCorps.Users.Api]*Program,
             [AmeriCorps.Users.Data]*Repository,
             [AmeriCorps.Users.Data.Core]*NpgsqlContext,
-            [AmeriCorps.Users.Api.Services]*EmailTemplatesService
+            [AmeriCorps.Users.Api]*.Configuration.*,
+            [AmeriCorps.Users.Api]*.Http.*,
+            [AmeriCorps.Users.Api]*.Scheduler.*
             </Exclude>
           </Configuration>
       </DataCollector>

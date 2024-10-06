@@ -23,4 +23,5 @@ public sealed class NotificationApiClient(
         var response = await PostAsync<UserResponse>(uri, email);
         return response;
     }
+
 }

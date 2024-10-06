@@ -1,11 +1,11 @@
 ﻿namespace AmeriCorps.Users.Api.Services;
 
-public interface IEmailTemplates
+public interface IEmailTemplatesService
 {
     string InviteUserTemplate();
 }
 
-public class EmailTemplates() : IEmailTemplates
+public class EmailTemplatesService() : IEmailTemplatesService
 {
     public string InviteUserTemplate()
     {
