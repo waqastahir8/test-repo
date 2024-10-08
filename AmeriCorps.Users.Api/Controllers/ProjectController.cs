@@ -23,6 +23,22 @@ public sealed class ProjectController(IProjectControllerService service) : Contr
     public async Task<IActionResult> GetProjectListByOrgAsync(string orgCode) =>
         await ServeAsync(async () => await _service.GetProjectListByOrgAsync(orgCode));
 
+    [HttpPost("update")]
+    public async Task<IActionResult> UpdateProjectAsync([FromBody] ProjectRequestModel projRequest) =>
+        await ServeAsync(async () => await _service.UpdateProjectAsync(projRequest));
+
+    [HttpPost("op-site/update")]
+    public async Task<IActionResult> UpdateOperatingSiteAsync([FromBody] OperatingSiteRequestModel opSiteRequest) =>
+        await ServeAsync(async () => await _service.UpdateOperatingSiteAsync(opSiteRequest));
+
+    [HttpPost("op-site/invite")]
+    public async Task<IActionResult> InviteOperatingSiteAsync([FromBody] OperatingSiteRequestModel opSiteRequest) =>
+        await ServeAsync(async () => await _service.InviteOperatingSiteAsync(opSiteRequest));        
+
+    // [HttpGet("sites/list/{projectCode}")]
+    // public async Task<IActionResult> GetOperatingSitesByProjectCodeAsync() =>
+    //     await ServeAsync(async () => await _service.GetOperatingSitesByProjectCodeAsync());
+
     private async Task<IActionResult> ServeAsync<T>(Func<Task<(ResponseStatus, T)>> callAsync)
     {
         var (status, response) = await callAsync();

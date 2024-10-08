@@ -36,6 +36,10 @@ public interface IResponseMapper
     List<OrganizationResponse> Map(List<Organization> orgList);
 
     List<ProjectResponse> Map(List<Project> projList);
+
+    List<OperatingSiteRequestModel> Map(List<OperatingSite> operatingSiteList);
+
+    OperatingSiteResponse? Map(OperatingSite? operatingSite);
 }
 
 public sealed class ResponseMapper : IResponseMapper
@@ -370,7 +374,8 @@ public sealed class ResponseMapper : IResponseMapper
                                ProjectCode = p.ProjectCode,
                                ProjectType = p.ProjectType,
                                ProjectOrg = p.ProjectOrg,
-                               Description = p.Description
+                               Description = p.Description,
+                               OperatingSites = Map(p.OperatingSites)
                            });
 
     public OrganizationResponse? Map(Organization? organization) => organization == null ? null : new()
@@ -388,8 +393,50 @@ public sealed class ResponseMapper : IResponseMapper
         ProjectCode = project.ProjectCode,
         ProjectType = project.ProjectType,
         ProjectOrg = project.ProjectOrg,
-        Description = project.Description
+        Description = project.Description,
+        OperatingSites = Map(project.OperatingSites)
     };
+
+    public OperatingSiteResponse? Map(OperatingSite? operatingSite) => operatingSite == null ? null : new()
+    {
+        Id = operatingSite.Id,
+        ProgramYear = operatingSite.ProgramYear,
+        Active = operatingSite.Active,
+        OperatingSiteName = operatingSite.OperatingSiteName,
+        ContactName = operatingSite.ContactName,
+        EmailAddress = operatingSite.EmailAddress,
+        PhoneNumber = operatingSite.PhoneNumber,
+        StreetAddress = operatingSite.StreetAddress,
+        StreetAddress2 = operatingSite.StreetAddress2,
+        City = operatingSite.City,
+        State = operatingSite.State,
+        ZipCode = operatingSite.ZipCode,
+        Plus4 = operatingSite.Plus4,
+        InviteUserId = operatingSite.InviteUserId,
+        InviteDate = operatingSite.InviteDate
+    };
+
+    public List<OperatingSiteRequestModel> Map(List<OperatingSite> operatingSiteList) =>
+       MapperUtils.MapList<OperatingSite, OperatingSiteRequestModel>(
+                           operatingSiteList,
+                           o => new OperatingSiteRequestModel
+                           {
+                                Id = o.Id,
+                                ProgramYear = o.ProgramYear,
+                                Active = o.Active,
+                                OperatingSiteName = o.OperatingSiteName,
+                                ContactName = o.ContactName,
+                                EmailAddress = o.EmailAddress,
+                                PhoneNumber = o.PhoneNumber,
+                                StreetAddress = o.StreetAddress,
+                                StreetAddress2 = o.StreetAddress2,
+                                City = o.City,
+                                State = o.State,
+                                ZipCode = o.ZipCode,
+                                Plus4 = o.Plus4,
+                                InviteUserId = o.InviteUserId,
+                                InviteDate = o.InviteDate
+                           });
 
     public AccessResponse? Map(Access? access) => access == null ? null : new()
     {

@@ -11,6 +11,7 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
     private Mock<IProjectRepository>? _repositoryMock;
     private Mock<IRequestMapper>? _requestMapperMock;
     private Mock<IResponseMapper>? _responseMapperMock;
+    private Mock<IUserHelperService>? _userHelperService;
 
 
     [Theory]
@@ -175,6 +176,7 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
         _repositoryMock = new();
         _requestMapperMock = new();
         _responseMapperMock = new();
+        _userHelperService = new();
 
         Fixture = new Fixture();
         Fixture.Customize<DateOnly>(x => x.FromFactory<DateTime>(DateOnly.FromDateTime));
@@ -182,7 +184,8 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
             Mock.Of<ILogger<ProjectControllerService>>(),
             _requestMapperMock.Object,
             _responseMapperMock.Object,
-            _repositoryMock.Object);
+            _repositoryMock.Object,
+            _userHelperService.Object);
     }
 
 }

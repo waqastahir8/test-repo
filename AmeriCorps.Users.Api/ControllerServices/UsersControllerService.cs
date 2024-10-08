@@ -958,11 +958,26 @@ public sealed class UsersControllerService : IUsersControllerService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Unable to save reference for user {Identifier}.", toInvite.UserName.ToString().Replace(Environment.NewLine, ""));
+            _logger.LogError(e, "Unable to save for user {Identifier} for invite.", toInvite.UserName.ToString().Replace(Environment.NewLine, ""));
             return (ResponseStatus.UnknownError, null);
         }
 
-        await _userHelperService.SendUserInviteAsync(user);
+        var success = false;
+
+        try
+        {
+            success = await _userHelperService.SendUserInviteAsync(user);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Unable to send invite for user {Identifier}.", toInvite.UserName.ToString().Replace(Environment.NewLine, ""));
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        if(!success){
+            _logger.LogInformation("Invite email not sent for {Identifier}.", toInvite.UserName.ToString().Replace(Environment.NewLine, ""));
+            return (ResponseStatus.MissingInformation, null);
+        }
 
         var response = _responseMapper.Map(user);
 

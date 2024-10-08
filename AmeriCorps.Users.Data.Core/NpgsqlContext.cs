@@ -23,6 +23,8 @@ public abstract class NpgsqlContext : ContextBase
     public DbSet<UserProject> UserProjects { get; set; }
 
     public DbSet<Access> Access { get; set; }
+    public DbSet<OperatingSite> OperatingSites { get; set; }
+
     public static string Schema => "users";
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -69,6 +71,8 @@ public abstract class NpgsqlContext : ContextBase
         var access = Create<Access>("access");
 
         var collection = Create<Collection>("collection");
+
+        var operatingSite = Create<OperatingSite>("operatingSite");
 
 
         EntityTypeBuilder<T> Create<T>(string tableName) where T : Entity

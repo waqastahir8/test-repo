@@ -13,4 +13,6 @@ public class ProjectRequestModel
 
     public string Description { get; set; } = string.Empty;
 
+    public List<OperatingSiteRequestModel> OperatingSites { get; set; } = new List<OperatingSiteRequestModel>();
+
 }

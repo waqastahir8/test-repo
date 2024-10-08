@@ -24,6 +24,8 @@ public interface IRequestMapper
     UserRole Map(Role role);
 
     Access Map(AccessRequestModel requestModel);
+
+    OperatingSite Map(OperatingSiteRequestModel operatingSite);
 }
 
 public sealed class RequestMapper : IRequestMapper
@@ -270,7 +272,8 @@ public sealed class RequestMapper : IRequestMapper
         ProjectCode = requestModel.ProjectCode,
         ProjectType = requestModel.ProjectType,
         ProjectOrg = requestModel.ProjectOrg,
-        Description = requestModel.Description
+        Description = requestModel.Description,
+        OperatingSites = Map(requestModel.OperatingSites)
     };
 
     public Access Map(AccessRequestModel requestModel) => new()
@@ -304,4 +307,50 @@ public sealed class RequestMapper : IRequestMapper
                                AccessName = a.AccessName,
                                AccessLevel = a.AccessLevel
                            });
+
+    
+    public OperatingSite Map(OperatingSiteRequestModel operatingSite) => new()
+    {
+        // ProjectCode = operatingSite.ProjectCode,
+        Id = operatingSite.Id,
+        // ProjectId = operatingSite.ProjectId,
+        ProgramYear = operatingSite.ProgramYear,
+        Active = operatingSite.Active,
+        OperatingSiteName = operatingSite.OperatingSiteName,
+        ContactName = operatingSite.ContactName,
+        EmailAddress = operatingSite.EmailAddress,
+        PhoneNumber = operatingSite.PhoneNumber,
+        StreetAddress = operatingSite.StreetAddress,
+        StreetAddress2 = operatingSite.StreetAddress2,
+        City = operatingSite.City,
+        State = operatingSite.State,
+        ZipCode = operatingSite.ZipCode,
+        Plus4 = operatingSite.Plus4,
+        InviteUserId = operatingSite.InviteUserId,
+        InviteDate = operatingSite.InviteDate
+    };
+
+    public List<OperatingSite> Map(List<OperatingSiteRequestModel> operatingSite) =>
+       MapperUtils.MapList<OperatingSiteRequestModel, OperatingSite>(
+                           operatingSite,
+                           o => new OperatingSite
+                           {
+                                // ProjectCode = o.ProjectCode,
+                                Id = o.Id,
+                                ProgramYear = o.ProgramYear,
+                                Active = o.Active,
+                                OperatingSiteName = o.OperatingSiteName,
+                                ContactName = o.ContactName,
+                                EmailAddress = o.EmailAddress,
+                                PhoneNumber = o.PhoneNumber,
+                                StreetAddress = o.StreetAddress,
+                                StreetAddress2 = o.StreetAddress2,
+                                City = o.City,
+                                State = o.State,
+                                ZipCode = o.ZipCode,
+                                Plus4 = o.Plus4,
+                                InviteUserId = o.InviteUserId,
+                                InviteDate = o.InviteDate
+                           });
+
 }

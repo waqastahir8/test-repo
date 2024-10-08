@@ -9,6 +9,12 @@ public interface IProjectControllerService
     Task<(ResponseStatus Status, List<ProjectResponse>? Response)> GetProjectListByOrgAsync(string orgCode);
 
     Task<(ResponseStatus Status, ProjectResponse? Response)> CreateProjectAsync(ProjectRequestModel? projRequest);
+
+    Task<(ResponseStatus Status, ProjectResponse? Response)> UpdateProjectAsync(ProjectRequestModel? projRequest);
+
+    Task<(ResponseStatus Status, OperatingSiteResponse? Response)> UpdateOperatingSiteAsync(OperatingSiteRequestModel opSiteRequest);
+
+    Task<(ResponseStatus Status, OperatingSiteResponse? Response)> InviteOperatingSiteAsync(OperatingSiteRequestModel toInvite);
 }
 
 public sealed class ProjectControllerService : IProjectControllerService
@@ -17,17 +23,20 @@ public sealed class ProjectControllerService : IProjectControllerService
     private readonly IResponseMapper _responseMapper;
     private readonly IRequestMapper _requestMapper;
     private readonly IProjectRepository _repository;
+    private readonly IUserHelperService _userHelperService;
 
     public ProjectControllerService(
     ILogger<ProjectControllerService> logger,
     IRequestMapper requestMapper,
     IResponseMapper responseMapper,
-    IProjectRepository repository)
+    IProjectRepository repository,
+    IUserHelperService userHelperService)
     {
         _logger = logger;
         _requestMapper = requestMapper;
         _responseMapper = responseMapper;
         _repository = repository;
+        _userHelperService = userHelperService;
     }
 
     public async Task<(ResponseStatus Status, ProjectResponse? Response)> GetProjectByCodeAsync(string projCode)
@@ -104,5 +113,138 @@ public sealed class ProjectControllerService : IProjectControllerService
         var response = _responseMapper.Map(project);
 
         return (ResponseStatus.Successful, response);
+    }
+
+
+    public async Task<(ResponseStatus Status, ProjectResponse? Response)> UpdateProjectAsync(ProjectRequestModel? projRequest)
+    {
+        if (projRequest == null)
+        {
+            return (ResponseStatus.MissingInformation, null);
+        }
+
+        Project? updatedProject = _requestMapper.Map(projRequest);
+
+        try
+        {
+            var foundProj = await _repository.GetProjectByCodeAsync(projRequest.ProjectCode);
+            if (foundProj != null)
+            {
+                updatedProject.Id = foundProj.Id;
+                await _repository.UpdateProjectAsync(updatedProject);
+            }
+            else
+            {
+                _logger.LogInformation("No project named {Identifier} found to updated", projRequest.ProjectName.ToString().Replace(Environment.NewLine, ""));
+                return (ResponseStatus.MissingInformation, null);
+            }
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error to updating project {Identifier}.", projRequest.ProjectName.ToString().Replace(Environment.NewLine, ""));
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        var response = _responseMapper.Map(updatedProject);
+
+        return (ResponseStatus.Successful, response);
+    }
+
+
+    public async Task<(ResponseStatus Status, OperatingSiteResponse? Response)> UpdateOperatingSiteAsync(OperatingSiteRequestModel opSiteRequest)
+    {
+        if (opSiteRequest == null)
+        {
+            return (ResponseStatus.MissingInformation, null);
+        }
+
+        OperatingSite updatedSite = _requestMapper.Map(opSiteRequest);
+
+        try
+        {
+            var foundSite = await _repository.GetOperatingSiteByIdAsync(opSiteRequest.Id);
+            if (foundSite != null)
+            {
+                updatedSite.Id = foundSite.Id;
+                await _repository.SaveAsync(updatedSite);
+            }
+            else if(!string.IsNullOrEmpty(opSiteRequest.ProjectCode))
+            {
+                var foundProj = await _repository.GetProjectByCodeAsync(opSiteRequest.ProjectCode);
+
+                if(foundProj != null)
+                {
+                    foundProj.OperatingSites.Add(updatedSite);
+                    await _repository.UpdateProjectAsync(foundProj);
+                }
+            }
+            else
+            {
+                _logger.LogInformation("No Operating Site or Project found to update operating sitenamed {Identifier}.", opSiteRequest.OperatingSiteName.ToString().Replace(Environment.NewLine, ""));
+                return (ResponseStatus.MissingInformation, null);
+            }
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error to updating Operating Site {Identifier}.", opSiteRequest.OperatingSiteName.ToString().Replace(Environment.NewLine, ""));
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        var response = _responseMapper.Map(updatedSite);
+
+        return (ResponseStatus.Successful, response);
+    }
+
+    public async Task<(ResponseStatus Status, OperatingSiteResponse? Response)> InviteOperatingSiteAsync(OperatingSiteRequestModel toInvite)
+    {
+        if (toInvite == null)
+        {
+            return (ResponseStatus.MissingInformation, null);
+        }
+
+        OperatingSite operatingSite = _requestMapper.Map(toInvite);
+
+        if(operatingSite != null){
+
+            operatingSite.UpdatedDate = DateTime.UtcNow;
+
+            operatingSite.InviteDate = DateTime.UtcNow;
+        }        
+        else
+        {
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        try
+        {
+            await _repository.SaveAsync(operatingSite);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error saving new Operating Site {Identifier}.", toInvite.OperatingSiteName.ToString().Replace(Environment.NewLine, ""));
+            return (ResponseStatus.UnknownError, null);
+        }
+
+
+        var success = false;
+        try
+        {
+            success = await _userHelperService.SendOperatingSiteInviteAsync(operatingSite);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Unable to send invite for Operating Site {Identifier}.", toInvite.OperatingSiteName.ToString().Replace(Environment.NewLine, ""));
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        if(!success){
+            _logger.LogInformation("Invite email not sent for Operating Site {Identifier}.", toInvite.OperatingSiteName.ToString().Replace(Environment.NewLine, ""));
+            return (ResponseStatus.MissingInformation, null);
+        }
+
+        var response = _responseMapper.Map(operatingSite);
+
+        return (ResponseStatus.Successful, response);
+
     }
 }

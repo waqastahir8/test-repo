@@ -11,5 +11,6 @@ public sealed class Project : Entity
     public string ProjectCode { get; set; } = string.Empty;
     public string ProjectType { get; set; } = string.Empty;
     public string ProjectOrg { get; set; } = string.Empty;
-    public string Description { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty; 
+    public List<OperatingSite> OperatingSites { get; set; } = new List<OperatingSite>();
 }

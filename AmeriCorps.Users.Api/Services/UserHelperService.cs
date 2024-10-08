@@ -12,6 +12,8 @@ public interface IUserHelperService
     Task<bool> ResendUserInviteAsync(User toInvite);
 
     Task ResendAllUserInvitesAsync();
+
+    Task<bool> SendOperatingSiteInviteAsync(OperatingSite toInvite);
 }
 
 public class UserHelperService : IUserHelperService
@@ -40,7 +42,7 @@ public class UserHelperService : IUserHelperService
     {
         if (toInvite != null)
         {
-            EmailModel email = await FormatInviteEmail(toInvite);
+            EmailModel email = await FormatUserInviteEmail(toInvite);
 
             try
             {
@@ -52,7 +54,7 @@ public class UserHelperService : IUserHelperService
                 return false;
             }
 
-            _logger.LogInformation("Reminder email sent for {Identifier}.", toInvite.UserName.ToString().Replace(Environment.NewLine, ""));
+            _logger.LogInformation("Invite email sent for {Identifier}.", toInvite.UserName.ToString().Replace(Environment.NewLine, ""));
             return true;
         }
         else
@@ -69,7 +71,7 @@ public class UserHelperService : IUserHelperService
         if (toInvite.Id.ToString() != null && toInvite.UserAccountStatus == UserAccountStatus.INVITED
             && dateInvited != DateTime.MinValue && DateTime.Compare(currentDate, dateInvited.AddDays(14)) > 0)
         {
-            EmailModel email = await FormatInviteEmail(toInvite);
+            EmailModel email = await FormatUserInviteEmail(toInvite);
 
             try
             {
@@ -120,7 +122,34 @@ public class UserHelperService : IUserHelperService
         _logger.LogInformation("Reminder email unsuccessful for {Identifier} number of users.", errorCount.ToString().Replace(Environment.NewLine, ""));
     }
 
-    public async Task<EmailModel> FormatInviteEmail(User toInvite)
+    public async Task<bool> SendOperatingSiteInviteAsync(OperatingSite toInvite)
+    {
+        if (toInvite != null)
+        {
+            EmailModel email = await FormatOperatingSiteInviteEmail(toInvite);
+
+            try
+            {
+                await _apiService.SendInviteEmailAsync(email);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Unable to send invite email for Operating Site {Identifier}.", toInvite.OperatingSiteName.ToString().Replace(Environment.NewLine, ""));
+                return false;
+            }
+
+            _logger.LogInformation("Invite email sent for {Identifier}.", toInvite.OperatingSiteName.ToString().Replace(Environment.NewLine, ""));
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+
+
+    private async Task<EmailModel> FormatUserInviteEmail(User toInvite)
     {
         EmailModel email = new EmailModel();
 
@@ -161,6 +190,49 @@ public class UserHelperService : IUserHelperService
 
         string link = "";
         string htmlContent = string.Format(htmlTemplate, inviteeFullName, inviter, link);
+
+        email.Recipients = recipients;
+        email.Subject = subject;
+        email.Content = htmlContent;
+
+        return email;
+    }
+
+    private async Task<EmailModel> FormatOperatingSiteInviteEmail(OperatingSite toInvite)
+    {
+        EmailModel email = new EmailModel();
+
+        string htmlTemplate = _templates.InviteUserTemplate();
+
+        List<string> recipients = new List<string>();
+
+        if (!string.IsNullOrEmpty(toInvite.EmailAddress))
+        {
+            recipients.Add(toInvite.EmailAddress);
+        }
+ 
+        string subject = "You're Invited";
+        string opSiteName = !string.IsNullOrEmpty(toInvite.OperatingSiteName) ? toInvite.OperatingSiteName : "";
+        string inviter = "";
+
+        User? inviterUser = new User();
+
+        try
+        {
+            inviterUser = await _repository.GetAsync(toInvite.InviteUserId);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Unable to find invitee for {Identifier}.", toInvite.OperatingSiteName.ToString().Replace(Environment.NewLine, ""));
+        }
+
+        if (inviterUser != null && !string.IsNullOrEmpty(inviterUser.FirstName) && !string.IsNullOrEmpty(inviterUser.LastName))
+        {
+            inviter = "by " + inviterUser.FirstName + ' ' + inviterUser.LastName;
+        }
+
+        string link = "";
+        string htmlContent = string.Format(htmlTemplate, opSiteName, inviter, link);
 
         email.Recipients = recipients;
         email.Subject = subject;
