@@ -11,8 +11,8 @@ public interface IUserHelperService
 
     Task<bool> ResendUserInviteAsync(User toInvite);
 
-    Task ResendAllUserInvitesAsync();
-
+    Task<bool> ResendAllUserInvitesAsync();
+    
     Task<bool> SendOperatingSiteInviteAsync(OperatingSite toInvite);
 }
 
@@ -22,15 +22,15 @@ public class UserHelperService : IUserHelperService
 
     private readonly IUserRepository _repository;
 
-    private readonly IApiService _apiService;
+    private readonly INotificationApiClient _apiService;
 
-    private readonly IEmailTemplates _templates;
+    private readonly IEmailTemplatesService _templates;
 
     public UserHelperService(
         ILogger<UserHelperService> logger,
         IUserRepository repository,
-        IApiService apiService,
-        IEmailTemplates templates)
+        INotificationApiClient apiService,
+        IEmailTemplatesService templates)
     {
         _logger = logger;
         _repository = repository;
@@ -40,7 +40,7 @@ public class UserHelperService : IUserHelperService
 
     public async Task<bool> SendUserInviteAsync(User toInvite)
     {
-        if (toInvite != null)
+        if (toInvite != null && (toInvite.CommunicationMethods != null && toInvite.CommunicationMethods.Count > 0) && (!string.IsNullOrEmpty(toInvite.FirstName) && !string.IsNullOrEmpty(toInvite.LastName)))
         {
             EmailModel email = await FormatUserInviteEmail(toInvite);
 
@@ -50,15 +50,20 @@ public class UserHelperService : IUserHelperService
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Unable to send invite email for {Identifier}.", toInvite.UserName.ToString().Replace(Environment.NewLine, ""));
+                _logger.LogError(e, "Unable to send invite email for {Identifier}.", toInvite.Id.ToString().Replace(Environment.NewLine, ""));
                 return false;
             }
 
+<<<<<<< HEAD
             _logger.LogInformation("Invite email sent for {Identifier}.", toInvite.UserName.ToString().Replace(Environment.NewLine, ""));
+=======
+            _logger.LogInformation("Reminder email sent for {Identifier}.", toInvite.Id.ToString().Replace(Environment.NewLine, ""));
+>>>>>>> upstream/dev
             return true;
         }
         else
         {
+            _logger.LogError("Unable to send invite email, null invitee");
             return false;
         }
     }
@@ -66,9 +71,9 @@ public class UserHelperService : IUserHelperService
     public async Task<bool> ResendUserInviteAsync(User toInvite)
     {
         var currentDate = DateTime.UtcNow;
-        DateTime dateInvited = toInvite.InviteDate.GetValueOrDefault();
+        DateTime dateInvited = toInvite.InviteDate ?? DateTime.MaxValue;
 
-        if (toInvite.Id.ToString() != null && toInvite.UserAccountStatus == UserAccountStatus.INVITED
+        if (toInvite.Id.ToString() != null && (toInvite.CommunicationMethods != null && toInvite.CommunicationMethods.Count > 0) && toInvite.UserAccountStatus == UserAccountStatus.INVITED
             && dateInvited != DateTime.MinValue && DateTime.Compare(currentDate, dateInvited.AddDays(14)) > 0)
         {
             EmailModel email = await FormatUserInviteEmail(toInvite);
@@ -92,9 +97,9 @@ public class UserHelperService : IUserHelperService
         }
     }
 
-    public async Task ResendAllUserInvitesAsync()
+    public async Task<bool> ResendAllUserInvitesAsync()
     {
-        List<User> userList = new List<User>();
+        List<User> userList;
 
         try
         {
@@ -103,6 +108,7 @@ public class UserHelperService : IUserHelperService
         catch (Exception e)
         {
             _logger.LogError(e, "Error fetching users for invite reminder.");
+            return false;
         }
 
         var errorCount = 0;
@@ -118,8 +124,19 @@ public class UserHelperService : IUserHelperService
                     errorCount++;
                 }
             }
+        } 
+        else
+        {
+            _logger.LogInformation("No users found for invite reminder.");
         }
-        _logger.LogInformation("Reminder email unsuccessful for {Identifier} number of users.", errorCount.ToString().Replace(Environment.NewLine, ""));
+
+        if (errorCount > 0){
+            _logger.LogInformation("Reminder email unsuccessful for {Identifier} number of users.", errorCount.ToString().Replace(Environment.NewLine, ""));
+            return false;
+        }
+        else{
+            return true;
+        }
     }
 
     public async Task<bool> SendOperatingSiteInviteAsync(OperatingSite toInvite)
@@ -169,7 +186,10 @@ public class UserHelperService : IUserHelperService
         }
 
         string subject = "You're Invited";
-        string inviteeFullName = toInvite.FirstName + ' ' + toInvite.LastName;
+        string inviteeFullName = "";
+        if(!string.IsNullOrEmpty(toInvite.FirstName) && !string.IsNullOrEmpty(toInvite.LastName)){
+           inviteeFullName = toInvite.FirstName + ' ' + toInvite.LastName;
+        }
         string inviter = "";
 
         User? inviterUser = new User();
@@ -189,11 +209,15 @@ public class UserHelperService : IUserHelperService
         }
 
         string link = "";
-        string htmlContent = string.Format(htmlTemplate, inviteeFullName, inviter, link);
+        string htmlContent = "";
+        if(!string.IsNullOrEmpty(htmlTemplate)){
+            htmlContent = string.Format(htmlTemplate, inviteeFullName, inviter, link);
 
-        email.Recipients = recipients;
-        email.Subject = subject;
-        email.Content = htmlContent;
+            email.Recipients = recipients;
+            email.Subject = subject;
+            email.Content = htmlContent;
+        }
+        
 
         return email;
     }
