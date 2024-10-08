@@ -54,11 +54,7 @@ public class UserHelperService : IUserHelperService
                 return false;
             }
 
-<<<<<<< HEAD
-            _logger.LogInformation("Invite email sent for {Identifier}.", toInvite.UserName.ToString().Replace(Environment.NewLine, ""));
-=======
             _logger.LogInformation("Reminder email sent for {Identifier}.", toInvite.Id.ToString().Replace(Environment.NewLine, ""));
->>>>>>> upstream/dev
             return true;
         }
         else
