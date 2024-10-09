@@ -25,7 +25,7 @@ public interface IRequestMapper
 
     Access Map(AccessRequestModel requestModel);
 
-    OperatingSite Map(OperatingSiteRequestModel operatingSite);
+    OperatingSite Map(OperatingSiteRequestModel requestModel);
 }
 
 public sealed class RequestMapper : IRequestMapper
@@ -309,25 +309,25 @@ public sealed class RequestMapper : IRequestMapper
                            });
 
     
-    public OperatingSite Map(OperatingSiteRequestModel operatingSite) => new()
+    public OperatingSite Map(OperatingSiteRequestModel requestModel) => new()
     {
         // ProjectCode = operatingSite.ProjectCode,
-        Id = operatingSite.Id,
+        Id = requestModel.Id,
         // ProjectId = operatingSite.ProjectId,
-        ProgramYear = operatingSite.ProgramYear,
-        Active = operatingSite.Active,
-        OperatingSiteName = operatingSite.OperatingSiteName,
-        ContactName = operatingSite.ContactName,
-        EmailAddress = operatingSite.EmailAddress,
-        PhoneNumber = operatingSite.PhoneNumber,
-        StreetAddress = operatingSite.StreetAddress,
-        StreetAddress2 = operatingSite.StreetAddress2,
-        City = operatingSite.City,
-        State = operatingSite.State,
-        ZipCode = operatingSite.ZipCode,
-        Plus4 = operatingSite.Plus4,
-        InviteUserId = operatingSite.InviteUserId,
-        InviteDate = operatingSite.InviteDate
+        ProgramYear = requestModel.ProgramYear,
+        Active = requestModel.Active,
+        OperatingSiteName = requestModel.OperatingSiteName,
+        ContactName = requestModel.ContactName,
+        EmailAddress = requestModel.EmailAddress,
+        PhoneNumber = requestModel.PhoneNumber,
+        StreetAddress = requestModel.StreetAddress,
+        StreetAddress2 = requestModel.StreetAddress2,
+        City = requestModel.City,
+        State = requestModel.State,
+        ZipCode = requestModel.ZipCode,
+        Plus4 = requestModel.Plus4,
+        InviteUserId = requestModel.InviteUserId,
+        InviteDate = requestModel.InviteDate
     };
 
     public List<OperatingSite> Map(List<OperatingSiteRequestModel> operatingSite) =>

@@ -35,9 +35,6 @@ public sealed class ProjectController(IProjectControllerService service) : Contr
     public async Task<IActionResult> InviteOperatingSiteAsync([FromBody] OperatingSiteRequestModel opSiteRequest) =>
         await ServeAsync(async () => await _service.InviteOperatingSiteAsync(opSiteRequest));        
 
-    // [HttpGet("sites/list/{projectCode}")]
-    // public async Task<IActionResult> GetOperatingSitesByProjectCodeAsync() =>
-    //     await ServeAsync(async () => await _service.GetOperatingSitesByProjectCodeAsync());
 
     private async Task<IActionResult> ServeAsync<T>(Func<Task<(ResponseStatus, T)>> callAsync)
     {

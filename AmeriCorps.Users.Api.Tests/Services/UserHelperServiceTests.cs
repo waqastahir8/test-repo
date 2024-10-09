@@ -49,7 +49,7 @@ public sealed partial class UserHelperServiceTests : BaseTests<UserHelperService
 
 
         _apiServiceMock!
-            .Setup(x => x.SendInviteEmailAsync(email))
+            .Setup(x => x.SendUserInviteEmailAsync(email))
             .ReturnsAsync(successfulResponse);
 
 
@@ -118,7 +118,7 @@ public sealed partial class UserHelperServiceTests : BaseTests<UserHelperService
 
 
         _apiServiceMock!
-            .Setup(x => x.SendInviteEmailAsync(email))
+            .Setup(x => x.SendUserInviteEmailAsync(email))
             .ReturnsAsync(successfulResponse);
 
 
@@ -158,10 +158,6 @@ public sealed partial class UserHelperServiceTests : BaseTests<UserHelperService
 
         DateTime dateInvited = new DateTime(2024, 6, 7, 12, 30, 0, DateTimeKind.Utc);
 
-        var userId =
-            Fixture
-            .Create<int>();
-
         var userEmail =
             Fixture
             .Build<List<CommunicationMethod>>()
@@ -192,7 +188,7 @@ public sealed partial class UserHelperServiceTests : BaseTests<UserHelperService
 
 
         _apiServiceMock!
-            .Setup(x => x.SendInviteEmailAsync(email))
+            .Setup(x => x.SendUserInviteEmailAsync(email))
             .ReturnsAsync(successfulResponse);
 
 
@@ -230,6 +226,60 @@ public sealed partial class UserHelperServiceTests : BaseTests<UserHelperService
     //     Assert.False(actual);
     // }
 
+[Fact]
+    public async Task SendOperatingSiteInviteAsync_Successful_Response()
+    {
+        // Arrange
+        var sut = Setup();
+
+        var toInvite =
+            Fixture
+            .Build<OperatingSite>()
+            .Create();
+
+        toInvite.EmailAddress = "email";
+
+        var email =
+            Fixture
+            .Build<EmailModel>()
+            .Create();
+
+        var successfulResponse =
+            Fixture
+                .Build<ServiceResponse<OperatingSiteResponse>>()
+                .With(x => x.Successful, true)
+                .Create();
+
+        _apiServiceMock!
+            .Setup(x => x.SendOperatingSiteInviteEmailAsync(email))
+            .ReturnsAsync(successfulResponse);
+
+        // Act
+         var actual = await sut.SendOperatingSiteInviteAsync(toInvite);
+
+        // Assert
+        Assert.True(actual);
+    }
+
+    [Fact]
+    public async Task SendOperatingSiteInviteAsync_ThrowsException_UnsuccessfulResponse()
+    {
+        // Arrange
+        var sut = Setup();
+
+        var toInvite =
+            Fixture
+            .Build<OperatingSite>()
+            .Create();
+
+        toInvite.EmailAddress = "";
+
+        // Act
+         var actual = await sut.SendOperatingSiteInviteAsync(toInvite);
+
+        // Assert
+        Assert.False(actual);
+    }
 
     protected override UserHelperService Setup()
     {

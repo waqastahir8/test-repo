@@ -976,7 +976,7 @@ public sealed class UsersControllerService : IUsersControllerService
 
         if(!success){
             _logger.LogInformation("Invite email not sent for {Identifier}.", toInvite.UserName.ToString().Replace(Environment.NewLine, ""));
-            return (ResponseStatus.MissingInformation, null);
+            return (ResponseStatus.UnknownError, null);
         }
 
         var response = _responseMapper.Map(user);

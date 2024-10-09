@@ -153,7 +153,7 @@ public sealed class ProjectControllerService : IProjectControllerService
 
     public async Task<(ResponseStatus Status, OperatingSiteResponse? Response)> UpdateOperatingSiteAsync(OperatingSiteRequestModel opSiteRequest)
     {
-        if (opSiteRequest == null)
+        if (opSiteRequest == null || string.IsNullOrEmpty(opSiteRequest.Id.ToString()) || opSiteRequest.Id < 1)
         {
             return (ResponseStatus.MissingInformation, null);
         }
@@ -197,7 +197,7 @@ public sealed class ProjectControllerService : IProjectControllerService
 
     public async Task<(ResponseStatus Status, OperatingSiteResponse? Response)> InviteOperatingSiteAsync(OperatingSiteRequestModel toInvite)
     {
-        if (toInvite == null)
+        if (toInvite == null || string.IsNullOrEmpty(toInvite.Id.ToString()) || toInvite.Id < 1)
         {
             return (ResponseStatus.MissingInformation, null);
         }

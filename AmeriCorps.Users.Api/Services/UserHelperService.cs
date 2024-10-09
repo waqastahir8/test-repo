@@ -46,7 +46,7 @@ public class UserHelperService : IUserHelperService
 
             try
             {
-                await _apiService.SendInviteEmailAsync(email);
+                await _apiService.SendUserInviteEmailAsync(email);
             }
             catch (Exception e)
             {
@@ -59,7 +59,7 @@ public class UserHelperService : IUserHelperService
         }
         else
         {
-            _logger.LogError("Unable to send invite email, null invitee");
+            _logger.LogInformation("Unable to send invite email, null invitee info.");
             return false;
         }
     }
@@ -76,7 +76,7 @@ public class UserHelperService : IUserHelperService
 
             try
             {
-                await _apiService.SendInviteEmailAsync(email);
+                await _apiService.SendUserInviteEmailAsync(email);
             }
             catch (Exception e)
             {
@@ -137,13 +137,13 @@ public class UserHelperService : IUserHelperService
 
     public async Task<bool> SendOperatingSiteInviteAsync(OperatingSite toInvite)
     {
-        if (toInvite != null)
+        if (toInvite != null && !string.IsNullOrEmpty(toInvite.EmailAddress) )
         {
             EmailModel email = await FormatOperatingSiteInviteEmail(toInvite);
 
             try
             {
-                await _apiService.SendInviteEmailAsync(email);
+                await _apiService.SendOperatingSiteInviteEmailAsync(email);
             }
             catch (Exception e)
             {
@@ -252,12 +252,15 @@ public class UserHelperService : IUserHelperService
         }
 
         string link = "";
-        string htmlContent = string.Format(htmlTemplate, opSiteName, inviter, link);
+        string htmlContent = "";
+        if(!string.IsNullOrEmpty(htmlTemplate))
+        {
+            htmlContent = string.Format(htmlTemplate, opSiteName, inviter, link);
 
-        email.Recipients = recipients;
-        email.Subject = subject;
-        email.Content = htmlContent;
-
+            email.Recipients = recipients;
+            email.Subject = subject;
+            email.Content = htmlContent;
+        }
         return email;
     }
 }
