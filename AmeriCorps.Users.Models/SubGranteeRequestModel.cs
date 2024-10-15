@@ -5,7 +5,7 @@ public class SubGranteeRequestModel
     public string GranteeCode { get; set; } = string.Empty;
     public string GranteeName { get; set; } = string.Empty;
 
-    public int Uei { get; set; } 
+    public int Uei { get; set; }
 
     public string StreetAddress { get; set; } = string.Empty;
     public string City { get; set; } = string.Empty;

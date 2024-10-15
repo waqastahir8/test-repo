@@ -12,7 +12,7 @@ public interface IUserHelperService
     Task<bool> ResendUserInviteAsync(User toInvite);
 
     Task<bool> ResendAllUserInvitesAsync();
-    
+
     Task<bool> SendOperatingSiteInviteAsync(OperatingSite toInvite);
 }
 
@@ -120,24 +120,26 @@ public class UserHelperService : IUserHelperService
                     errorCount++;
                 }
             }
-        } 
+        }
         else
         {
             _logger.LogInformation("No users found for invite reminder.");
         }
 
-        if (errorCount > 0){
+        if (errorCount > 0)
+        {
             _logger.LogInformation("Reminder email unsuccessful for {Identifier} number of users.", errorCount.ToString().Replace(Environment.NewLine, ""));
             return false;
         }
-        else{
+        else
+        {
             return true;
         }
     }
 
     public async Task<bool> SendOperatingSiteInviteAsync(OperatingSite toInvite)
     {
-        if (toInvite != null && !string.IsNullOrEmpty(toInvite.EmailAddress) )
+        if (toInvite != null && !string.IsNullOrEmpty(toInvite.EmailAddress))
         {
             EmailModel email = await FormatOperatingSiteInviteEmail(toInvite);
 
@@ -160,8 +162,6 @@ public class UserHelperService : IUserHelperService
         }
     }
 
-
-
     private async Task<EmailModel> FormatUserInviteEmail(User toInvite)
     {
         EmailModel email = new EmailModel();
@@ -183,8 +183,9 @@ public class UserHelperService : IUserHelperService
 
         string subject = "You're Invited";
         string inviteeFullName = "";
-        if(!string.IsNullOrEmpty(toInvite.FirstName) && !string.IsNullOrEmpty(toInvite.LastName)){
-           inviteeFullName = toInvite.FirstName + ' ' + toInvite.LastName;
+        if (!string.IsNullOrEmpty(toInvite.FirstName) && !string.IsNullOrEmpty(toInvite.LastName))
+        {
+            inviteeFullName = toInvite.FirstName + ' ' + toInvite.LastName;
         }
         string inviter = "";
 
@@ -206,14 +207,14 @@ public class UserHelperService : IUserHelperService
 
         string link = "";
         string htmlContent = "";
-        if(!string.IsNullOrEmpty(htmlTemplate)){
+        if (!string.IsNullOrEmpty(htmlTemplate))
+        {
             htmlContent = string.Format(htmlTemplate, inviteeFullName, inviter, link);
 
             email.Recipients = recipients;
             email.Subject = subject;
             email.Content = htmlContent;
         }
-        
 
         return email;
     }
@@ -230,7 +231,7 @@ public class UserHelperService : IUserHelperService
         {
             recipients.Add(toInvite.EmailAddress);
         }
- 
+
         string subject = "You're Invited";
         string opSiteName = !string.IsNullOrEmpty(toInvite.OperatingSiteName) ? toInvite.OperatingSiteName : "";
         string inviter = "";
@@ -253,7 +254,7 @@ public class UserHelperService : IUserHelperService
 
         string link = "";
         string htmlContent = "";
-        if(!string.IsNullOrEmpty(htmlTemplate))
+        if (!string.IsNullOrEmpty(htmlTemplate))
         {
             htmlContent = string.Format(htmlTemplate, opSiteName, inviter, link);
 

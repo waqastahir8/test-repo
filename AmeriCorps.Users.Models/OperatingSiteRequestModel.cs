@@ -2,7 +2,7 @@ namespace AmeriCorps.Users.Models;
 
 public class OperatingSiteRequestModel
 {
-     public int Id { get; set; }
+    public int Id { get; set; }
     public string ProjectCode { get; set; } = string.Empty;
     public string ProgramYear { get; set; } = string.Empty;
     public bool Active { get; set; } = true;

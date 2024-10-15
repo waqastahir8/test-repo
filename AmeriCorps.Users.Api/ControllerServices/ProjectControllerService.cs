@@ -115,7 +115,6 @@ public sealed class ProjectControllerService : IProjectControllerService
         return (ResponseStatus.Successful, response);
     }
 
-
     public async Task<(ResponseStatus Status, ProjectResponse? Response)> UpdateProjectAsync(ProjectRequestModel? projRequest)
     {
         if (projRequest == null)
@@ -132,11 +131,13 @@ public sealed class ProjectControllerService : IProjectControllerService
             {
                 updatedProject.Id = foundProj.Id;
 
-                if(foundProj.AuthorizedRep != null){
+                if (foundProj.AuthorizedRep != null)
+                {
                     updatedProject.AuthorizedRep = foundProj.AuthorizedRep;
                 }
 
-                if(foundProj.ProjectDirector != null){
+                if (foundProj.ProjectDirector != null)
+                {
                     updatedProject.ProjectDirector = foundProj.ProjectDirector;
                 }
 
@@ -159,7 +160,6 @@ public sealed class ProjectControllerService : IProjectControllerService
         return (ResponseStatus.Successful, response);
     }
 
-
     public async Task<(ResponseStatus Status, OperatingSiteResponse? Response)> UpdateOperatingSiteAsync(OperatingSiteRequestModel opSiteRequest)
     {
         if (opSiteRequest == null || string.IsNullOrEmpty(opSiteRequest.Id.ToString()) || opSiteRequest.Id < 1)
@@ -177,11 +177,11 @@ public sealed class ProjectControllerService : IProjectControllerService
                 updatedSite.Id = foundSite.Id;
                 await _repository.SaveAsync(updatedSite);
             }
-            else if(!string.IsNullOrEmpty(opSiteRequest.ProjectCode))
+            else if (!string.IsNullOrEmpty(opSiteRequest.ProjectCode))
             {
                 var foundProj = await _repository.GetProjectByCodeAsync(opSiteRequest.ProjectCode);
 
-                if(foundProj != null)
+                if (foundProj != null)
                 {
                     foundProj.OperatingSites.Add(updatedSite);
                     await _repository.UpdateProjectAsync(foundProj);
@@ -213,12 +213,12 @@ public sealed class ProjectControllerService : IProjectControllerService
 
         OperatingSite operatingSite = _requestMapper.Map(toInvite);
 
-        if(operatingSite != null){
-
+        if (operatingSite != null)
+        {
             operatingSite.UpdatedDate = DateTime.UtcNow;
 
             operatingSite.InviteDate = DateTime.UtcNow;
-        }        
+        }
         else
         {
             return (ResponseStatus.UnknownError, null);
@@ -234,7 +234,6 @@ public sealed class ProjectControllerService : IProjectControllerService
             return (ResponseStatus.UnknownError, null);
         }
 
-
         var success = false;
         try
         {
@@ -246,7 +245,8 @@ public sealed class ProjectControllerService : IProjectControllerService
             return (ResponseStatus.UnknownError, null);
         }
 
-        if(!success){
+        if (!success)
+        {
             _logger.LogInformation("Invite email not sent for Operating Site {Identifier}.", toInvite.OperatingSiteName.ToString().Replace(Environment.NewLine, ""));
             return (ResponseStatus.MissingInformation, null);
         }
@@ -254,6 +254,5 @@ public sealed class ProjectControllerService : IProjectControllerService
         var response = _responseMapper.Map(operatingSite);
 
         return (ResponseStatus.Successful, response);
-
     }
 }

@@ -2,7 +2,7 @@ namespace AmeriCorps.Users.Models;
 
 public class ProjectRequestModel
 {
-    public string ProjectName { get; set; }  = string.Empty;
+    public string ProjectName { get; set; } = string.Empty;
     public string ProjectOrgCode { get; set; } = string.Empty;
     public string ProjectCode { get; set; } = string.Empty;
     public int ProjectId { get; set; } //UEI Number
@@ -28,6 +28,5 @@ public class ProjectRequestModel
     public List<SubGranteeRequestModel> SubGrantees { get; set; } = new List<SubGranteeRequestModel>();
 
     public string ProjectType { get; set; } = string.Empty;
-    public string Description { get; set; } = string.Empty; 
-
+    public string Description { get; set; } = string.Empty;
 }

@@ -1,6 +1,5 @@
 namespace AmeriCorps.Users.Data.Core;
 
-
 public sealed class ProjectRole : EntityWithUserProjectId
 {
     /**
@@ -11,6 +10,4 @@ public sealed class ProjectRole : EntityWithUserProjectId
 * Human redeable name for display purposes
 */
     public string FunctionalName { get; set; } = string.Empty;
-
-
 }

@@ -1,8 +1,5 @@
-﻿using Xunit;
-using AmeriCorps.Users.Models;
-using AmeriCorps.Users.Api.Services;
+﻿using AmeriCorps.Users.Api.Services;
 using AmeriCorps.Users.Data.Core;
-using System.Linq;
 
 namespace AmeriCorps.Users.Api.Tests;
 

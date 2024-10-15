@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace AmeriCorps.Users.Models;
 
 public sealed class SubGranteeResponse : SubGranteeRequestModel

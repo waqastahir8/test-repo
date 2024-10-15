@@ -1,9 +1,5 @@
-﻿using Xunit;
-using AmeriCorps.Users.Models;
-using AmeriCorps.Users.Api.Services;
+﻿using AmeriCorps.Users.Api.Services;
 using AmeriCorps.Users.Data.Core;
-using System.Linq;
-using AutoFixture;
 
 namespace AmeriCorps.Users.Api.Tests;
 
@@ -296,7 +292,7 @@ public sealed class ResponseMapperTests : ResponseMapperSetup
                 Assert.Equal(pair.source.State, pair.mapped.State);
                 Assert.Equal(pair.source.ZipCode, pair.mapped.ZipCode);
             });
-        
+
         Assert.Equal(model.ProjectType, result.ProjectType);
         Assert.Equal(model.Description, result.Description);
     }

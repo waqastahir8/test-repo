@@ -6,9 +6,12 @@ namespace AmeriCorps.Users.Data.Core;
 
 public abstract class NpgsqlContext : ContextBase
 {
-    protected NpgsqlContext(DbContextOptions options) : base(options) { }
+    protected NpgsqlContext(DbContextOptions options) : base(options)
+    {
+    }
 
-    protected NpgsqlContext() { }
+    protected NpgsqlContext()
+    { }
 
     public DbSet<User> Users { get; set; }
     public DbSet<Role> Roles { get; set; }
@@ -26,6 +29,7 @@ public abstract class NpgsqlContext : ContextBase
     public DbSet<OperatingSite> OperatingSites { get; set; }
 
     public static string Schema => "users";
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -74,7 +78,6 @@ public abstract class NpgsqlContext : ContextBase
 
         var operatingSite = Create<OperatingSite>("operatingSite");
 
-
         EntityTypeBuilder<T> Create<T>(string tableName) where T : Entity
         {
             var entity = modelBuilder.Entity<T>();
@@ -85,7 +88,6 @@ public abstract class NpgsqlContext : ContextBase
 
             return entity;
         }
-
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

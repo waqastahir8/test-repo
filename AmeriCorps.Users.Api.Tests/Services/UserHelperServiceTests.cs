@@ -14,7 +14,6 @@ public sealed partial class UserHelperServiceTests : BaseTests<UserHelperService
     private Mock<INotificationApiClient>? _apiServiceMock;
     private Mock<IEmailTemplatesService>? _templatesMock;
 
-
     [Fact]
     public async Task SendUserInviteAsync_Successful_Response()
     {
@@ -40,21 +39,18 @@ public sealed partial class UserHelperServiceTests : BaseTests<UserHelperService
             .Build<EmailModel>()
             .Create();
 
-
         var successfulResponse =
             Fixture
                 .Build<ServiceResponse<UserResponse>>()
                 .With(x => x.Successful, true)
                 .Create();
 
-
         _apiServiceMock!
             .Setup(x => x.SendUserInviteEmailAsync(email))
             .ReturnsAsync(successfulResponse);
 
-
         // Act
-         var actual = await sut.SendUserInviteAsync(toInvite);
+        var actual = await sut.SendUserInviteAsync(toInvite);
 
         // Assert
         Assert.True(actual);
@@ -70,17 +66,16 @@ public sealed partial class UserHelperServiceTests : BaseTests<UserHelperService
             Fixture
             .Build<User>()
             .Create();
-            
+
         toInvite.FirstName = "";
         toInvite.LastName = "";
 
         // Act
-         var actual = await sut.SendUserInviteAsync(toInvite);
+        var actual = await sut.SendUserInviteAsync(toInvite);
 
         // Assert
         Assert.False(actual);
     }
-
 
     [Fact]
     public async Task ResendUserInviteAsync_Successful_Response()
@@ -91,7 +86,7 @@ public sealed partial class UserHelperServiceTests : BaseTests<UserHelperService
         var toInvite =
             Fixture
             .Build<User>()
-            .Create();      
+            .Create();
 
         var userEmail =
             Fixture
@@ -109,21 +104,18 @@ public sealed partial class UserHelperServiceTests : BaseTests<UserHelperService
             .Build<EmailModel>()
             .Create();
 
-
         var successfulResponse =
             Fixture
                 .Build<ServiceResponse<UserResponse>>()
                 .With(x => x.Successful, true)
                 .Create();
 
-
         _apiServiceMock!
             .Setup(x => x.SendUserInviteEmailAsync(email))
             .ReturnsAsync(successfulResponse);
 
-
         // Act
-         var actual = await sut.ResendUserInviteAsync(toInvite);
+        var actual = await sut.ResendUserInviteAsync(toInvite);
 
         // Assert
         Assert.True(actual);
@@ -138,17 +130,16 @@ public sealed partial class UserHelperServiceTests : BaseTests<UserHelperService
         var toInvite =
             Fixture
             .Build<User>()
-            .Create();      
+            .Create();
 
         toInvite.UserAccountStatus = UserAccountStatus.ACTIVE;
 
         // Act
-         var actual = await sut.ResendUserInviteAsync(toInvite);
+        var actual = await sut.ResendUserInviteAsync(toInvite);
 
         // Assert
         Assert.False(actual);
     }
-
 
     [Fact]
     public async Task ResendAllUserInvitesAsync_Successful_Response()
@@ -186,14 +177,12 @@ public sealed partial class UserHelperServiceTests : BaseTests<UserHelperService
                 .With(x => x.Successful, true)
                 .Create();
 
-
         _apiServiceMock!
             .Setup(x => x.SendUserInviteEmailAsync(email))
             .ReturnsAsync(successfulResponse);
 
-
         // Act
-         var actual = await sut.ResendAllUserInvitesAsync();
+        var actual = await sut.ResendAllUserInvitesAsync();
 
         // Assert
         Assert.True(actual);
@@ -214,7 +203,7 @@ public sealed partial class UserHelperServiceTests : BaseTests<UserHelperService
     //         .With(o => o.UserAccountStatus, UserAccountStatus.INVITED)
     //         .Without(u => u.CommunicationMethods)
     //         .Create();
-            
+
     //     _repositoryMock!
     //         .Setup(x => x.SaveAsync(user))
     //         .ReturnsAsync(user);
@@ -226,7 +215,7 @@ public sealed partial class UserHelperServiceTests : BaseTests<UserHelperService
     //     Assert.False(actual);
     // }
 
-[Fact]
+    [Fact]
     public async Task SendOperatingSiteInviteAsync_Successful_Response()
     {
         // Arrange
@@ -255,7 +244,7 @@ public sealed partial class UserHelperServiceTests : BaseTests<UserHelperService
             .ReturnsAsync(successfulResponse);
 
         // Act
-         var actual = await sut.SendOperatingSiteInviteAsync(toInvite);
+        var actual = await sut.SendOperatingSiteInviteAsync(toInvite);
 
         // Assert
         Assert.True(actual);
@@ -275,7 +264,7 @@ public sealed partial class UserHelperServiceTests : BaseTests<UserHelperService
         toInvite.EmailAddress = "";
 
         // Act
-         var actual = await sut.SendOperatingSiteInviteAsync(toInvite);
+        var actual = await sut.SendOperatingSiteInviteAsync(toInvite);
 
         // Assert
         Assert.False(actual);

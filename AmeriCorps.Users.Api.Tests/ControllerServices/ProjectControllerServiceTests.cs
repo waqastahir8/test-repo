@@ -7,12 +7,10 @@ namespace AmeriCorps.Users.Api.Tests;
 
 public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectControllerService>
 {
-
     private Mock<IProjectRepository>? _repositoryMock;
     private Mock<IRequestMapper>? _requestMapperMock;
     private Mock<IResponseMapper>? _responseMapperMock;
     private Mock<IUserHelperService>? _userHelperService;
-
 
     [Theory]
     [InlineData("proj")]
@@ -20,7 +18,7 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
     {
         // Arrange
         var sut = Setup();
-        
+
         _repositoryMock!
             .Setup(x => x.GetProjectByCodeAsync(projCode))
             .ReturnsAsync(() => Fixture.Build<Project>()
@@ -93,7 +91,6 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
 
         // Assert
         Assert.Equal(ResponseStatus.Successful, status);
-
     }
 
     [Fact]
@@ -134,14 +131,13 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
         Assert.Equal(expected, actual);
     }
 
-
     [Theory]
     [InlineData("proj")]
     public async Task GetProjectListByOrgAsync_Successful_Status(string orgCode)
     {
         // Arrange
         var sut = Setup();
-        
+
         _repositoryMock!
             .Setup(x => x.GetProjectListByOrgAsync(orgCode))
             .ReturnsAsync(() => Fixture.Build<List<Project>>()
@@ -186,15 +182,14 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
         var model =
             Fixture
             .Build<ProjectRequestModel>()
-            .With(o => o.ProjectCode, "")  
+            .With(o => o.ProjectCode, "")
             .Create();
-            
+
         //Act
         var (status2, _) = await sut.UpdateProjectAsync(model);
 
         //Assert
         Assert.Equal(ResponseStatus.MissingInformation, status2);
-
     }
 
     [Fact]
@@ -225,7 +220,6 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
 
         // Assert
         Assert.Equal(ResponseStatus.Successful, status);
-
     }
 
     [Fact]
@@ -277,7 +271,7 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
             .Build<OperatingSiteRequestModel>()
             .Without(o => o.Id)
             .Create();
-            
+
         //Act
         var (status, _) = await sut.UpdateOperatingSiteAsync(model);
 
@@ -287,9 +281,9 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
         var model2 =
             Fixture
             .Build<OperatingSiteRequestModel>()
-            .With(o => o.ProjectCode, "")  
+            .With(o => o.ProjectCode, "")
             .Create();
-            
+
         //Act
         var (status2, _) = await sut.UpdateOperatingSiteAsync(model2);
 
@@ -325,7 +319,6 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
 
         // Assert
         Assert.Equal(ResponseStatus.Successful, status);
-
     }
 
     [Fact]
@@ -387,7 +380,7 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
         var model2 =
             Fixture
             .Build<OperatingSiteRequestModel>()
-            .With(o => o.EmailAddress, "")  
+            .With(o => o.EmailAddress, "")
             .Create();
 
         //Act
@@ -484,7 +477,6 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
     //     Assert.Equal(expected, actual);
     // }
 
-
     protected override ProjectControllerService Setup()
     {
         _repositoryMock = new();
@@ -501,5 +493,4 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
             _repositoryMock.Object,
             _userHelperService.Object);
     }
-
 }

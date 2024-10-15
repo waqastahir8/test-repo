@@ -8,5 +8,4 @@ public sealed class ProjectAccess : EntityWithUserProjectId
     public string AccessName { get; set; } = string.Empty;
 
     public int AccessLevel { get; set; }
-
 }

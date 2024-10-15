@@ -33,8 +33,7 @@ public sealed class ProjectController(IProjectControllerService service) : Contr
 
     [HttpPost("op-site/invite")]
     public async Task<IActionResult> InviteOperatingSiteAsync([FromBody] OperatingSiteRequestModel opSiteRequest) =>
-        await ServeAsync(async () => await _service.InviteOperatingSiteAsync(opSiteRequest));        
-
+        await ServeAsync(async () => await _service.InviteOperatingSiteAsync(opSiteRequest));
 
     private async Task<IActionResult> ServeAsync<T>(Func<Task<(ResponseStatus, T)>> callAsync)
     {

@@ -1727,7 +1727,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             Fixture
             .Build<List<CommunicationMethodRequestModel>>()
             .Create();
-        
+
         modelEmailList.Add(modelEmail);
         model.CommunicationMethods = modelEmailList;
 

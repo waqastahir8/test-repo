@@ -388,7 +388,7 @@ public sealed class ResponseMapper : IResponseMapper
                                State = p.State,
                                ZipCode = p.ZipCode,
 
-                            //    Award = Map(p.Award),
+                               //    Award = Map(p.Award),
 
                                ProjectPeriodStartDt = p.ProjectPeriodStartDt,
                                ProjectPeriodEndDt = p.ProjectPeriodEndDt,
@@ -468,13 +468,13 @@ public sealed class ResponseMapper : IResponseMapper
                            subGranteeList,
                            o => new SubGranteeRequestModel
                            {
-                                GranteeCode = o.GranteeCode,
-                                GranteeName = o.GranteeName,
-                                Uei = o.Uei,
-                                StreetAddress = o.StreetAddress,
-                                City = o.City,
-                                State = o.State,
-                                ZipCode = o.ZipCode
+                               GranteeCode = o.GranteeCode,
+                               GranteeName = o.GranteeName,
+                               Uei = o.Uei,
+                               StreetAddress = o.StreetAddress,
+                               City = o.City,
+                               State = o.State,
+                               ZipCode = o.ZipCode
                            });
 
     public OperatingSiteResponse? Map(OperatingSite? operatingSite) => operatingSite == null ? null : new()
@@ -501,21 +501,21 @@ public sealed class ResponseMapper : IResponseMapper
                            operatingSiteList,
                            o => new OperatingSiteRequestModel
                            {
-                                Id = o.Id,
-                                ProgramYear = o.ProgramYear,
-                                Active = o.Active,
-                                OperatingSiteName = o.OperatingSiteName,
-                                ContactName = o.ContactName,
-                                EmailAddress = o.EmailAddress,
-                                PhoneNumber = o.PhoneNumber,
-                                StreetAddress = o.StreetAddress,
-                                StreetAddress2 = o.StreetAddress2,
-                                City = o.City,
-                                State = o.State,
-                                ZipCode = o.ZipCode,
-                                Plus4 = o.Plus4,
-                                InviteUserId = o.InviteUserId,
-                                InviteDate = o.InviteDate
+                               Id = o.Id,
+                               ProgramYear = o.ProgramYear,
+                               Active = o.Active,
+                               OperatingSiteName = o.OperatingSiteName,
+                               ContactName = o.ContactName,
+                               EmailAddress = o.EmailAddress,
+                               PhoneNumber = o.PhoneNumber,
+                               StreetAddress = o.StreetAddress,
+                               StreetAddress2 = o.StreetAddress2,
+                               City = o.City,
+                               State = o.State,
+                               ZipCode = o.ZipCode,
+                               Plus4 = o.Plus4,
+                               InviteUserId = o.InviteUserId,
+                               InviteDate = o.InviteDate
                            });
 
     public AccessResponse? Map(Access? access) => access == null ? null : new()

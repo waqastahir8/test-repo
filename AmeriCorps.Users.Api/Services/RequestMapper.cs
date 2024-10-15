@@ -30,7 +30,6 @@ public interface IRequestMapper
     Award Map(AwardResponse requestModel);
 
     SubGrantee Map(SubGranteeRequestModel requestModel);
-
 }
 
 public sealed class RequestMapper : IRequestMapper
@@ -343,7 +342,6 @@ public sealed class RequestMapper : IRequestMapper
                                AccessLevel = a.AccessLevel
                            });
 
-    
     public OperatingSite Map(OperatingSiteRequestModel requestModel) => new()
     {
         // ProjectCode = operatingSite.ProjectCode,
@@ -370,22 +368,22 @@ public sealed class RequestMapper : IRequestMapper
                            operatingSite,
                            o => new OperatingSite
                            {
-                                // ProjectCode = o.ProjectCode,
-                                Id = o.Id,
-                                ProgramYear = o.ProgramYear,
-                                Active = o.Active,
-                                OperatingSiteName = o.OperatingSiteName,
-                                ContactName = o.ContactName,
-                                EmailAddress = o.EmailAddress,
-                                PhoneNumber = o.PhoneNumber,
-                                StreetAddress = o.StreetAddress,
-                                StreetAddress2 = o.StreetAddress2,
-                                City = o.City,
-                                State = o.State,
-                                ZipCode = o.ZipCode,
-                                Plus4 = o.Plus4,
-                                InviteUserId = o.InviteUserId,
-                                InviteDate = o.InviteDate
+                               // ProjectCode = o.ProjectCode,
+                               Id = o.Id,
+                               ProgramYear = o.ProgramYear,
+                               Active = o.Active,
+                               OperatingSiteName = o.OperatingSiteName,
+                               ContactName = o.ContactName,
+                               EmailAddress = o.EmailAddress,
+                               PhoneNumber = o.PhoneNumber,
+                               StreetAddress = o.StreetAddress,
+                               StreetAddress2 = o.StreetAddress2,
+                               City = o.City,
+                               State = o.State,
+                               ZipCode = o.ZipCode,
+                               Plus4 = o.Plus4,
+                               InviteUserId = o.InviteUserId,
+                               InviteDate = o.InviteDate
                            });
 
     public SubGrantee Map(SubGranteeRequestModel requestModel) => new()
@@ -404,12 +402,12 @@ public sealed class RequestMapper : IRequestMapper
                            requestModel,
                            o => new SubGrantee
                            {
-                                GranteeCode = o.GranteeCode,
-                                GranteeName = o.GranteeName,
-                                Uei = o.Uei,
-                                StreetAddress = o.StreetAddress,
-                                City = o.City,
-                                State = o.State,
-                                ZipCode = o.ZipCode
+                               GranteeCode = o.GranteeCode,
+                               GranteeName = o.GranteeName,
+                               Uei = o.Uei,
+                               StreetAddress = o.StreetAddress,
+                               City = o.City,
+                               State = o.State,
+                               ZipCode = o.ZipCode
                            });
 }

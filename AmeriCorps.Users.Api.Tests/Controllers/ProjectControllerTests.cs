@@ -71,7 +71,6 @@ public sealed partial class ProjectControllerTests : BaseTests<ProjectController
     [Fact]
     public async Task CreateProjectAsync_UnknownError_500StatusCode()
     {
-
         //Arrange
         var sut = Setup();
         var model = Fixture.Create<ProjectRequestModel>();
@@ -128,7 +127,6 @@ public sealed partial class ProjectControllerTests : BaseTests<ProjectController
         Assert.Equal((int)HttpStatusCode.InternalServerError, response.StatusCode);
     }
 
-
     [Fact]
     public async Task GetProjectListByOrgAsync_SuccessProcessing_200StatusCode()
     {
@@ -148,7 +146,6 @@ public sealed partial class ProjectControllerTests : BaseTests<ProjectController
         Assert.NotNull(response);
         Assert.Equal((int)HttpStatusCode.OK, response.StatusCode);
     }
-
 
     [Fact]
     public async Task GetProjectListByOrgAsync_NonExistent_UnprocessableEntity_422StatusCode()
@@ -228,7 +225,6 @@ public sealed partial class ProjectControllerTests : BaseTests<ProjectController
         Assert.Equal((int)HttpStatusCode.InternalServerError, response.StatusCode);
     }
 
-
     [Fact]
     public async Task UpdateOperatingSiteAsync_SuccessProcessing_200StatusCode()
     {
@@ -249,7 +245,6 @@ public sealed partial class ProjectControllerTests : BaseTests<ProjectController
         Assert.NotNull(response);
         Assert.Equal((int)HttpStatusCode.OK, response.StatusCode);
     }
-
 
     [Fact]
     public async Task UpdateOperatingSiteAsync_NonExistent_UnprocessableEntity_422StatusCode()
@@ -288,7 +283,7 @@ public sealed partial class ProjectControllerTests : BaseTests<ProjectController
         Assert.NotNull(response);
         Assert.Equal((int)HttpStatusCode.InternalServerError, response.StatusCode);
     }
-    
+
     [Fact]
     public async Task InviteOperatingSiteAsync_SuccessProcessing_200StatusCode()
     {
@@ -309,7 +304,6 @@ public sealed partial class ProjectControllerTests : BaseTests<ProjectController
         Assert.NotNull(response);
         Assert.Equal((int)HttpStatusCode.OK, response.StatusCode);
     }
-
 
     [Fact]
     public async Task InviteOperatingSiteAsync_NonExistent_UnprocessableEntity_422StatusCode()

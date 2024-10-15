@@ -1,7 +1,7 @@
-﻿using AmeriCorps.Users.Data.Core;
-using AmeriCorps.Users.Data.Core.Model;
-using System.Data;
+﻿using System.Data;
 using System.Security.Cryptography;
+using AmeriCorps.Users.Data.Core;
+using AmeriCorps.Users.Data.Core.Model;
 
 namespace AmeriCorps.Users.Api;
 
@@ -279,7 +279,7 @@ public sealed class UsersControllerService : IUsersControllerService
             if (userId <= 0)
             {
                 user.Id = 0;
-                user.UserAccountStatus =  UserAccountStatus.ACTIVE;
+                user.UserAccountStatus = UserAccountStatus.ACTIVE;
                 user = await _repository.SaveAsync(user);
             }
             else
@@ -974,7 +974,8 @@ public sealed class UsersControllerService : IUsersControllerService
             return (ResponseStatus.UnknownError, null);
         }
 
-        if(!success){
+        if (!success)
+        {
             _logger.LogInformation("Invite email not sent for {Identifier}.", toInvite.UserName.ToString().Replace(Environment.NewLine, ""));
             return (ResponseStatus.UnknownError, null);
         }
