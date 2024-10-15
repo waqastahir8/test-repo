@@ -812,7 +812,7 @@ public sealed class UsersControllerService : IUsersControllerService
             ProjectName = project.ProjectName,
             ProjectCode = project.ProjectCode,
             ProjectType = project.ProjectType,
-            ProjectOrg = project.ProjectOrg,
+            ProjectOrg = project.ProjectOrgCode,
             Active = true,
             UserId = userId
         };
@@ -1156,7 +1156,7 @@ public sealed class UsersControllerService : IUsersControllerService
                             ProjectName = orgProj.ProjectName,
                             ProjectCode = orgProj.ProjectCode,
                             ProjectType = orgProj.ProjectType,
-                            ProjectOrg = orgProj.ProjectOrg,
+                            ProjectOrg = orgProj.ProjectOrgCode,
                             Active = true,
                             ProjectRoles = roleList,
                             ProjectAccess = accessList

@@ -34,15 +34,33 @@ public sealed partial class ProjectRepository(
     IProjectRepository
 {
     public async Task<Project?> GetProjectByCodeAsync(string projCode) =>
-        await ExecuteAsync(async context => await context.Projects.Include(u => u.OperatingSites).FirstOrDefaultAsync(p => p.ProjectCode == projCode));
+        await ExecuteAsync(async context => await context.Projects
+            .Include(p => p.OperatingSites)
+            .Include(p => p.SubGrantees)
+            .Include(p => p.Award)
+            .Include(p => p.AuthorizedRep)
+            .Include(p => p.ProjectDirector)
+            .FirstOrDefaultAsync(p => p.ProjectCode == projCode));
 
 
     public async Task<Project?> GetAsync(int id) =>
-        await ExecuteAsync(async context => await context.Projects.Include(p => p.OperatingSites).FirstOrDefaultAsync(p =>p.Id == id));
+        await ExecuteAsync(async context => await context.Projects
+            .Include(p => p.OperatingSites)
+            .Include(p => p.SubGrantees)
+            .Include(p => p.Award)
+            .Include(p => p.AuthorizedRep)
+            .Include(p => p.ProjectDirector)
+            .FirstOrDefaultAsync(p =>p.Id == id));
 
 
     public async Task<List<Project>?> GetProjectListByOrgAsync(string orgCode) =>
-        await ExecuteAsync(async context => await context.Projects.Include(p => p.OperatingSites).Where(o =>o.ProjectOrg == orgCode).ToListAsync());
+        await ExecuteAsync(async context => await context.Projects
+            .Include(p => p.OperatingSites)
+            .Include(p => p.SubGrantees)
+            .Include(p => p.Award)
+            .Include(p => p.AuthorizedRep)
+            .Include(p => p.ProjectDirector)
+            .Where(o =>o.ProjectOrgCode == orgCode).ToListAsync());
 
     public async Task<T> SaveAsync<T>(T entity) where T : Entity =>
        await ExecuteAsync(async context =>
@@ -68,7 +86,7 @@ public sealed partial class ProjectRepository(
 
 
 
-    public async Task<Project?> UpdateProjectAsync(Project project)
+    public async Task<Project?> UpdateProjectAsync(Project entity)
     {
         Project? upatedProject = null;
         await ExecuteAsync(async context =>
@@ -76,9 +94,9 @@ public sealed partial class ProjectRepository(
             await using var transaction = await context.Database.BeginTransactionAsync();
             try
             {
-                context.Attach(project);
-                context.Entry(project).State = EntityState.Modified;
-                upatedProject = UpdateProject(project, context);
+                context.Attach(entity);
+                context.Entry(entity).State = EntityState.Modified;
+                upatedProject = UpdateProject(entity, context);
                 await transaction.CommitAsync();
                 await context.SaveChangesAsync();
             }
@@ -96,6 +114,8 @@ public sealed partial class ProjectRepository(
     {
         var id = project.Id;
         UpdateEntities(project.OperatingSites, context, id);
+        // UpdateEntities(project.Award, context, id);
+        UpdateEntities(project.SubGrantees, context, id);
         return project;
     }
 

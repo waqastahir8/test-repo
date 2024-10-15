@@ -131,6 +131,15 @@ public sealed class ProjectControllerService : IProjectControllerService
             if (foundProj != null)
             {
                 updatedProject.Id = foundProj.Id;
+
+                if(foundProj.AuthorizedRep != null){
+                    updatedProject.AuthorizedRep = foundProj.AuthorizedRep;
+                }
+
+                if(foundProj.ProjectDirector != null){
+                    updatedProject.ProjectDirector = foundProj.ProjectDirector;
+                }
+
                 await _repository.UpdateProjectAsync(updatedProject);
             }
             else
