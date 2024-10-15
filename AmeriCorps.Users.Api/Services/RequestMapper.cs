@@ -344,9 +344,7 @@ public sealed class RequestMapper : IRequestMapper
 
     public OperatingSite Map(OperatingSiteRequestModel requestModel) => new()
     {
-        // ProjectCode = operatingSite.ProjectCode,
         Id = requestModel.Id,
-        // ProjectId = operatingSite.ProjectId,
         ProgramYear = requestModel.ProgramYear,
         Active = requestModel.Active,
         OperatingSiteName = requestModel.OperatingSiteName,
@@ -368,7 +366,6 @@ public sealed class RequestMapper : IRequestMapper
                            operatingSite,
                            o => new OperatingSite
                            {
-                               // ProjectCode = o.ProjectCode,
                                Id = o.Id,
                                ProgramYear = o.ProgramYear,
                                Active = o.Active,

@@ -114,7 +114,6 @@ public sealed partial class ProjectRepository(
     {
         var id = project.Id;
         UpdateEntities(project.OperatingSites, context, id);
-        // UpdateEntities(project.Award, context, id);
         UpdateEntities(project.SubGrantees, context, id);
         return project;
     }
