@@ -36,6 +36,14 @@ public interface IResponseMapper
     List<OrganizationResponse> Map(List<Organization> orgList);
 
     List<ProjectResponse> Map(List<Project> projList);
+
+    List<OperatingSiteRequestModel> Map(List<OperatingSite> operatingSiteList);
+
+    OperatingSiteResponse? Map(OperatingSite? operatingSite);
+
+    AwardResponse? Map(Award? award);
+
+    SubGranteeResponse Map(SubGrantee subGrantee);
 }
 
 public sealed class ResponseMapper : IResponseMapper
@@ -367,9 +375,30 @@ public sealed class ResponseMapper : IResponseMapper
                            {
                                Id = p.Id,
                                ProjectName = p.ProjectName,
+                               ProjectOrgCode = p.ProjectOrgCode,
                                ProjectCode = p.ProjectCode,
+                               ProjectId = p.ProjectId,
+                               GspProjectId = p.GspProjectId,
+                               ProgramName = p.ProgramName,
+                               ProgramYear = p.ProgramYear,
+                               AuthorizedRep = Map(p.AuthorizedRep),
+                               ProjectDirector = Map(p.ProjectDirector),
+                               StreetAddress = p.StreetAddress,
+                               City = p.City,
+                               State = p.State,
+                               ZipCode = p.ZipCode,
+
+                               //    Award = Map(p.Award),
+
+                               ProjectPeriodStartDt = p.ProjectPeriodStartDt,
+                               ProjectPeriodEndDt = p.ProjectPeriodEndDt,
+                               EnrollmentStartDt = p.EnrollmentStartDt,
+                               EnrollmentEndDt = p.EnrollmentEndDt,
+
+                               OperatingSites = Map(p.OperatingSites),
+                               SubGrantees = Map(p.SubGrantees),
+
                                ProjectType = p.ProjectType,
-                               ProjectOrg = p.ProjectOrg,
                                Description = p.Description
                            });
 
@@ -383,13 +412,111 @@ public sealed class ResponseMapper : IResponseMapper
 
     public ProjectResponse? Map(Project? project) => project == null ? null : new()
     {
-        Id = project.Id,
         ProjectName = project.ProjectName,
+        ProjectOrgCode = project.ProjectOrgCode,
         ProjectCode = project.ProjectCode,
+        ProjectId = project.ProjectId,
+        GspProjectId = project.GspProjectId,
+        ProgramName = project.ProgramName,
+        ProgramYear = project.ProgramYear,
+        AuthorizedRep = Map(project.AuthorizedRep),
+        ProjectDirector = Map(project.ProjectDirector),
+        StreetAddress = project.StreetAddress,
+        City = project.City,
+        State = project.State,
+        ZipCode = project.ZipCode,
+
+        // Award = Map(project.Award),
+
+        ProjectPeriodStartDt = project.ProjectPeriodStartDt,
+        ProjectPeriodEndDt = project.ProjectPeriodEndDt,
+        EnrollmentStartDt = project.EnrollmentStartDt,
+        EnrollmentEndDt = project.EnrollmentEndDt,
+
+        OperatingSites = Map(project.OperatingSites),
+        SubGrantees = Map(project.SubGrantees),
+
         ProjectType = project.ProjectType,
-        ProjectOrg = project.ProjectOrg,
         Description = project.Description
     };
+
+    public AwardResponse? Map(Award? award) => new()
+    {
+        Id = award.Id,
+        AwardCode = award.AwardCode,
+        AwardName = award.AwardName,
+        GspListingNumber = award.GspListingNumber,
+        Fain = award.Fain,
+        Uei = award.Uei,
+        PerformanceStartDt = award.PerformanceStartDt,
+        PerformanceEndDt = award.PerformanceEndDt
+    };
+
+    public SubGranteeResponse Map(SubGrantee subGrantee) => new()
+    {
+        GranteeCode = subGrantee.GranteeCode,
+        GranteeName = subGrantee.GranteeName,
+        Uei = subGrantee.Uei,
+        StreetAddress = subGrantee.StreetAddress,
+        City = subGrantee.City,
+        State = subGrantee.State,
+        ZipCode = subGrantee.ZipCode
+    };
+
+    public List<SubGranteeRequestModel> Map(List<SubGrantee> subGranteeList) =>
+       MapperUtils.MapList<SubGrantee, SubGranteeRequestModel>(
+                           subGranteeList,
+                           o => new SubGranteeRequestModel
+                           {
+                               GranteeCode = o.GranteeCode,
+                               GranteeName = o.GranteeName,
+                               Uei = o.Uei,
+                               StreetAddress = o.StreetAddress,
+                               City = o.City,
+                               State = o.State,
+                               ZipCode = o.ZipCode
+                           });
+
+    public OperatingSiteResponse? Map(OperatingSite? operatingSite) => operatingSite == null ? null : new()
+    {
+        Id = operatingSite.Id,
+        ProgramYear = operatingSite.ProgramYear,
+        Active = operatingSite.Active,
+        OperatingSiteName = operatingSite.OperatingSiteName,
+        ContactName = operatingSite.ContactName,
+        EmailAddress = operatingSite.EmailAddress,
+        PhoneNumber = operatingSite.PhoneNumber,
+        StreetAddress = operatingSite.StreetAddress,
+        StreetAddress2 = operatingSite.StreetAddress2,
+        City = operatingSite.City,
+        State = operatingSite.State,
+        ZipCode = operatingSite.ZipCode,
+        Plus4 = operatingSite.Plus4,
+        InviteUserId = operatingSite.InviteUserId,
+        InviteDate = operatingSite.InviteDate
+    };
+
+    public List<OperatingSiteRequestModel> Map(List<OperatingSite> operatingSiteList) =>
+       MapperUtils.MapList<OperatingSite, OperatingSiteRequestModel>(
+                           operatingSiteList,
+                           o => new OperatingSiteRequestModel
+                           {
+                               Id = o.Id,
+                               ProgramYear = o.ProgramYear,
+                               Active = o.Active,
+                               OperatingSiteName = o.OperatingSiteName,
+                               ContactName = o.ContactName,
+                               EmailAddress = o.EmailAddress,
+                               PhoneNumber = o.PhoneNumber,
+                               StreetAddress = o.StreetAddress,
+                               StreetAddress2 = o.StreetAddress2,
+                               City = o.City,
+                               State = o.State,
+                               ZipCode = o.ZipCode,
+                               Plus4 = o.Plus4,
+                               InviteUserId = o.InviteUserId,
+                               InviteDate = o.InviteDate
+                           });
 
     public AccessResponse? Map(Access? access) => access == null ? null : new()
     {

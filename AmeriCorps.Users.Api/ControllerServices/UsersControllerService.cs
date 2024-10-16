@@ -1,7 +1,7 @@
-﻿using AmeriCorps.Users.Data.Core;
-using AmeriCorps.Users.Data.Core.Model;
-using System.Data;
+﻿using System.Data;
 using System.Security.Cryptography;
+using AmeriCorps.Users.Data.Core;
+using AmeriCorps.Users.Data.Core.Model;
 
 namespace AmeriCorps.Users.Api;
 
@@ -279,7 +279,7 @@ public sealed class UsersControllerService : IUsersControllerService
             if (userId <= 0)
             {
                 user.Id = 0;
-                user.UserAccountStatus =  UserAccountStatus.ACTIVE;
+                user.UserAccountStatus = UserAccountStatus.ACTIVE;
                 user = await _repository.SaveAsync(user);
             }
             else
@@ -812,7 +812,7 @@ public sealed class UsersControllerService : IUsersControllerService
             ProjectName = project.ProjectName,
             ProjectCode = project.ProjectCode,
             ProjectType = project.ProjectType,
-            ProjectOrg = project.ProjectOrg,
+            ProjectOrg = project.ProjectOrgCode,
             Active = true,
             UserId = userId
         };
@@ -958,11 +958,27 @@ public sealed class UsersControllerService : IUsersControllerService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Unable to save reference for user {Identifier}.", toInvite.UserName.ToString().Replace(Environment.NewLine, ""));
+            _logger.LogError(e, "Unable to save for user {Identifier} for invite.", toInvite.UserName.ToString().Replace(Environment.NewLine, ""));
             return (ResponseStatus.UnknownError, null);
         }
 
-        await _userHelperService.SendUserInviteAsync(user);
+        var success = false;
+
+        try
+        {
+            success = await _userHelperService.SendUserInviteAsync(user);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Unable to send invite for user {Identifier}.", toInvite.UserName.ToString().Replace(Environment.NewLine, ""));
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        if (!success)
+        {
+            _logger.LogInformation("Invite email not sent for {Identifier}.", toInvite.UserName.ToString().Replace(Environment.NewLine, ""));
+            return (ResponseStatus.UnknownError, null);
+        }
 
         var response = _responseMapper.Map(user);
 
@@ -1141,7 +1157,7 @@ public sealed class UsersControllerService : IUsersControllerService
                             ProjectName = orgProj.ProjectName,
                             ProjectCode = orgProj.ProjectCode,
                             ProjectType = orgProj.ProjectType,
-                            ProjectOrg = orgProj.ProjectOrg,
+                            ProjectOrg = orgProj.ProjectOrgCode,
                             Active = true,
                             ProjectRoles = roleList,
                             ProjectAccess = accessList

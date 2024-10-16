@@ -71,7 +71,6 @@ public sealed partial class ProjectControllerTests : BaseTests<ProjectController
     [Fact]
     public async Task CreateProjectAsync_UnknownError_500StatusCode()
     {
-
         //Arrange
         var sut = Setup();
         var model = Fixture.Create<ProjectRequestModel>();
@@ -128,7 +127,6 @@ public sealed partial class ProjectControllerTests : BaseTests<ProjectController
         Assert.Equal((int)HttpStatusCode.InternalServerError, response.StatusCode);
     }
 
-
     [Fact]
     public async Task GetProjectListByOrgAsync_SuccessProcessing_200StatusCode()
     {
@@ -149,7 +147,6 @@ public sealed partial class ProjectControllerTests : BaseTests<ProjectController
         Assert.Equal((int)HttpStatusCode.OK, response.StatusCode);
     }
 
-
     [Fact]
     public async Task GetProjectListByOrgAsync_NonExistent_UnprocessableEntity_422StatusCode()
     {
@@ -168,6 +165,184 @@ public sealed partial class ProjectControllerTests : BaseTests<ProjectController
         Assert.NotNull(response);
         Assert.Equal((int)HttpStatusCode.UnprocessableEntity, response.StatusCode);
     }
+
+    [Fact]
+    public async Task UpdateProjectAsync_SuccessProcessing_200StatusCode()
+    {
+        //Arrange
+        var sut = Setup();
+        var model = Fixture.Create<ProjectRequestModel>();
+        var projResponse = Fixture.Create<ProjectResponse>();
+
+        _serviceMock!
+            .Setup(x => x.UpdateProjectAsync(model))
+            .ReturnsAsync((ResponseStatus.Successful, projResponse));
+
+        //Act
+        var actual = await sut.UpdateProjectAsync(model);
+
+        //Assert
+        var response = actual as OkObjectResult;
+        Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task UpdateProjectAsync_NonExistent_UnprocessableEntity_422StatusCode()
+    {
+        //Arrange
+        var sut = Setup();
+        var model = Fixture.Create<ProjectRequestModel>();
+
+        _serviceMock!
+            .Setup(x => x.UpdateProjectAsync(model))
+            .ReturnsAsync((ResponseStatus.MissingInformation, null));
+        //Act
+        var actual = await sut.UpdateProjectAsync(model);
+
+        //Assert
+        var response = actual as StatusCodeResult;
+        Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.UnprocessableEntity, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task UpdateProjectAsync_UnknownError_500StatusCode()
+    {
+        //Arrange
+        var sut = Setup();
+        var model = Fixture.Create<ProjectRequestModel>();
+
+        _serviceMock!
+            .Setup(x => x.UpdateProjectAsync(model))
+            .ReturnsAsync((ResponseStatus.UnknownError, null));
+        //Act
+        var actual = await sut.UpdateProjectAsync(model);
+
+        //Assert
+        var response = actual as StatusCodeResult;
+        Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.InternalServerError, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task UpdateOperatingSiteAsync_SuccessProcessing_200StatusCode()
+    {
+        //Arrange
+        var sut = Setup();
+        var model = Fixture.Create<OperatingSiteRequestModel>();
+        var projResponse = Fixture.Create<OperatingSiteResponse>();
+
+        _serviceMock!
+            .Setup(x => x.UpdateOperatingSiteAsync(model))
+            .ReturnsAsync((ResponseStatus.Successful, projResponse));
+
+        //Act
+        var actual = await sut.UpdateOperatingSiteAsync(model);
+
+        //Assert
+        var response = actual as OkObjectResult;
+        Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task UpdateOperatingSiteAsync_NonExistent_UnprocessableEntity_422StatusCode()
+    {
+        //Arrange
+        var sut = Setup();
+        var model = Fixture.Create<OperatingSiteRequestModel>();
+
+        _serviceMock!
+            .Setup(x => x.UpdateOperatingSiteAsync(model))
+            .ReturnsAsync((ResponseStatus.MissingInformation, null));
+        //Act
+        var actual = await sut.UpdateOperatingSiteAsync(model);
+
+        //Assert
+        var response = actual as StatusCodeResult;
+        Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.UnprocessableEntity, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task UpdateOperatingSiteAsync_UnknownError_500StatusCode()
+    {
+        //Arrange
+        var sut = Setup();
+        var model = Fixture.Create<OperatingSiteRequestModel>();
+
+        _serviceMock!
+            .Setup(x => x.UpdateOperatingSiteAsync(model))
+            .ReturnsAsync((ResponseStatus.UnknownError, null));
+        //Act
+        var actual = await sut.UpdateOperatingSiteAsync(model);
+
+        //Assert
+        var response = actual as StatusCodeResult;
+        Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.InternalServerError, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task InviteOperatingSiteAsync_SuccessProcessing_200StatusCode()
+    {
+        //Arrange
+        var sut = Setup();
+        var model = Fixture.Create<OperatingSiteRequestModel>();
+        var projResponse = Fixture.Create<OperatingSiteResponse>();
+
+        _serviceMock!
+            .Setup(x => x.InviteOperatingSiteAsync(model))
+            .ReturnsAsync((ResponseStatus.Successful, projResponse));
+
+        //Act
+        var actual = await sut.InviteOperatingSiteAsync(model);
+
+        //Assert
+        var response = actual as OkObjectResult;
+        Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task InviteOperatingSiteAsync_NonExistent_UnprocessableEntity_422StatusCode()
+    {
+        //Arrange
+        var sut = Setup();
+        var model = Fixture.Create<OperatingSiteRequestModel>();
+
+        _serviceMock!
+            .Setup(x => x.InviteOperatingSiteAsync(model))
+            .ReturnsAsync((ResponseStatus.MissingInformation, null));
+        //Act
+        var actual = await sut.InviteOperatingSiteAsync(model);
+
+        //Assert
+        var response = actual as StatusCodeResult;
+        Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.UnprocessableEntity, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task InviteOperatingSiteAsync_UnknownError_500StatusCode()
+    {
+        //Arrange
+        var sut = Setup();
+        var model = Fixture.Create<OperatingSiteRequestModel>();
+
+        _serviceMock!
+            .Setup(x => x.InviteOperatingSiteAsync(model))
+            .ReturnsAsync((ResponseStatus.UnknownError, null));
+        //Act
+        var actual = await sut.InviteOperatingSiteAsync(model);
+
+        //Assert
+        var response = actual as StatusCodeResult;
+        Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.InternalServerError, response.StatusCode);
+    }
+
     protected override ProjectController Setup()
     {
         _serviceMock = new();

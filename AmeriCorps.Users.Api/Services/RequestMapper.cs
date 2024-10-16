@@ -24,6 +24,12 @@ public interface IRequestMapper
     UserRole Map(Role role);
 
     Access Map(AccessRequestModel requestModel);
+
+    OperatingSite Map(OperatingSiteRequestModel requestModel);
+
+    Award Map(AwardResponse requestModel);
+
+    SubGrantee Map(SubGranteeRequestModel requestModel);
 }
 
 public sealed class RequestMapper : IRequestMapper
@@ -267,10 +273,41 @@ public sealed class RequestMapper : IRequestMapper
     public Project Map(ProjectRequestModel requestModel) => new()
     {
         ProjectName = requestModel.ProjectName,
+        ProjectOrgCode = requestModel.ProjectOrgCode,
         ProjectCode = requestModel.ProjectCode,
+        ProjectId = requestModel.ProjectId,
+        GspProjectId = requestModel.GspProjectId,
+        ProgramName = requestModel.ProgramName,
+        ProgramYear = requestModel.ProgramYear,
+        StreetAddress = requestModel.StreetAddress,
+        City = requestModel.City,
+        State = requestModel.State,
+        ZipCode = requestModel.ZipCode,
+
+        // Award = Map(requestModel.Award),
+
+        ProjectPeriodStartDt = requestModel.ProjectPeriodStartDt,
+        ProjectPeriodEndDt = requestModel.ProjectPeriodEndDt,
+        EnrollmentStartDt = requestModel.EnrollmentStartDt,
+        EnrollmentEndDt = requestModel.EnrollmentEndDt,
+
+        OperatingSites = Map(requestModel.OperatingSites),
+        SubGrantees = Map(requestModel.SubGrantees),
+
         ProjectType = requestModel.ProjectType,
-        ProjectOrg = requestModel.ProjectOrg,
         Description = requestModel.Description
+    };
+
+    public Award? Map(AwardResponse? requestModel) => new()
+    {
+        Id = requestModel.Id,
+        AwardCode = requestModel.AwardCode,
+        AwardName = requestModel.AwardName,
+        GspListingNumber = requestModel.GspListingNumber,
+        Fain = requestModel.Fain,
+        Uei = requestModel.Uei,
+        PerformanceStartDt = requestModel.PerformanceStartDt,
+        PerformanceEndDt = requestModel.PerformanceEndDt
     };
 
     public Access Map(AccessRequestModel requestModel) => new()
@@ -303,5 +340,71 @@ public sealed class RequestMapper : IRequestMapper
                            {
                                AccessName = a.AccessName,
                                AccessLevel = a.AccessLevel
+                           });
+
+    public OperatingSite Map(OperatingSiteRequestModel requestModel) => new()
+    {
+        Id = requestModel.Id,
+        ProgramYear = requestModel.ProgramYear,
+        Active = requestModel.Active,
+        OperatingSiteName = requestModel.OperatingSiteName,
+        ContactName = requestModel.ContactName,
+        EmailAddress = requestModel.EmailAddress,
+        PhoneNumber = requestModel.PhoneNumber,
+        StreetAddress = requestModel.StreetAddress,
+        StreetAddress2 = requestModel.StreetAddress2,
+        City = requestModel.City,
+        State = requestModel.State,
+        ZipCode = requestModel.ZipCode,
+        Plus4 = requestModel.Plus4,
+        InviteUserId = requestModel.InviteUserId,
+        InviteDate = requestModel.InviteDate
+    };
+
+    public List<OperatingSite> Map(List<OperatingSiteRequestModel> operatingSite) =>
+       MapperUtils.MapList<OperatingSiteRequestModel, OperatingSite>(
+                           operatingSite,
+                           o => new OperatingSite
+                           {
+                               Id = o.Id,
+                               ProgramYear = o.ProgramYear,
+                               Active = o.Active,
+                               OperatingSiteName = o.OperatingSiteName,
+                               ContactName = o.ContactName,
+                               EmailAddress = o.EmailAddress,
+                               PhoneNumber = o.PhoneNumber,
+                               StreetAddress = o.StreetAddress,
+                               StreetAddress2 = o.StreetAddress2,
+                               City = o.City,
+                               State = o.State,
+                               ZipCode = o.ZipCode,
+                               Plus4 = o.Plus4,
+                               InviteUserId = o.InviteUserId,
+                               InviteDate = o.InviteDate
+                           });
+
+    public SubGrantee Map(SubGranteeRequestModel requestModel) => new()
+    {
+        GranteeCode = requestModel.GranteeCode,
+        GranteeName = requestModel.GranteeName,
+        Uei = requestModel.Uei,
+        StreetAddress = requestModel.StreetAddress,
+        City = requestModel.City,
+        State = requestModel.State,
+        ZipCode = requestModel.ZipCode
+    };
+
+    public List<SubGrantee> Map(List<SubGranteeRequestModel> requestModel) =>
+       MapperUtils.MapList<SubGranteeRequestModel, SubGrantee>(
+                           requestModel,
+                           o => new SubGrantee
+                           {
+                               GranteeCode = o.GranteeCode,
+                               GranteeName = o.GranteeName,
+                               Uei = o.Uei,
+                               StreetAddress = o.StreetAddress,
+                               City = o.City,
+                               State = o.State,
+                               ZipCode = o.ZipCode
                            });
 }

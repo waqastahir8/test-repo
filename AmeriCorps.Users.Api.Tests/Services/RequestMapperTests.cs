@@ -1,8 +1,5 @@
-﻿using Xunit;
-using AmeriCorps.Users.Models;
-using AmeriCorps.Users.Api.Services;
+﻿using AmeriCorps.Users.Api.Services;
 using AmeriCorps.Users.Data.Core;
-using System.Linq;
 
 namespace AmeriCorps.Users.Api.Tests;
 
@@ -211,7 +208,7 @@ public sealed class RequestMapperTests : RequestMapperSetup
         Assert.Equal(model.ProjectName, result.ProjectName);
         Assert.Equal(model.ProjectCode, result.ProjectCode);
         Assert.Equal(model.ProjectType, result.ProjectType);
-        Assert.Equal(model.ProjectOrg, result.ProjectOrg);
+        Assert.Equal(model.ProjectOrgCode, result.ProjectOrgCode);
         Assert.Equal(model.Description, result.Description);
     }
 
@@ -269,6 +266,83 @@ public sealed class RequestMapperTests : RequestMapperSetup
         // Assert
         Assert.Equal(model.RoleName, result.RoleName);
         Assert.Equal(model.FunctionalName, result.FunctionalName);
+    }
+
+    [Fact]
+    public void Map_CorrectlyMapsOperatingSiteRequest()
+    {
+        // Arrange
+        var sut = Setup();
+        var model = Fixture.Create<OperatingSiteRequestModel>();
+
+        IRequestMapper mapper = new RequestMapper();
+
+        // Act
+        var result = mapper.Map(model);
+
+        // Assert
+        Assert.Equal(model.ProgramYear, result.ProgramYear);
+        Assert.Equal(model.Active, result.Active);
+        Assert.Equal(model.OperatingSiteName, result.OperatingSiteName);
+        Assert.Equal(model.ContactName, result.ContactName);
+        Assert.Equal(model.EmailAddress, result.EmailAddress);
+        Assert.Equal(model.PhoneNumber, result.PhoneNumber);
+        Assert.Equal(model.StreetAddress, result.StreetAddress);
+        Assert.Equal(model.StreetAddress2, result.StreetAddress2);
+        Assert.Equal(model.City, result.City);
+        Assert.Equal(model.State, result.State);
+        Assert.Equal(model.ZipCode, result.ZipCode);
+        Assert.Equal(model.Plus4, result.Plus4);
+        Assert.Equal(model.InviteDate, result.InviteDate);
+        Assert.Equal(model.InviteUserId, result.InviteUserId);
+    }
+
+    [Fact]
+    public void Map_CorrectlyMapsAwardRequest()
+    {
+        // Arrange
+        var sut = Setup();
+        var model = Fixture.Build<AwardResponse>()
+            .Without(a => a.PerformanceStartDt)
+            .Without(a => a.PerformanceEndDt)
+            .Create();
+
+        IRequestMapper mapper = new RequestMapper();
+
+        // Act
+        var result = mapper.Map(model);
+
+        // Assert
+        Assert.Equal(model.AwardCode, result.AwardCode);
+        Assert.Equal(model.AwardName, result.AwardName);
+        Assert.Equal(model.GspListingNumber, result.GspListingNumber);
+        Assert.Equal(model.Fain, result.Fain);
+        Assert.Equal(model.Uei, result.Uei);
+
+        Assert.Equal(model.PerformanceStartDt, result.PerformanceStartDt);
+        Assert.Equal(model.PerformanceEndDt, result.PerformanceEndDt);
+    }
+
+    [Fact]
+    public void Map_CorrectlyMapsSubGranteeRequest()
+    {
+        // Arrange
+        var sut = Setup();
+        var model = Fixture.Create<SubGranteeRequestModel>();
+
+        IRequestMapper mapper = new RequestMapper();
+
+        // Act
+        var result = mapper.Map(model);
+
+        // Assert
+        Assert.Equal(model.GranteeCode, result.GranteeCode);
+        Assert.Equal(model.GranteeName, result.GranteeName);
+        Assert.Equal(model.Uei, result.Uei);
+        Assert.Equal(model.StreetAddress, result.StreetAddress);
+        Assert.Equal(model.City, result.City);
+        Assert.Equal(model.State, result.State);
+        Assert.Equal(model.ZipCode, result.ZipCode);
     }
 
     private void TestUserCollectionRequestMapper(User result, UserRequestModel model)
