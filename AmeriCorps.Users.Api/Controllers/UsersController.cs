@@ -83,6 +83,7 @@ public sealed class UsersController(IUsersControllerService service) : Controlle
             ResponseStatus.MissingInformation => new StatusCodeResult((int)HttpStatusCode.UnprocessableContent),
             ResponseStatus.UnknownError => new StatusCodeResult((int)HttpStatusCode.InternalServerError),
             ResponseStatus.Successful => new OkObjectResult(response),
+            ResponseStatus.NotFound => new StatusCodeResult((int)HttpStatusCode.NotFound),
             _ => Ok()
         };
     }

@@ -132,7 +132,7 @@ public sealed class UsersControllerService : IUsersControllerService
 
         if (user == null)
         {
-            return (ResponseStatus.MissingInformation, null);
+            return (ResponseStatus.NotFound, null);
         }
 
         var response = _responseMapper.Map(user);
@@ -315,7 +315,7 @@ public sealed class UsersControllerService : IUsersControllerService
         }
         catch (Exception e)
         {
-            
+
             _logger.LogError(e, "Unable to save search with exception: {ExceptionMessage}.",e.Message);
             return (ResponseStatus.UnknownError, null);
         }
