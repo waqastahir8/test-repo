@@ -1,4 +1,3 @@
-
 namespace AmeriCorps.Users.Models;
 
 public sealed class SearchFilters

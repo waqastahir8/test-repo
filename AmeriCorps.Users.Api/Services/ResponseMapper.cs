@@ -416,7 +416,7 @@ public sealed class ResponseMapper : IResponseMapper
                                         InviteUserId = o.InviteUserId,
                                         InviteDate = o.InviteDate
                                     }),
-                               
+
                                //Map(p.OperatingSites),
                                SubGrantees = Map(p.SubGrantees),
 
@@ -449,7 +449,7 @@ public sealed class ResponseMapper : IResponseMapper
         State = project.State,
         ZipCode = project.ZipCode,
         Active = project.Active,
-        
+
         Award = Map(project.Award),
 
         ProjectPeriodStartDt = project.ProjectPeriodStartDt,

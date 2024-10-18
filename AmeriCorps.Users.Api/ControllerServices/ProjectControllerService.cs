@@ -17,7 +17,6 @@ public interface IProjectControllerService
     Task<(ResponseStatus Status, OperatingSiteResponse? Response)> InviteOperatingSiteAsync(OperatingSiteRequestModel toInvite);
 
     Task<(ResponseStatus Status, List<ProjectResponse>? Response)> SearchProjectsAsync(SearchFilters filters);
-
 }
 
 public sealed class ProjectControllerService : IProjectControllerService
@@ -270,7 +269,8 @@ public sealed class ProjectControllerService : IProjectControllerService
 
         try
         {
-            if(filters.Awarded){
+            if (filters.Awarded)
+            {
                 projList = await _repository.SearchAwardedProjectsAsync(filters.Query, filters.Active, filters.OrgCode);
             }
             else
@@ -293,5 +293,4 @@ public sealed class ProjectControllerService : IProjectControllerService
 
         return (ResponseStatus.Successful, response);
     }
-
 }

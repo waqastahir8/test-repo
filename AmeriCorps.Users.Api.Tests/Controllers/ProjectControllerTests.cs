@@ -1,7 +1,6 @@
+using System.Net;
 using AmeriCorps.Users.Controllers;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
-using AmeriCorps.Users.Data.Core;
 
 namespace AmeriCorps.Users.Api.Tests;
 
