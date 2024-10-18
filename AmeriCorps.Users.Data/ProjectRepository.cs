@@ -5,13 +5,10 @@ using Microsoft.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
-
 namespace AmeriCorps.Users.Data;
 
 public interface IProjectRepository
 {
-
-
     Task<Project?> GetAsync(int id);
 
     Task<Project?> GetProjectByCodeAsync(string projCode);
@@ -45,7 +42,6 @@ public sealed partial class ProjectRepository(
             .Include(p => p.ProjectDirector)
             .FirstOrDefaultAsync(p => p.ProjectCode == projCode));
 
-
     public async Task<Project?> GetAsync(int id) =>
         await ExecuteAsync(async context => await context.Projects
             .Include(p => p.OperatingSites)
@@ -53,8 +49,7 @@ public sealed partial class ProjectRepository(
             .Include(p => p.Award)
             .Include(p => p.AuthorizedRep)
             .Include(p => p.ProjectDirector)
-            .FirstOrDefaultAsync(p =>p.Id == id));
-
+            .FirstOrDefaultAsync(p => p.Id == id));
 
     public async Task<List<Project>?> GetProjectListByOrgAsync(string orgCode) =>
         await ExecuteAsync(async context => await context.Projects
@@ -86,8 +81,6 @@ public sealed partial class ProjectRepository(
 
     public async Task<OperatingSite?> GetOperatingSiteByIdAsync(int opSiteId) =>
         await ExecuteAsync(async context => await context.OperatingSites.FirstOrDefaultAsync(o => o.Id == opSiteId));
-
-
 
     public async Task<Project?> UpdateProjectAsync(Project entity)
     {
@@ -144,7 +137,7 @@ public sealed partial class ProjectRepository(
         }
     }
 
-    public async Task<List<Project>?>  SearchAwardedProjectsAsync(string query, bool active, string orgCode) =>
+    public async Task<List<Project>?> SearchAwardedProjectsAsync(string query, bool active, string orgCode) =>
         await ExecuteAsync(async context => await context.Projects
             .Include(p => p.OperatingSites)
             .Include(p => p.SubGrantees)
@@ -157,7 +150,7 @@ public sealed partial class ProjectRepository(
             .Matches(query))
             .ToListAsync());
 
-    public async Task<List<Project>?>  SearchAllProjectsAsync(string query, bool active, string orgCode) =>
+    public async Task<List<Project>?> SearchAllProjectsAsync(string query, bool active, string orgCode) =>
         await ExecuteAsync(async context => await context.Projects
             .Include(p => p.OperatingSites)
             .Include(p => p.SubGrantees)
@@ -169,5 +162,4 @@ public sealed partial class ProjectRepository(
                 + " " + p.City + " " + p.State + " " + p.ProjectType + " " + p.Description + " ")
             .Matches(query))
             .ToListAsync());
-
 }

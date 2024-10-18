@@ -477,7 +477,6 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
     //     Assert.Equal(expected, actual);
     // }
 
-
     [Theory]
     [InlineData("proj", "org")]
     public async Task SearchProjectsAsync_Successful_Status(string query, string orgCode)
@@ -522,7 +521,7 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
         // Assert
         Assert.Equal(ResponseStatus.MissingInformation, status);
     }
-    
+
     protected override ProjectControllerService Setup()
     {
         _repositoryMock = new();
