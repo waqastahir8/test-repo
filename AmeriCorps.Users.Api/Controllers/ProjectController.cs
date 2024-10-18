@@ -1,6 +1,6 @@
+using System.Net;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
 
 namespace AmeriCorps.Users.Controllers;
 
@@ -34,6 +34,10 @@ public sealed class ProjectController(IProjectControllerService service) : Contr
     [HttpPost("op-site/invite")]
     public async Task<IActionResult> InviteOperatingSiteAsync([FromBody] OperatingSiteRequestModel opSiteRequest) =>
         await ServeAsync(async () => await _service.InviteOperatingSiteAsync(opSiteRequest));
+
+    [HttpPost("search")]
+    public async Task<IActionResult> SearchProjectsAsync([FromBody] SearchFiltersRequestModel filters) =>
+        await ServeAsync(async () => await _service.SearchProjectsAsync(filters));
 
     private async Task<IActionResult> ServeAsync<T>(Func<Task<(ResponseStatus, T)>> callAsync)
     {

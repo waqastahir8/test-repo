@@ -477,6 +477,51 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
     //     Assert.Equal(expected, actual);
     // }
 
+    [Theory]
+    [InlineData("proj", "org")]
+    public async Task SearchProjectsAsync_Successful_Status(string query, string orgCode)
+    {
+        // Arrange
+        var sut = Setup();
+        var filters = Fixture.Create<SearchFiltersRequestModel>();
+        filters.Query = query;
+        filters.Awarded = true;
+        filters.Active = true;
+        filters.OrgCode = orgCode;
+
+        _repositoryMock!
+            .Setup(x => x.SearchAwardedProjectsAsync(filters.Query, filters.Active, filters.OrgCode))
+            .ReturnsAsync(() => Fixture.Build<List<Project>>()
+            .Create());
+
+        // Act
+        var (status, _) = await sut.SearchProjectsAsync(filters);
+
+        // Assert
+        Assert.Equal(ResponseStatus.Successful, status);
+    }
+
+    [Theory]
+    [InlineData("proj", "org")]
+    public async Task SearchProjectsAsync_NonExistent_InformationMissing_Status(string query, string orgCode)
+    {
+        // Arrange
+        var sut = Setup();
+        var filters = Fixture.Create<SearchFiltersRequestModel>();
+        filters.Awarded = true;
+        filters.Active = true;
+
+        _repositoryMock!
+            .Setup(x => x.SearchAwardedProjectsAsync(filters.Query, filters.Active, filters.OrgCode))
+            .ReturnsAsync(() => null);
+
+        // Act
+        var (status, _) = await sut.SearchProjectsAsync(filters);
+
+        // Assert
+        Assert.Equal(ResponseStatus.MissingInformation, status);
+    }
+
     protected override ProjectControllerService Setup()
     {
         _repositoryMock = new();

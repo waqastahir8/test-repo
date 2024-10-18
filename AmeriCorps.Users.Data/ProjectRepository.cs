@@ -5,13 +5,10 @@ using Microsoft.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
-
 namespace AmeriCorps.Users.Data;
 
 public interface IProjectRepository
 {
-
-
     Task<Project?> GetAsync(int id);
 
     Task<Project?> GetProjectByCodeAsync(string projCode);
@@ -24,6 +21,9 @@ public interface IProjectRepository
 
     Task<OperatingSite?> GetOperatingSiteByIdAsync(int opSiteId);
 
+    Task<List<Project>?> SearchAwardedProjectsAsync(string query, bool active, string orgCode);
+
+    Task<List<Project>?> SearchAllProjectsAsync(string query, bool active, string orgCode);
 }
 
 public sealed partial class ProjectRepository(
@@ -42,7 +42,6 @@ public sealed partial class ProjectRepository(
             .Include(p => p.ProjectDirector)
             .FirstOrDefaultAsync(p => p.ProjectCode == projCode));
 
-
     public async Task<Project?> GetAsync(int id) =>
         await ExecuteAsync(async context => await context.Projects
             .Include(p => p.OperatingSites)
@@ -50,8 +49,7 @@ public sealed partial class ProjectRepository(
             .Include(p => p.Award)
             .Include(p => p.AuthorizedRep)
             .Include(p => p.ProjectDirector)
-            .FirstOrDefaultAsync(p =>p.Id == id));
-
+            .FirstOrDefaultAsync(p => p.Id == id));
 
     public async Task<List<Project>?> GetProjectListByOrgAsync(string orgCode) =>
         await ExecuteAsync(async context => await context.Projects
@@ -60,7 +58,7 @@ public sealed partial class ProjectRepository(
             .Include(p => p.Award)
             .Include(p => p.AuthorizedRep)
             .Include(p => p.ProjectDirector)
-            .Where(o =>o.ProjectOrgCode == orgCode).ToListAsync());
+            .Where(o => o.ProjectOrgCode == orgCode && o.Award != null).ToListAsync());
 
     public async Task<T> SaveAsync<T>(T entity) where T : Entity =>
        await ExecuteAsync(async context =>
@@ -83,8 +81,6 @@ public sealed partial class ProjectRepository(
 
     public async Task<OperatingSite?> GetOperatingSiteByIdAsync(int opSiteId) =>
         await ExecuteAsync(async context => await context.OperatingSites.FirstOrDefaultAsync(o => o.Id == opSiteId));
-
-
 
     public async Task<Project?> UpdateProjectAsync(Project entity)
     {
@@ -140,4 +136,30 @@ public sealed partial class ProjectRepository(
             context.Entry(entity).State = EntityState.Deleted;
         }
     }
+
+    public async Task<List<Project>?> SearchAwardedProjectsAsync(string query, bool active, string orgCode) =>
+        await ExecuteAsync(async context => await context.Projects
+            .Include(p => p.OperatingSites)
+            .Include(p => p.SubGrantees)
+            .Include(p => p.Award)
+            .Include(p => p.AuthorizedRep)
+            .Include(p => p.ProjectDirector)
+            .Where(p => p.ProjectOrgCode == orgCode && p.Award != null && p.Active == active && EF.Functions.ToTsVector("english", p.ProjectName + " " + p.ProjectOrgCode + " " + p.ProjectCode
+                + " " + p.ProjectId + " " + p.GspProjectId + " " + p.ProgramName + " " + p.StreetAddress
+                + " " + p.City + " " + p.State + " " + p.ProjectType + " " + p.Description + " " + p.Award.AwardName)
+            .Matches(query))
+            .ToListAsync());
+
+    public async Task<List<Project>?> SearchAllProjectsAsync(string query, bool active, string orgCode) =>
+        await ExecuteAsync(async context => await context.Projects
+            .Include(p => p.OperatingSites)
+            .Include(p => p.SubGrantees)
+            .Include(p => p.Award)
+            .Include(p => p.AuthorizedRep)
+            .Include(p => p.ProjectDirector)
+            .Where(p => p.ProjectOrgCode == orgCode && p.Active == active && EF.Functions.ToTsVector("english", p.ProjectName + " " + p.ProjectOrgCode + " " + p.ProjectCode
+                + " " + p.ProjectId + " " + p.GspProjectId + " " + p.ProgramName + " " + p.StreetAddress
+                + " " + p.City + " " + p.State + " " + p.ProjectType + " " + p.Description + " ")
+            .Matches(query))
+            .ToListAsync());
 }

@@ -78,6 +78,46 @@ public abstract class NpgsqlContext : ContextBase
 
         var operatingSite = Create<OperatingSite>("operatingSite");
 
+        modelBuilder.Entity<Project>()
+            .HasIndex(p => new
+            {
+                p.ProjectName,
+                p.ProjectOrgCode,
+                p.ProjectCode,
+                p.ProjectId,
+                p.GspProjectId,
+                p.ProgramName,
+                p.StreetAddress,
+                p.City,
+                p.State,
+                p.ProjectType,
+                p.Description
+            })
+            .HasMethod("GIST")
+            .IsTsVectorExpressionIndex("english");
+
+        modelBuilder.Entity<OperatingSite>()
+            .HasIndex(o => new
+            {
+                o.ProgramYear,
+                o.OperatingSiteName,
+                o.ContactName,
+                o.EmailAddress,
+                o.PhoneNumber,
+                o.StreetAddress,
+                o.StreetAddress2,
+                o.City,
+                o.State,
+                o.ZipCode
+            })
+            .HasMethod("GIST")
+            .IsTsVectorExpressionIndex("english");
+
+        modelBuilder.Entity<Award>()
+            .HasIndex(a => new { a.AwardCode, a.AwardName, a.GspListingNumber })
+            .HasMethod("GIST")
+            .IsTsVectorExpressionIndex("english");
+
         EntityTypeBuilder<T> Create<T>(string tableName) where T : Entity
         {
             var entity = modelBuilder.Entity<T>();

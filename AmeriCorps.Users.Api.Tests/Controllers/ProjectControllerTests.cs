@@ -1,7 +1,6 @@
+using System.Net;
 using AmeriCorps.Users.Controllers;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
-using AmeriCorps.Users.Data.Core;
 
 namespace AmeriCorps.Users.Api.Tests;
 
@@ -341,6 +340,64 @@ public sealed partial class ProjectControllerTests : BaseTests<ProjectController
         var response = actual as StatusCodeResult;
         Assert.NotNull(response);
         Assert.Equal((int)HttpStatusCode.InternalServerError, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task SearchProjectsAsync_UnknownError_500StatusCode()
+    {
+        //Arrange
+        var sut = Setup();
+        var filters = Fixture.Create<SearchFiltersRequestModel>();
+
+        _serviceMock!
+            .Setup(x => x.SearchProjectsAsync(filters))
+            .ReturnsAsync((ResponseStatus.UnknownError, null));
+        //Act
+        var actual = await sut.SearchProjectsAsync(filters);
+
+        //Assert
+        var response = actual as StatusCodeResult;
+        Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.InternalServerError, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task SearchProjectsAsync_SuccessProcessing_200StatusCode()
+    {
+        //Arrange
+        var sut = Setup();
+        var filters = Fixture.Create<SearchFiltersRequestModel>();
+        var projResponse = Fixture.Create<List<ProjectResponse>>();
+
+        _serviceMock!
+            .Setup(x => x.SearchProjectsAsync(filters))
+            .ReturnsAsync((ResponseStatus.Successful, projResponse));
+        //Act
+        var actual = await sut.SearchProjectsAsync(filters);
+
+        //Assert
+        var response = actual as OkObjectResult;
+        Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task SearchProjectsAsync_NonExistent_UnprocessableEntity_422StatusCode()
+    {
+        //Arrange
+        var sut = Setup();
+        var filters = Fixture.Create<SearchFiltersRequestModel>();
+
+        _serviceMock!
+            .Setup(x => x.SearchProjectsAsync(filters))
+            .ReturnsAsync((ResponseStatus.MissingInformation, null));
+        //Act
+        var actual = await sut.SearchProjectsAsync(filters);
+
+        //Assert
+        var response = actual as StatusCodeResult;
+        Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.UnprocessableEntity, response.StatusCode);
     }
 
     protected override ProjectController Setup()

@@ -37,7 +37,7 @@ public interface IResponseMapper
 
     List<ProjectResponse> Map(List<Project> projList);
 
-    List<OperatingSiteRequestModel> Map(List<OperatingSite> operatingSiteList);
+    List<OperatingSiteResponse> Map(List<OperatingSite> operatingSiteList);
 
     OperatingSiteResponse? Map(OperatingSite? operatingSite);
 
@@ -387,15 +387,37 @@ public sealed class ResponseMapper : IResponseMapper
                                City = p.City,
                                State = p.State,
                                ZipCode = p.ZipCode,
+                               Active = p.Active,
 
-                               //    Award = Map(p.Award),
+                               Award = Map(p.Award),
 
                                ProjectPeriodStartDt = p.ProjectPeriodStartDt,
                                ProjectPeriodEndDt = p.ProjectPeriodEndDt,
                                EnrollmentStartDt = p.EnrollmentStartDt,
                                EnrollmentEndDt = p.EnrollmentEndDt,
 
-                               OperatingSites = Map(p.OperatingSites),
+                               OperatingSites = MapperUtils.MapList<AmeriCorps.Users.Data.Core.OperatingSite, OperatingSiteRequestModel>(
+                                    p.OperatingSites,
+                                    o => new OperatingSiteRequestModel
+                                    {
+                                        Id = o.Id,
+                                        ProgramYear = o.ProgramYear,
+                                        Active = o.Active,
+                                        OperatingSiteName = o.OperatingSiteName,
+                                        ContactName = o.ContactName,
+                                        EmailAddress = o.EmailAddress,
+                                        PhoneNumber = o.PhoneNumber,
+                                        StreetAddress = o.StreetAddress,
+                                        StreetAddress2 = o.StreetAddress2,
+                                        City = o.City,
+                                        State = o.State,
+                                        ZipCode = o.ZipCode,
+                                        Plus4 = o.Plus4,
+                                        InviteUserId = o.InviteUserId,
+                                        InviteDate = o.InviteDate
+                                    }),
+
+                               //Map(p.OperatingSites),
                                SubGrantees = Map(p.SubGrantees),
 
                                ProjectType = p.ProjectType,
@@ -412,6 +434,7 @@ public sealed class ResponseMapper : IResponseMapper
 
     public ProjectResponse? Map(Project? project) => project == null ? null : new()
     {
+        Id = project.Id,
         ProjectName = project.ProjectName,
         ProjectOrgCode = project.ProjectOrgCode,
         ProjectCode = project.ProjectCode,
@@ -425,15 +448,36 @@ public sealed class ResponseMapper : IResponseMapper
         City = project.City,
         State = project.State,
         ZipCode = project.ZipCode,
+        Active = project.Active,
 
-        // Award = Map(project.Award),
+        Award = Map(project.Award),
 
         ProjectPeriodStartDt = project.ProjectPeriodStartDt,
         ProjectPeriodEndDt = project.ProjectPeriodEndDt,
         EnrollmentStartDt = project.EnrollmentStartDt,
         EnrollmentEndDt = project.EnrollmentEndDt,
 
-        OperatingSites = Map(project.OperatingSites),
+        OperatingSites = MapperUtils.MapList<AmeriCorps.Users.Data.Core.OperatingSite, OperatingSiteRequestModel>(
+                        project.OperatingSites,
+                        o => new OperatingSiteRequestModel
+                        {
+                            Id = o.Id,
+                            ProgramYear = o.ProgramYear,
+                            Active = o.Active,
+                            OperatingSiteName = o.OperatingSiteName,
+                            ContactName = o.ContactName,
+                            EmailAddress = o.EmailAddress,
+                            PhoneNumber = o.PhoneNumber,
+                            StreetAddress = o.StreetAddress,
+                            StreetAddress2 = o.StreetAddress2,
+                            City = o.City,
+                            State = o.State,
+                            ZipCode = o.ZipCode,
+                            Plus4 = o.Plus4,
+                            InviteUserId = o.InviteUserId,
+                            InviteDate = o.InviteDate
+                        }),
+
         SubGrantees = Map(project.SubGrantees),
 
         ProjectType = project.ProjectType,
@@ -496,10 +540,10 @@ public sealed class ResponseMapper : IResponseMapper
         InviteDate = operatingSite.InviteDate
     };
 
-    public List<OperatingSiteRequestModel> Map(List<OperatingSite> operatingSiteList) =>
-       MapperUtils.MapList<OperatingSite, OperatingSiteRequestModel>(
+    public List<OperatingSiteResponse> Map(List<OperatingSite> operatingSiteList) =>
+       MapperUtils.MapList<OperatingSite, OperatingSiteResponse>(
                            operatingSiteList,
-                           o => new OperatingSiteRequestModel
+                           o => new OperatingSiteResponse
                            {
                                Id = o.Id,
                                ProgramYear = o.ProgramYear,

@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 
 namespace AmeriCorps.Users.Data.Core;
@@ -58,4 +57,6 @@ public sealed class Project : Entity
 
     [Column(TypeName = "varchar(64)")]
     public string Description { get; set; } = string.Empty;
+
+    public bool Active { get; set; } = true;
 }

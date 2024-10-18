@@ -15,6 +15,8 @@ public interface IProjectControllerService
     Task<(ResponseStatus Status, OperatingSiteResponse? Response)> UpdateOperatingSiteAsync(OperatingSiteRequestModel opSiteRequest);
 
     Task<(ResponseStatus Status, OperatingSiteResponse? Response)> InviteOperatingSiteAsync(OperatingSiteRequestModel toInvite);
+
+    Task<(ResponseStatus Status, List<ProjectResponse>? Response)> SearchProjectsAsync(SearchFiltersRequestModel filters);
 }
 
 public sealed class ProjectControllerService : IProjectControllerService
@@ -252,6 +254,42 @@ public sealed class ProjectControllerService : IProjectControllerService
         }
 
         var response = _responseMapper.Map(operatingSite);
+
+        return (ResponseStatus.Successful, response);
+    }
+
+    public async Task<(ResponseStatus Status, List<ProjectResponse>? Response)> SearchProjectsAsync(SearchFiltersRequestModel filters)
+    {
+        if (filters == null || string.IsNullOrEmpty(filters.Query) || string.IsNullOrEmpty(filters.OrgCode))
+        {
+            return (ResponseStatus.MissingInformation, null);
+        }
+
+        List<Project>? projList;
+
+        try
+        {
+            if (filters.Awarded)
+            {
+                projList = await _repository.SearchAwardedProjectsAsync(filters.Query, filters.Active, filters.OrgCode);
+            }
+            else
+            {
+                projList = await _repository.SearchAllProjectsAsync(filters.Query, filters.Active, filters.OrgCode);
+            }
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Could not retrieve project list with query {Identifier}.", filters.Query.Replace(Environment.NewLine, ""));
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        if (projList == null)
+        {
+            return (ResponseStatus.MissingInformation, null);
+        }
+
+        var response = _responseMapper.Map(projList);
 
         return (ResponseStatus.Successful, response);
     }
