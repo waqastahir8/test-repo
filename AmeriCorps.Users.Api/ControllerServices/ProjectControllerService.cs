@@ -16,7 +16,7 @@ public interface IProjectControllerService
 
     Task<(ResponseStatus Status, OperatingSiteResponse? Response)> InviteOperatingSiteAsync(OperatingSiteRequestModel toInvite);
 
-    Task<(ResponseStatus Status, List<ProjectResponse>? Response)> SearchProjectsAsync(SearchFilters filters);
+    Task<(ResponseStatus Status, List<ProjectResponse>? Response)> SearchProjectsAsync(SearchFiltersRequestModel filters);
 
 }
 
@@ -259,7 +259,7 @@ public sealed class ProjectControllerService : IProjectControllerService
         return (ResponseStatus.Successful, response);
     }
 
-    public async Task<(ResponseStatus Status, List<ProjectResponse>? Response)> SearchProjectsAsync(SearchFilters filters)
+    public async Task<(ResponseStatus Status, List<ProjectResponse>? Response)> SearchProjectsAsync(SearchFiltersRequestModel filters)
     {
         if (filters == null || string.IsNullOrEmpty(filters.Query) || string.IsNullOrEmpty(filters.OrgCode))
         {

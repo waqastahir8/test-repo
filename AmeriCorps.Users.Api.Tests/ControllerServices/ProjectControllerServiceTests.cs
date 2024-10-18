@@ -484,7 +484,7 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
     {
         // Arrange
         var sut = Setup();
-        var filters = Fixture.Create<SearchFilters>();
+        var filters = Fixture.Create<SearchFiltersRequestModel>();
         filters.Query = query;
         filters.Awarded = true;
         filters.Active = true;
@@ -508,7 +508,7 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
     {
         // Arrange
         var sut = Setup();
-        var filters = Fixture.Create<SearchFilters>();
+        var filters = Fixture.Create<SearchFiltersRequestModel>();
         filters.Awarded = true;
         filters.Active = true;
 

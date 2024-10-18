@@ -348,7 +348,7 @@ public sealed partial class ProjectControllerTests : BaseTests<ProjectController
     {
         //Arrange
         var sut = Setup();
-        var filters = Fixture.Create<SearchFilters>();
+        var filters = Fixture.Create<SearchFiltersRequestModel>();
 
         _serviceMock!
             .Setup(x => x.SearchProjectsAsync(filters))
@@ -367,7 +367,7 @@ public sealed partial class ProjectControllerTests : BaseTests<ProjectController
     {
         //Arrange
         var sut = Setup();
-        var filters = Fixture.Create<SearchFilters>();
+        var filters = Fixture.Create<SearchFiltersRequestModel>();
         var projResponse = Fixture.Create<List<ProjectResponse>>();
 
         _serviceMock!
@@ -387,7 +387,7 @@ public sealed partial class ProjectControllerTests : BaseTests<ProjectController
     {
         //Arrange
         var sut = Setup();
-        var filters = Fixture.Create<SearchFilters>();
+        var filters = Fixture.Create<SearchFiltersRequestModel>();
 
         _serviceMock!
             .Setup(x => x.SearchProjectsAsync(filters))
