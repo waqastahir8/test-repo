@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AmeriCorps.Users.Data.Migrations.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20241018185307_ProjectSearchFunctionality")]
+    [Migration("20241018193841_ProjectSearchFunctionality")]
     partial class ProjectSearchFunctionality
     {
         /// <inheritdoc />
