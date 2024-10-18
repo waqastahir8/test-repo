@@ -24,6 +24,9 @@ public interface IProjectRepository
 
     Task<OperatingSite?> GetOperatingSiteByIdAsync(int opSiteId);
 
+    Task<List<Project>?> SearchAwardedProjectsAsync(string query, bool active, string orgCode);
+
+    Task<List<Project>?> SearchAllProjectsAsync(string query, bool active, string orgCode);
 }
 
 public sealed partial class ProjectRepository(
@@ -60,7 +63,7 @@ public sealed partial class ProjectRepository(
             .Include(p => p.Award)
             .Include(p => p.AuthorizedRep)
             .Include(p => p.ProjectDirector)
-            .Where(o =>o.ProjectOrgCode == orgCode).ToListAsync());
+            .Where(o => o.ProjectOrgCode == orgCode && o.Award != null).ToListAsync());
 
     public async Task<T> SaveAsync<T>(T entity) where T : Entity =>
        await ExecuteAsync(async context =>
@@ -140,4 +143,31 @@ public sealed partial class ProjectRepository(
             context.Entry(entity).State = EntityState.Deleted;
         }
     }
+
+    public async Task<List<Project>?>  SearchAwardedProjectsAsync(string query, bool active, string orgCode) =>
+        await ExecuteAsync(async context => await context.Projects
+            .Include(p => p.OperatingSites)
+            .Include(p => p.SubGrantees)
+            .Include(p => p.Award)
+            .Include(p => p.AuthorizedRep)
+            .Include(p => p.ProjectDirector)
+            .Where(p => p.ProjectOrgCode == orgCode && p.Award != null && p.Active == active && EF.Functions.ToTsVector("english", p.ProjectName + " " + p.ProjectOrgCode + " " + p.ProjectCode
+                + " " + p.ProjectId + " " + p.GspProjectId + " " + p.ProgramName + " " + p.StreetAddress
+                + " " + p.City + " " + p.State + " " + p.ProjectType + " " + p.Description + " " + p.Award.AwardName)
+            .Matches(query))
+            .ToListAsync());
+
+    public async Task<List<Project>?>  SearchAllProjectsAsync(string query, bool active, string orgCode) =>
+        await ExecuteAsync(async context => await context.Projects
+            .Include(p => p.OperatingSites)
+            .Include(p => p.SubGrantees)
+            .Include(p => p.Award)
+            .Include(p => p.AuthorizedRep)
+            .Include(p => p.ProjectDirector)
+            .Where(p => p.ProjectOrgCode == orgCode && p.Active == active && EF.Functions.ToTsVector("english", p.ProjectName + " " + p.ProjectOrgCode + " " + p.ProjectCode
+                + " " + p.ProjectId + " " + p.GspProjectId + " " + p.ProgramName + " " + p.StreetAddress
+                + " " + p.City + " " + p.State + " " + p.ProjectType + " " + p.Description + " ")
+            .Matches(query))
+            .ToListAsync());
+
 }

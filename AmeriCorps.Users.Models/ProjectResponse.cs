@@ -6,4 +6,5 @@ public sealed class ProjectResponse : ProjectRequestModel
 
     public UserResponse? AuthorizedRep { get; set; }
     public UserResponse? ProjectDirector { get; set; }
+    public AwardResponse? Award { get; set; }
 }

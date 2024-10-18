@@ -203,6 +203,12 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                     b.HasIndex("AwardCode")
                         .HasDatabaseName("ix_award_award_code");
 
+                    b.HasIndex("AwardCode", "AwardName", "GspListingNumber")
+                        .HasDatabaseName("ix_award_award_code_award_name_gsp_listing_number")
+                        .HasAnnotation("Npgsql:TsVectorConfig", "english");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("AwardCode", "AwardName", "GspListingNumber"), "GIST");
+
                     b.ToTable("award", "users");
                 });
 
@@ -498,6 +504,12 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                     b.HasIndex("ProjectId")
                         .HasDatabaseName("ix_operating_site_project_id");
 
+                    b.HasIndex("ProgramYear", "OperatingSiteName", "ContactName", "EmailAddress", "PhoneNumber", "StreetAddress", "StreetAddress2", "City", "State", "ZipCode")
+                        .HasDatabaseName("ix_operating_site_program_year_operating_site_name_contact_name")
+                        .HasAnnotation("Npgsql:TsVectorConfig", "english");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("ProgramYear", "OperatingSiteName", "ContactName", "EmailAddress", "PhoneNumber", "StreetAddress", "StreetAddress2", "City", "State", "ZipCode"), "GIST");
+
                     b.ToTable("operatingSite", "users");
                 });
 
@@ -542,6 +554,10 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                         .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("boolean")
+                        .HasColumnName("active");
 
                     b.Property<int?>("AuthorizedRepId")
                         .HasColumnType("integer")
@@ -648,6 +664,12 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
 
                     b.HasIndex("ProjectDirectorId")
                         .HasDatabaseName("ix_project_project_director_id");
+
+                    b.HasIndex("ProjectName", "ProjectOrgCode", "ProjectCode", "ProjectId", "GspProjectId", "ProgramName", "StreetAddress", "City", "State", "ProjectType", "Description")
+                        .HasDatabaseName("ix_project_project_name_project_org_code_project_code_project_")
+                        .HasAnnotation("Npgsql:TsVectorConfig", "english");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("ProjectName", "ProjectOrgCode", "ProjectCode", "ProjectId", "GspProjectId", "ProgramName", "StreetAddress", "City", "State", "ProjectType", "Description"), "GIST");
 
                     b.ToTable("project", "users");
                 });

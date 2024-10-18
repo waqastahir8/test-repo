@@ -35,6 +35,10 @@ public sealed class ProjectController(IProjectControllerService service) : Contr
     public async Task<IActionResult> InviteOperatingSiteAsync([FromBody] OperatingSiteRequestModel opSiteRequest) =>
         await ServeAsync(async () => await _service.InviteOperatingSiteAsync(opSiteRequest));
 
+    [HttpPost("search")]
+    public async Task<IActionResult> SearchProjectsAsync([FromBody] SearchFilters filters) =>
+        await ServeAsync(async () => await _service.SearchProjectsAsync(filters));
+
     private async Task<IActionResult> ServeAsync<T>(Func<Task<(ResponseStatus, T)>> callAsync)
     {
         var (status, response) = await callAsync();
