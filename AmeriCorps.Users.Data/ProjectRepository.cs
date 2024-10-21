@@ -147,7 +147,7 @@ public sealed partial class ProjectRepository(
             .Where(p => p.ProjectOrgCode == orgCode && p.Award != null && p.Active == active && EF.Functions.ToTsVector("english", p.ProjectName + " " + p.ProjectOrgCode + " " + p.ProjectCode
                 + " " + p.ProjectId + " " + p.GspProjectId + " " + p.ProgramName + " " + p.StreetAddress
                 + " " + p.City + " " + p.State + " " + p.ProjectType + " " + p.Description + " " + p.Award.AwardName)
-            .Matches(query))
+            .Matches(EF.Functions.ToTsQuery(query)))
             .ToListAsync());
 
     public async Task<List<Project>?> SearchAllProjectsAsync(string query, bool active, string orgCode) =>
@@ -160,6 +160,6 @@ public sealed partial class ProjectRepository(
             .Where(p => p.ProjectOrgCode == orgCode && p.Active == active && EF.Functions.ToTsVector("english", p.ProjectName + " " + p.ProjectOrgCode + " " + p.ProjectCode
                 + " " + p.ProjectId + " " + p.GspProjectId + " " + p.ProgramName + " " + p.StreetAddress
                 + " " + p.City + " " + p.State + " " + p.ProjectType + " " + p.Description + " ")
-            .Matches(query))
+            .Matches(EF.Functions.ToTsQuery(query)))
             .ToListAsync());
 }

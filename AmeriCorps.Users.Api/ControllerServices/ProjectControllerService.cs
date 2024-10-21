@@ -271,11 +271,11 @@ public sealed class ProjectControllerService : IProjectControllerService
         {
             if (filters.Awarded)
             {
-                projList = await _repository.SearchAwardedProjectsAsync(filters.Query, filters.Active, filters.OrgCode);
+                projList = await _repository.SearchAwardedProjectsAsync(filters.Query.Trim()+":*", filters.Active, filters.OrgCode);
             }
             else
             {
-                projList = await _repository.SearchAllProjectsAsync(filters.Query, filters.Active, filters.OrgCode);
+                projList = await _repository.SearchAllProjectsAsync(filters.Query.Trim()+":*", filters.Active, filters.OrgCode);
             }
         }
         catch (Exception e)
