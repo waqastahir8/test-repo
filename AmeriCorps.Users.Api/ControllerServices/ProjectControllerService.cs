@@ -276,22 +276,23 @@ public sealed class ProjectControllerService : IProjectControllerService
 
     public async Task<(ResponseStatus Status, List<ProjectResponse>? Response)> SearchProjectsAsync(SearchFiltersRequestModel filters)
     {
+        List<Project> projectList = new List<Project>();
+
         if (filters == null || string.IsNullOrEmpty(filters.Query) || string.IsNullOrEmpty(filters.OrgCode))
         {
             return (ResponseStatus.MissingInformation, null);
         }
 
-        List<Project>? projList;
-
+        List<Project>? foundList;    
         try
         {
             if (filters.Awarded)
             {
-                projList = await _repository.SearchAwardedProjectsAsync(filters.Query.Trim()+":*", filters.Active, filters.OrgCode);
+                foundList = await _repository.SearchAwardedProjectsAsync(filters.Query.Trim()+":*", filters.Active, filters.OrgCode);
             }
             else
             {
-                projList = await _repository.SearchAllProjectsAsync(filters.Query.Trim()+":*", filters.Active, filters.OrgCode);
+                foundList = await _repository.SearchAllProjectsAsync(filters.Query.Trim()+":*", filters.Active, filters.OrgCode);
             }
         }
         catch (Exception e)
@@ -300,28 +301,41 @@ public sealed class ProjectControllerService : IProjectControllerService
             return (ResponseStatus.UnknownError, null);
         }
 
-        var response = _responseMapper.Map(projList);
+        if(foundList != null){
+            foundList.ForEach(proj => {
+                projectList.Add(proj);
+            });
+        }
+
+        var response = _responseMapper.Map(projectList);
 
         return (ResponseStatus.Successful, response);
     }
 
     public async Task<(ResponseStatus Status, List<OperatingSiteResponse>? Response)> SearchOperatingSitesAsync(SearchFiltersRequestModel filters)
     {
+        List<OperatingSite> opSiteList = new List<OperatingSite>();
         if (filters == null || string.IsNullOrEmpty(filters.Query) || filters.ProjectId < 1)
         {
             return (ResponseStatus.MissingInformation, null);
         }
 
-        List<OperatingSite>? opSiteList;
+        List<OperatingSite>? foundList;
 
         try
         {
-            opSiteList = await _repository.SearchOperatingSitesAsync(filters.ProjectId, filters.Active, filters.Query.Trim()+":*");
+            foundList = await _repository.SearchOperatingSitesAsync(filters.ProjectId, filters.Active, filters.Query.Trim()+":*");
         }
         catch (Exception e)
         {
             _logger.LogError(e, "Could not retrieve project list with query {Identifier}.", filters.Query.Replace(Environment.NewLine, ""));
             return (ResponseStatus.UnknownError, null);
+        }
+
+        if(foundList != null){
+            foundList.ForEach(site => {
+                opSiteList.Add(site);
+            });
         }
 
         var response = _responseMapper.Map(opSiteList);
