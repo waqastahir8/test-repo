@@ -26,7 +26,7 @@ public sealed class Project : Entity
 
     public string ProgramYear { get; set; } = string.Empty;
 
-    public Award? Award { get; set; }
+    public Award Award { get; set; } = new Award();
 
     public User? AuthorizedRep { get; set; }
     public User? ProjectDirector { get; set; }

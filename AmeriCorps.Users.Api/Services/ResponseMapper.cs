@@ -41,7 +41,7 @@ public interface IResponseMapper
 
     OperatingSiteResponse? Map(OperatingSite? operatingSite);
 
-    AwardResponse? Map(Award? award);
+    AwardResponse Map(Award award);
 
     SubGranteeResponse Map(SubGrantee subGrantee);
 }
@@ -484,7 +484,7 @@ public sealed class ResponseMapper : IResponseMapper
         Description = project.Description
     };
 
-    public AwardResponse? Map(Award? award) => new()
+    public AwardResponse Map(Award award) => new()
     {
         Id = award.Id,
         AwardCode = award.AwardCode,

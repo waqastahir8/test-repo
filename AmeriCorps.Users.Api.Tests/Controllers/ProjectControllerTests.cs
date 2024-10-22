@@ -52,7 +52,7 @@ public sealed partial class ProjectControllerTests : BaseTests<ProjectController
     {
         //Arrange
         var sut = Setup();
-        var model = Fixture.Create<ProjectResponse>();
+        var model = Fixture.Create<ProjectRequestModel>();
 
         _serviceMock!
             .Setup(x => x.CreateProjectAsync(model))
@@ -288,8 +288,13 @@ public sealed partial class ProjectControllerTests : BaseTests<ProjectController
     {
         //Arrange
         var sut = Setup();
-        var model = Fixture.Create<OperatingSiteRequestModel>();
-        var projResponse = Fixture.Create<OperatingSiteResponse>();
+
+        var model = Fixture.Create<ProjectRequestModel>();
+        var toInvite = Fixture.Create<OperatingSiteRequestModel>();
+        model.OperatingSites.Add(toInvite);
+
+        var projResponse = Fixture.Create<ProjectResponse>();
+        
 
         _serviceMock!
             .Setup(x => x.InviteOperatingSiteAsync(model))
@@ -309,7 +314,9 @@ public sealed partial class ProjectControllerTests : BaseTests<ProjectController
     {
         //Arrange
         var sut = Setup();
-        var model = Fixture.Create<OperatingSiteRequestModel>();
+        var model = Fixture.Create<ProjectRequestModel>();
+        var toInvite = Fixture.Create<OperatingSiteRequestModel>();
+        model.OperatingSites.Add(toInvite);
 
         _serviceMock!
             .Setup(x => x.InviteOperatingSiteAsync(model))
@@ -328,7 +335,9 @@ public sealed partial class ProjectControllerTests : BaseTests<ProjectController
     {
         //Arrange
         var sut = Setup();
-        var model = Fixture.Create<OperatingSiteRequestModel>();
+        var model = Fixture.Create<ProjectRequestModel>();
+        var toInvite = Fixture.Create<OperatingSiteRequestModel>();
+        model.OperatingSites.Add(toInvite);
 
         _serviceMock!
             .Setup(x => x.InviteOperatingSiteAsync(model))
@@ -399,6 +408,66 @@ public sealed partial class ProjectControllerTests : BaseTests<ProjectController
         Assert.NotNull(response);
         Assert.Equal((int)HttpStatusCode.UnprocessableEntity, response.StatusCode);
     }
+
+
+    [Fact]
+    public async Task SearchOperatingSitesAsync_UnknownError_500StatusCode()
+    {
+        //Arrange
+        var sut = Setup();
+        var filters = Fixture.Create<SearchFiltersRequestModel>();
+
+        _serviceMock!
+            .Setup(x => x.SearchOperatingSitesAsync(filters))
+            .ReturnsAsync((ResponseStatus.UnknownError, null));
+        //Act
+        var actual = await sut.SearchOperatingSitesAsync(filters);
+
+        //Assert
+        var response = actual as StatusCodeResult;
+        Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.InternalServerError, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task SearchOperatingSitesAsync_SuccessProcessing_200StatusCode()
+    {
+        //Arrange
+        var sut = Setup();
+        var filters = Fixture.Create<SearchFiltersRequestModel>();
+        var projResponse = Fixture.Create<List<OperatingSiteResponse>>();
+
+        _serviceMock!
+            .Setup(x => x.SearchOperatingSitesAsync(filters))
+            .ReturnsAsync((ResponseStatus.Successful, projResponse));
+        //Act
+        var actual = await sut.SearchOperatingSitesAsync(filters);
+
+        //Assert
+        var response = actual as OkObjectResult;
+        Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task SearchOperatingSitesAsync_NonExistent_UnprocessableEntity_422StatusCode()
+    {
+        //Arrange
+        var sut = Setup();
+        var filters = Fixture.Create<SearchFiltersRequestModel>();
+
+        _serviceMock!
+            .Setup(x => x.SearchOperatingSitesAsync(filters))
+            .ReturnsAsync((ResponseStatus.MissingInformation, null));
+        //Act
+        var actual = await sut.SearchOperatingSitesAsync(filters);
+
+        //Assert
+        var response = actual as StatusCodeResult;
+        Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.UnprocessableEntity, response.StatusCode);
+    }
+
 
     protected override ProjectController Setup()
     {

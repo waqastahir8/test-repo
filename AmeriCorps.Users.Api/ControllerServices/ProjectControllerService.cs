@@ -14,9 +14,11 @@ public interface IProjectControllerService
 
     Task<(ResponseStatus Status, OperatingSiteResponse? Response)> UpdateOperatingSiteAsync(OperatingSiteRequestModel opSiteRequest);
 
-    Task<(ResponseStatus Status, OperatingSiteResponse? Response)> InviteOperatingSiteAsync(OperatingSiteRequestModel toInvite);
+    Task<(ResponseStatus Status, ProjectResponse? Response)> InviteOperatingSiteAsync(ProjectRequestModel toInvite);
 
     Task<(ResponseStatus Status, List<ProjectResponse>? Response)> SearchProjectsAsync(SearchFiltersRequestModel filters);
+
+    Task<(ResponseStatus Status, List<OperatingSiteResponse>? Response)> SearchOperatingSitesAsync(SearchFiltersRequestModel filters);
 }
 
 public sealed class ProjectControllerService : IProjectControllerService
@@ -143,6 +145,16 @@ public sealed class ProjectControllerService : IProjectControllerService
                     updatedProject.ProjectDirector = foundProj.ProjectDirector;
                 }
 
+                if (foundProj.Award != null)
+                {
+                    updatedProject.Award = foundProj.Award;
+                }
+
+                if (foundProj.SubGrantees != null)
+                {
+                    updatedProject.SubGrantees = foundProj.SubGrantees;
+                }
+
                 await _repository.UpdateProjectAsync(updatedProject);
             }
             else
@@ -206,20 +218,21 @@ public sealed class ProjectControllerService : IProjectControllerService
         return (ResponseStatus.Successful, response);
     }
 
-    public async Task<(ResponseStatus Status, OperatingSiteResponse? Response)> InviteOperatingSiteAsync(OperatingSiteRequestModel toInvite)
+    public async Task<(ResponseStatus Status, ProjectResponse? Response)> InviteOperatingSiteAsync(ProjectRequestModel toInvite)
     {
-        if (toInvite == null || string.IsNullOrEmpty(toInvite.Id.ToString()) || toInvite.Id < 1)
+        if (toInvite == null || string.IsNullOrEmpty(toInvite.Id.ToString()) || toInvite.OperatingSites == null || toInvite.OperatingSites.Count < 1)
         {
             return (ResponseStatus.MissingInformation, null);
         }
 
-        OperatingSite operatingSite = _requestMapper.Map(toInvite);
+        var foundProject = await _repository.GetProjectByCodeAsync(toInvite.ProjectCode);
+        OperatingSite inviteSite = _requestMapper.Map(toInvite.OperatingSites[0]);
 
-        if (operatingSite != null)
+        if (foundProject != null && inviteSite != null)
         {
-            operatingSite.UpdatedDate = DateTime.UtcNow;
-
-            operatingSite.InviteDate = DateTime.UtcNow;
+            inviteSite.UpdatedDate = DateTime.UtcNow;
+            inviteSite.InviteDate = DateTime.UtcNow;
+            foundProject.OperatingSites.Add(inviteSite);
         }
         else
         {
@@ -228,32 +241,35 @@ public sealed class ProjectControllerService : IProjectControllerService
 
         try
         {
-            await _repository.SaveAsync(operatingSite);
+            foundProject = await _repository.UpdateProjectAsync(foundProject);
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error saving new Operating Site {Identifier}.", toInvite.OperatingSiteName.ToString().Replace(Environment.NewLine, ""));
+            _logger.LogError(e, "Error saving new Operating Site for {Identifier}.", toInvite.ProjectName.ToString().Replace(Environment.NewLine, ""));
             return (ResponseStatus.UnknownError, null);
         }
 
         var success = false;
         try
         {
-            success = await _userHelperService.SendOperatingSiteInviteAsync(operatingSite);
+            if(foundProject != null && foundProject.OperatingSites != null && foundProject.OperatingSites.Count < 1)
+            {
+                success = await _userHelperService.SendOperatingSiteInviteAsync(foundProject.OperatingSites[foundProject.OperatingSites.Count-1]);
+            }
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Unable to send invite for Operating Site {Identifier}.", toInvite.OperatingSiteName.ToString().Replace(Environment.NewLine, ""));
+            _logger.LogError(e, "Unable to send invite for Operating Site for {Identifier}.",  toInvite.ProjectName.ToString().Replace(Environment.NewLine, ""));
             return (ResponseStatus.UnknownError, null);
         }
 
         if (!success)
         {
-            _logger.LogInformation("Invite email not sent for Operating Site {Identifier}.", toInvite.OperatingSiteName.ToString().Replace(Environment.NewLine, ""));
+            _logger.LogInformation("Invite email not sent for Operating Site for {Identifier}.",  toInvite.ProjectName.ToString().Replace(Environment.NewLine, ""));
             return (ResponseStatus.MissingInformation, null);
         }
 
-        var response = _responseMapper.Map(operatingSite);
+        var response = _responseMapper.Map(foundProject);
 
         return (ResponseStatus.Successful, response);
     }
@@ -284,12 +300,31 @@ public sealed class ProjectControllerService : IProjectControllerService
             return (ResponseStatus.UnknownError, null);
         }
 
-        if (projList == null)
+        var response = _responseMapper.Map(projList);
+
+        return (ResponseStatus.Successful, response);
+    }
+
+    public async Task<(ResponseStatus Status, List<OperatingSiteResponse>? Response)> SearchOperatingSitesAsync(SearchFiltersRequestModel filters)
+    {
+        if (filters == null || string.IsNullOrEmpty(filters.Query) || filters.ProjectId < 1)
         {
             return (ResponseStatus.MissingInformation, null);
         }
 
-        var response = _responseMapper.Map(projList);
+        List<OperatingSite>? opSiteList;
+
+        try
+        {
+            opSiteList = await _repository.SearchOperatingSitesAsync(filters.ProjectId, filters.Active, filters.Query.Trim()+":*");
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Could not retrieve project list with query {Identifier}.", filters.Query.Replace(Environment.NewLine, ""));
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        var response = _responseMapper.Map(opSiteList);
 
         return (ResponseStatus.Successful, response);
     }

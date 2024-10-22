@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 namespace AmeriCorps.Users.Data.Core;
 
 [Index(nameof(OperatingSiteName))]
-public sealed class OperatingSite : Entity
+public sealed class OperatingSite : EntityWithProjectId
 {
     public string ProgramYear { get; set; } = string.Empty;
     public bool Active { get; set; } = true;

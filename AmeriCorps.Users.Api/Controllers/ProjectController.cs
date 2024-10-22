@@ -32,12 +32,16 @@ public sealed class ProjectController(IProjectControllerService service) : Contr
         await ServeAsync(async () => await _service.UpdateOperatingSiteAsync(opSiteRequest));
 
     [HttpPost("op-site/invite")]
-    public async Task<IActionResult> InviteOperatingSiteAsync([FromBody] OperatingSiteRequestModel opSiteRequest) =>
-        await ServeAsync(async () => await _service.InviteOperatingSiteAsync(opSiteRequest));
+    public async Task<IActionResult> InviteOperatingSiteAsync([FromBody] ProjectRequestModel toInvite) =>
+        await ServeAsync(async () => await _service.InviteOperatingSiteAsync(toInvite));
 
     [HttpPost("search")]
     public async Task<IActionResult> SearchProjectsAsync([FromBody] SearchFiltersRequestModel filters) =>
         await ServeAsync(async () => await _service.SearchProjectsAsync(filters));
+
+    [HttpPost("op-site/search")]
+    public async Task<IActionResult> SearchOperatingSitesAsync([FromBody] SearchFiltersRequestModel filters) =>
+        await ServeAsync(async () => await _service.SearchOperatingSitesAsync(filters));
 
     private async Task<IActionResult> ServeAsync<T>(Func<Task<(ResponseStatus, T)>> callAsync)
     {

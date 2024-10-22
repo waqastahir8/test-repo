@@ -2,6 +2,7 @@ namespace AmeriCorps.Users.Models;
 
 public class ProjectRequestModel
 {
+    public int Id { get; set; }
     public string ProjectName { get; set; } = string.Empty;
     public string ProjectOrgCode { get; set; } = string.Empty;
     public string ProjectCode { get; set; } = string.Empty;
