@@ -27,8 +27,6 @@ public interface IRequestMapper
 
     OperatingSite Map(OperatingSiteRequestModel requestModel);
 
-    Award Map(AwardResponse requestModel);
-
     SubGrantee Map(SubGranteeRequestModel requestModel);
 }
 
@@ -284,7 +282,6 @@ public sealed class RequestMapper : IRequestMapper
         State = requestModel.State,
         ZipCode = requestModel.ZipCode,
 
-        // Award = Map(requestModel.Award),
 
         ProjectPeriodStartDt = requestModel.ProjectPeriodStartDt,
         ProjectPeriodEndDt = requestModel.ProjectPeriodEndDt,
@@ -296,18 +293,6 @@ public sealed class RequestMapper : IRequestMapper
 
         ProjectType = requestModel.ProjectType,
         Description = requestModel.Description
-    };
-
-    public Award? Map(AwardResponse? requestModel) => new()
-    {
-        Id = requestModel.Id,
-        AwardCode = requestModel.AwardCode,
-        AwardName = requestModel.AwardName,
-        GspListingNumber = requestModel.GspListingNumber,
-        Fain = requestModel.Fain,
-        Uei = requestModel.Uei,
-        PerformanceStartDt = requestModel.PerformanceStartDt,
-        PerformanceEndDt = requestModel.PerformanceEndDt
     };
 
     public Access Map(AccessRequestModel requestModel) => new()

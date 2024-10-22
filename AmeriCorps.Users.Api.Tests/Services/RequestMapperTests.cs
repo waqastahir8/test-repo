@@ -298,32 +298,6 @@ public sealed class RequestMapperTests : RequestMapperSetup
     }
 
     [Fact]
-    public void Map_CorrectlyMapsAwardRequest()
-    {
-        // Arrange
-        var sut = Setup();
-        var model = Fixture.Build<AwardResponse>()
-            .Without(a => a.PerformanceStartDt)
-            .Without(a => a.PerformanceEndDt)
-            .Create();
-
-        IRequestMapper mapper = new RequestMapper();
-
-        // Act
-        var result = mapper.Map(model);
-
-        // Assert
-        Assert.Equal(model.AwardCode, result.AwardCode);
-        Assert.Equal(model.AwardName, result.AwardName);
-        Assert.Equal(model.GspListingNumber, result.GspListingNumber);
-        Assert.Equal(model.Fain, result.Fain);
-        Assert.Equal(model.Uei, result.Uei);
-
-        Assert.Equal(model.PerformanceStartDt, result.PerformanceStartDt);
-        Assert.Equal(model.PerformanceEndDt, result.PerformanceEndDt);
-    }
-
-    [Fact]
     public void Map_CorrectlyMapsSubGranteeRequest()
     {
         // Arrange

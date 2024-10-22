@@ -365,30 +365,23 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
         //Arrange
         var sut = Setup();
 
-        var model =
+        var toInvite =
             Fixture
             .Build<OperatingSiteRequestModel>()
-            .Without(o => o.Id)
             .Create();
+        var model =
+            Fixture
+            .Build<ProjectRequestModel>()
+            .Create();
+
+        model.OperatingSites.Add(toInvite);
+
 
         //Act
         var (status, _) = await sut.InviteOperatingSiteAsync(model);
 
         //Assert
-        Assert.Equal(ResponseStatus.MissingInformation, status);
-
-        var model2 =
-            Fixture
-            .Build<OperatingSiteRequestModel>()
-            .With(o => o.EmailAddress, "")
-            .Create();
-
-        //Act
-        var (status2, _) = await sut.InviteOperatingSiteAsync(model2);
-
-        //Assert
-        //TODO FIX TEST
-        Assert.Equal(ResponseStatus.UnknownError, status2);
+        Assert.Equal(ResponseStatus.UnknownError, status);
     }
 
     [Fact]
@@ -397,10 +390,16 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
         //Arrange
         var sut = Setup();
 
+        var toInvite =
+            Fixture
+            .Build<OperatingSiteRequestModel>()
+            .Without(o => o.Id)
+            .Create();
         var model =
             Fixture
-            .Create<OperatingSiteRequestModel>();
-
+            .Build<ProjectRequestModel>()
+            .Create();
+        model.OperatingSites.Add(toInvite);
         //Act
         var (status, _) = await sut.InviteOperatingSiteAsync(model);
 
@@ -510,6 +509,7 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
         var filters = Fixture.Create<SearchFiltersRequestModel>();
         filters.Awarded = true;
         filters.Active = true;
+        filters.OrgCode = "";
 
         _repositoryMock!
             .Setup(x => x.SearchAwardedProjectsAsync(filters.Query, filters.Active, filters.OrgCode))
@@ -517,6 +517,50 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
 
         // Act
         var (status, _) = await sut.SearchProjectsAsync(filters);
+
+        // Assert
+        Assert.Equal(ResponseStatus.MissingInformation, status);
+    }
+
+    [Theory]
+    [InlineData("site", 2)]
+    public async Task SearchOperatingSitesAsync_Successful_Status(string query, int projId)
+    {
+        // Arrange
+        var sut = Setup();
+        var filters = Fixture.Create<SearchFiltersRequestModel>();
+        filters.Active = true;
+        filters.ProjectId = projId;
+
+        _repositoryMock!
+            .Setup(x => x.SearchOperatingSitesAsync(filters.ProjectId, filters.Active, filters.Query))
+            .ReturnsAsync(() => Fixture.Build<List<OperatingSite>>()
+            .Create());
+
+        // Act
+        var (status, _) = await sut.SearchOperatingSitesAsync(filters);
+
+        // Assert
+        Assert.Equal(ResponseStatus.Successful, status);
+    }
+
+    [Theory]
+    [InlineData("site", 0)]
+    public async Task SearchOperatingSitesAsync_NonExistent_InformationMissing_Status(string query, int projId)
+    {
+        // Arrange
+        var sut = Setup();
+        var filters = Fixture.Create<SearchFiltersRequestModel>();
+        filters.Awarded = true;
+        filters.Active = true;
+        filters.ProjectId = projId;
+
+        _repositoryMock!
+            .Setup(x => x.SearchOperatingSitesAsync(filters.ProjectId, filters.Active, filters.Query))
+            .ReturnsAsync(() => null);
+
+        // Act
+        var (status, _) = await sut.SearchOperatingSitesAsync(filters);
 
         // Assert
         Assert.Equal(ResponseStatus.MissingInformation, status);
