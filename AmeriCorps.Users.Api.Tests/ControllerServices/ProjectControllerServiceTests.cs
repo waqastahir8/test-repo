@@ -488,10 +488,10 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
         filters.Active = true;
         filters.OrgCode = orgCode;
 
+
         _repositoryMock!
             .Setup(x => x.SearchAwardedProjectsAsync(filters.Query, filters.Active, filters.OrgCode))
-            .ReturnsAsync(() => Fixture.Build<List<Project>>()
-            .Create());
+            .ReturnsAsync(() => Fixture.Create<List<Project>>());
 
         // Act
         var (status, _) = await sut.SearchProjectsAsync(filters);
@@ -500,9 +500,8 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
         Assert.Equal(ResponseStatus.Successful, status);
     }
 
-    [Theory]
-    [InlineData("proj", "org")]
-    public async Task SearchProjectsAsync_NonExistent_InformationMissing_Status(string query, string orgCode)
+    [Fact]
+    public async Task SearchProjectsAsync_NonExistent_InformationMissing_Status()
     {
         // Arrange
         var sut = Setup();
@@ -531,11 +530,11 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
         var filters = Fixture.Create<SearchFiltersRequestModel>();
         filters.Active = true;
         filters.ProjectId = projId;
+        filters.Query = query;
 
         _repositoryMock!
             .Setup(x => x.SearchOperatingSitesAsync(filters.ProjectId, filters.Active, filters.Query))
-            .ReturnsAsync(() => Fixture.Build<List<OperatingSite>>()
-            .Create());
+            .ReturnsAsync(() => Fixture.Create<List<OperatingSite>>());
 
         // Act
         var (status, _) = await sut.SearchOperatingSitesAsync(filters);
@@ -545,8 +544,8 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
     }
 
     [Theory]
-    [InlineData("site", 0)]
-    public async Task SearchOperatingSitesAsync_NonExistent_InformationMissing_Status(string query, int projId)
+    [InlineData(0)]
+    public async Task SearchOperatingSitesAsync_NonExistent_InformationMissing_Status(int projId)
     {
         // Arrange
         var sut = Setup();
