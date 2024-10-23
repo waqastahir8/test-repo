@@ -294,13 +294,17 @@ public sealed class ProjectControllerService : IProjectControllerService
         List<Project>? foundList;    
         try
         {
-            if (filters.Awarded)
+            if (filters.Awarded && filters.Active)
             {
-                foundList = await _repository.SearchAwardedProjectsAsync(filters.Query.Trim()+":*", filters.Active, filters.OrgCode);
+                foundList = await _repository.SearchActiveAwardedProjectsAsync(filters.Query.Trim()+":*", filters.Active, filters.OrgCode);
+            }
+            else if(filters.Awarded && !filters.Active)
+            {
+                foundList = await _repository.SearchAwardedProjectsAsync(filters.Query.Trim()+":*", filters.OrgCode);
             }
             else
             {
-                foundList = await _repository.SearchAllProjectsAsync(filters.Query.Trim()+":*", filters.Active, filters.OrgCode);
+                foundList = await _repository.SearchAllProjectsAsync(filters.Query.Trim()+":*", filters.OrgCode);
             }
         }
         catch (Exception e)
