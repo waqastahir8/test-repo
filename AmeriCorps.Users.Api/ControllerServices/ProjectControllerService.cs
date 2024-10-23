@@ -232,7 +232,14 @@ public sealed class ProjectControllerService : IProjectControllerService
         {
             inviteSite.UpdatedDate = DateTime.UtcNow;
             inviteSite.InviteDate = DateTime.UtcNow;
-            foundProject.OperatingSites.Add(inviteSite);
+
+            if(string.IsNullOrEmpty(inviteSite.Id.ToString()) || inviteSite.Id < 1){
+                foundProject.OperatingSites.Add(inviteSite);
+            }
+            else{
+               foundProject.OperatingSites = foundProject.OperatingSites.Where(x => x.Id != inviteSite.Id).ToList();
+               foundProject.OperatingSites.Add(inviteSite);
+            }
         }
         else
         {
@@ -252,8 +259,9 @@ public sealed class ProjectControllerService : IProjectControllerService
         var success = false;
         try
         {
-            if(foundProject != null && foundProject.OperatingSites != null && foundProject.OperatingSites.Count < 1)
+            if(foundProject != null && foundProject.OperatingSites != null && foundProject.OperatingSites.Count > 0)
             {
+                foundProject.OperatingSites = foundProject.OperatingSites.OrderBy(s => s.UpdatedDate).ToList();
                 success = await _userHelperService.SendOperatingSiteInviteAsync(foundProject.OperatingSites[foundProject.OperatingSites.Count-1]);
             }
         }
