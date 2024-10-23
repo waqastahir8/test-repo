@@ -40,8 +40,8 @@ public sealed partial class ProjectRepository(
             .Include(p => p.OperatingSites)
             .Include(p => p.SubGrantees)
             .Include(p => p.Award)
-            .Include(p => p.AuthorizedRep)
-            .Include(p => p.ProjectDirector)
+            .Include(p => p.AuthorizedRep).ThenInclude(a => a.CommunicationMethods)
+            .Include(p => p.ProjectDirector).ThenInclude(d => d.CommunicationMethods)
             .FirstOrDefaultAsync(p => p.ProjectCode == projCode));
 
     public async Task<Project?> GetAsync(int id) =>
@@ -49,8 +49,8 @@ public sealed partial class ProjectRepository(
             .Include(p => p.OperatingSites)
             .Include(p => p.SubGrantees)
             .Include(p => p.Award)
-            .Include(p => p.AuthorizedRep)
-            .Include(p => p.ProjectDirector)
+            .Include(p => p.AuthorizedRep).ThenInclude(a => a.CommunicationMethods)
+            .Include(p => p.ProjectDirector).ThenInclude(d => d.CommunicationMethods)
             .FirstOrDefaultAsync(p => p.Id == id));
 
     public async Task<List<Project>?> GetProjectListByOrgAsync(string orgCode) =>
@@ -58,8 +58,8 @@ public sealed partial class ProjectRepository(
             .Include(p => p.OperatingSites)
             .Include(p => p.SubGrantees)
             .Include(p => p.Award)
-            .Include(p => p.AuthorizedRep)
-            .Include(p => p.ProjectDirector)
+            .Include(p => p.AuthorizedRep).ThenInclude(a => a.CommunicationMethods)
+            .Include(p => p.ProjectDirector).ThenInclude(d => d.CommunicationMethods)
             .Where(o => o.ProjectOrgCode == orgCode && o.Award != null).ToListAsync());
 
     public async Task<T> SaveAsync<T>(T entity) where T : Entity =>
@@ -144,8 +144,8 @@ public sealed partial class ProjectRepository(
             .Include(p => p.OperatingSites)
             .Include(p => p.SubGrantees)
             .Include(p => p.Award)
-            .Include(p => p.AuthorizedRep)
-            .Include(p => p.ProjectDirector)
+            .Include(p => p.AuthorizedRep).ThenInclude(a => a.CommunicationMethods)
+            .Include(p => p.ProjectDirector).ThenInclude(d => d.CommunicationMethods)
             .Where(p => p.ProjectOrgCode == orgCode && p.Award != null && p.Active == active && EF.Functions.ToTsVector("english", p.ProjectName + " " + p.ProjectOrgCode + " " + p.ProjectCode
                 + " " + p.ProjectId + " " + p.GspProjectId + " " + p.ProgramName + " " + p.StreetAddress
                 + " " + p.City + " " + p.State + " " + p.ProjectType + " " + p.Description + " " + p.Award.AwardName)
@@ -157,8 +157,8 @@ public sealed partial class ProjectRepository(
             .Include(p => p.OperatingSites)
             .Include(p => p.SubGrantees)
             .Include(p => p.Award)
-            .Include(p => p.AuthorizedRep)
-            .Include(p => p.ProjectDirector)
+            .Include(p => p.AuthorizedRep).ThenInclude(a => a.CommunicationMethods)
+            .Include(p => p.ProjectDirector).ThenInclude(d => d.CommunicationMethods)
             .Where(p => p.ProjectOrgCode == orgCode && p.Active == active && EF.Functions.ToTsVector("english", p.ProjectName + " " + p.ProjectOrgCode + " " + p.ProjectCode
                 + " " + p.ProjectId + " " + p.GspProjectId + " " + p.ProgramName + " " + p.StreetAddress
                 + " " + p.City + " " + p.State + " " + p.ProjectType + " " + p.Description + " ")
