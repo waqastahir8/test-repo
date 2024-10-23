@@ -76,11 +76,11 @@ jobs:
           package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
           publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
 
-      - name: run Azure Function DB migration
-        uses: satak/webrequest-action@master
-        with:
-          url: ${{ env.AZURE_FUNCTIONAPP_URI }}?code=${{ secrets.AZURE_FUNCTIONAPP_API_KEY }}
-          method: POST
+      # - name: run Azure Function DB migration
+      #   uses: satak/webrequest-action@master
+      #   with:
+      #     url: ${{ env.AZURE_FUNCTIONAPP_URI }}?code=${{ secrets.AZURE_FUNCTIONAPP_API_KEY }}
+      #     method: POST
 
       - name: release App Service
         uses: azure/webapps-deploy@v3
