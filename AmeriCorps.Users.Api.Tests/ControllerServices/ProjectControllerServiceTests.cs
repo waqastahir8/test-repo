@@ -490,7 +490,7 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
 
 
         _repositoryMock!
-            .Setup(x => x.SearchAwardedProjectsAsync(filters.Query, filters.Active, filters.OrgCode))
+            .Setup(x => x.SearchAwardedProjectsAsync(filters.Query, filters.OrgCode))
             .ReturnsAsync(() => Fixture.Create<List<Project>>());
 
         // Act
@@ -511,7 +511,7 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
         filters.OrgCode = "";
 
         _repositoryMock!
-            .Setup(x => x.SearchAwardedProjectsAsync(filters.Query, filters.Active, filters.OrgCode))
+            .Setup(x => x.SearchAwardedProjectsAsync(filters.Query, filters.OrgCode))
             .ReturnsAsync(() => null);
 
         // Act
