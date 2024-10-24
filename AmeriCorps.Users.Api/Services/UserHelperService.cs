@@ -238,14 +238,18 @@ public class UserHelperService : IUserHelperService
 
         User? inviterUser = new User();
 
-        try
+        if(!string.IsNullOrEmpty(toInvite.InviteUserId.ToString()))
         {
-            inviterUser = await _repository.GetAsync(toInvite.InviteUserId);
+            try
+            {
+                inviterUser = await _repository.GetAsync(toInvite.InviteUserId);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Unable to find invitee for {Identifier}.", toInvite.OperatingSiteName.ToString().Replace(Environment.NewLine, ""));
+            }
         }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Unable to find invitee for {Identifier}.", toInvite.OperatingSiteName.ToString().Replace(Environment.NewLine, ""));
-        }
+        
 
         if (inviterUser != null && !string.IsNullOrEmpty(inviterUser.FirstName) && !string.IsNullOrEmpty(inviterUser.LastName))
         {
