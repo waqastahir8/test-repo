@@ -28,8 +28,8 @@ public sealed class Project : Entity
 
     public Award Award { get; set; } = new Award();
 
-    public User? AuthorizedRep { get; set; }
-    public User? ProjectDirector { get; set; }
+    public User? AuthorizedRep { get; set; } = new User();
+    public User? ProjectDirector { get; set; } = new User();
 
     [Column(TypeName = "varchar(64)")]
     public string StreetAddress { get; set; } = string.Empty;
