@@ -48,6 +48,8 @@ public interface IUsersControllerService
     Task<(ResponseStatus Status, UserResponse? Response)> UpdateUserProjectAndRoleDataAsync(UserProjectRoleUpdateRequestModel toUpdate);
 
     Task<(ResponseStatus Status, UserResponse? Response)> InviteUserAsync(UserRequestModel toInvite);
+
+    Task<(ResponseStatus Status, UserResponse? Response)> AcceptUserInviteAsync(UserRequestModel toInvite);
 }
 
 public sealed class UsersControllerService : IUsersControllerService
