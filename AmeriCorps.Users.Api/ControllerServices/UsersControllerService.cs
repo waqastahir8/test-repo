@@ -49,7 +49,7 @@ public interface IUsersControllerService
 
     Task<(ResponseStatus Status, UserResponse? Response)> InviteUserAsync(UserRequestModel toInvite);
 
-    Task<(ResponseStatus Status, UserResponse? Response)> AcceptUserInviteAsync(UserRequestModel toInvite);
+    Task<(ResponseStatus Status, UserResponse? Response)> LinkNewAccountToExistingUserAsync(ExistingUserSearchModel toLink);
 }
 
 public sealed class UsersControllerService : IUsersControllerService
@@ -926,6 +926,7 @@ public sealed class UsersControllerService : IUsersControllerService
         }
 
         var user = _requestMapper.Map(toInvite);
+
         if (user != null)
         {
             user.UserAccountStatus = UserAccountStatus.INVITED;
@@ -953,6 +954,7 @@ public sealed class UsersControllerService : IUsersControllerService
         List<CommunicationMethod> commList = new List<CommunicationMethod>();
         commList.Add(email);
         user.CommunicationMethods = commList;
+        user.UserName = toInvite.Email;
 
         try
         {
@@ -983,6 +985,53 @@ public sealed class UsersControllerService : IUsersControllerService
         }
 
         var response = _responseMapper.Map(user);
+
+        return (ResponseStatus.Successful, response);
+    }
+
+    public async Task<(ResponseStatus Status, UserResponse? Response)> LinkNewAccountToExistingUserAsync(ExistingUserSearchModel toLink)
+    {
+
+        if (toLink == null || String.IsNullOrEmpty(toLink.UserEmail) || toLink.NewUser == null || String.IsNullOrEmpty(toLink.NewUser.OrgCode))
+        {
+            return (ResponseStatus.MissingInformation, null);
+        }
+
+        User? existingUser;
+
+        try
+        {
+            existingUser = await _repository.FindInvitedUserInfo(toLink.UserEmail, toLink.NewUser.OrgCode);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Could not retrieve existing user with given user id {Identifier}.", toLink.UserEmail.ToString().Replace(Environment.NewLine, ""));
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        if(existingUser != null)
+        {
+            existingUser.FirstName = toLink.NewUser.FirstName;
+            existingUser.LastName = toLink.NewUser.LastName;
+            existingUser.UserName = toLink.NewUser.UserName;
+            existingUser.PreferredName = toLink.NewUser.PreferredName;
+
+            await UpdateUserAccountStatusAsync(existingUser, UserAccountStatus.ACTIVE);
+
+            existingUser.UpdatedDate = DateTime.UtcNow;
+
+            try
+            {
+                await _repository.SaveAsync(existingUser);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Unable to save for user {Identifier} for invite.", existingUser.UserName.ToString().Replace(Environment.NewLine, ""));
+                return (ResponseStatus.UnknownError, null);
+            }
+        }
+
+        var response = _responseMapper.Map(existingUser);
 
         return (ResponseStatus.Successful, response);
     }
