@@ -116,4 +116,14 @@ public sealed class UsersController(IUsersControllerService service) : Controlle
     [HttpPost("org/users/invite")]
     public async Task<IActionResult> InviteUserAsync([FromBody] UserRequestModel toInvite) =>
         await ServeAsync(async () => await _service.InviteUserAsync(toInvite));
+
+    //Save Direct Deposit Information
+    [HttpPost("directdeposit/{userId}")]
+    public async Task<IActionResult> SaveDirectDepositFormAsync(int userId, [FromBody] DirectDepositRequestModel directDepositFormRequest) =>
+        await ServeAsync(async () => await _service.SaveDirectDepositFormAsync(userId, directDepositFormRequest));
+
+    //Delete direct deposit information with userId and directDepositId
+    [HttpDelete("directdeposit/{userId}/{directDepositId}")]
+    public async Task<IActionResult> DeleteDirectDepositFormAsync(int userId, int directDepositId) =>
+        await ServeAsync(async () => await _service.DeleteDirectDepositFormAsync(userId, directDepositId));
 }

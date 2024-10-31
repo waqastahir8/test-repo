@@ -42,4 +42,6 @@ public sealed class User : Entity
     public DateTime? InviteDate { get; set; }
     public int InviteUserId { get; set; }
     public DateTime? UpdatedDate { get; set; }
+    public List<DirectDeposit> DirectDeposits { get; set; } = new List<DirectDeposit>();
+
 }

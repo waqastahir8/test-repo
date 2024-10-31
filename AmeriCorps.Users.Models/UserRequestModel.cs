@@ -34,7 +34,8 @@ public class UserRequestModel
     public string? StateOfBirth { get; set; } = string.Empty;
     public string? ResidentRegistrationNumber { get; set; } = string.Empty;
     public DateOnly? DocumentExpirationDate { get; set; }
-    public AccountStatusRequestModel UserAccountStatus { get; set; } 
+    public AccountStatusRequestModel UserAccountStatus { get; set; }
     public int InviteUserId { get; set; }
     public DateTime? InviteDate { get; set; }
+    public List<DirectDepositRequestModel> DirectDeposits { get; set; } = new List<DirectDepositRequestModel>();
 }
