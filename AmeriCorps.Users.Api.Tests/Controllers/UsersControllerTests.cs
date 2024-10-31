@@ -111,7 +111,6 @@ public sealed partial class UsersControllerTests : BaseTests<UsersController>
     [Fact]
     public async Task CreateUserAsync_UnknownError_500StatusCode()
     {
-
         //Arrange
         var sut = Setup();
         var model = Fixture.Create<UserRequestModel>();
@@ -148,8 +147,7 @@ public sealed partial class UsersControllerTests : BaseTests<UsersController>
         Assert.Equal((int)HttpStatusCode.OK, response.StatusCode);
     }
 
-    /// 
-
+    ///
 
     [Fact]
     public async Task PatchUserAsync_InformationMissing_422StatusCode()
@@ -174,7 +172,6 @@ public sealed partial class UsersControllerTests : BaseTests<UsersController>
     [Fact]
     public async Task PatchUserAsync_UnknownError_500StatusCode()
     {
-
         //Arrange
         var sut = Setup();
         var model = Fixture.Create<UserRequestModel>();
@@ -483,6 +480,164 @@ public sealed partial class UsersControllerTests : BaseTests<UsersController>
         var response = actual as OkObjectResult;
         Assert.NotNull(response);
         Assert.Equal((int)HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task AddUserToProjectAsync_SuccessProcessing_200StatusCode()
+    {
+        //Arrange
+        var sut = Setup();
+        var userId = Fixture.Create<int>();
+        var projCode = Fixture.Create<string>();
+        var userResponse = Fixture.Create<UserResponse>();
+
+        _serviceMock!
+            .Setup(x => x.AddUserToProjectAsync(userId, projCode))
+            .ReturnsAsync((ResponseStatus.Successful, userResponse));
+        //Act
+        var actual = await sut.AddUserToProjectAsync(userId, projCode);
+
+        //Assert
+        var response = actual as OkObjectResult;
+        Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task AddUserToProjectAsync_NonExistent_UnprocessableEntity_422StatusCode()
+    {
+        //Arrange
+        var sut = Setup();
+        var userId = Fixture.Create<int>();
+        var projCode = Fixture.Create<string>();
+
+        _serviceMock!
+            .Setup(x => x.AddUserToProjectAsync(userId, projCode))
+            .ReturnsAsync((ResponseStatus.MissingInformation, null));
+        //Act
+        var actual = await sut.AddUserToProjectAsync(userId, projCode);
+
+        //Assert
+        var response = actual as StatusCodeResult;
+        Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.UnprocessableEntity, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task FetchUserListByOrgCodeAsync_SuccessProcessing_200StatusCode()
+    {
+        //Arrange
+        var sut = Setup();
+        var orgCode = Fixture.Create<string>();
+        var userResponse = Fixture.Create<UserListResponse>();
+
+        _serviceMock!
+            .Setup(x => x.FetchUserListByOrgCodeAsync(orgCode))
+            .ReturnsAsync((ResponseStatus.Successful, userResponse));
+        //Act
+        var actual = await sut.FetchUserListByOrgCodeAsync(orgCode);
+
+        //Assert
+        var response = actual as OkObjectResult;
+        Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task FetchUserListByOrgCodeAsync_NonExistent_UnprocessableEntity_422StatusCode()
+    {
+        //Arrange
+        var sut = Setup();
+        var orgCode = Fixture.Create<string>();
+
+        _serviceMock!
+            .Setup(x => x.FetchUserListByOrgCodeAsync(orgCode))
+            .ReturnsAsync((ResponseStatus.MissingInformation, null));
+        //Act
+        var actual = await sut.FetchUserListByOrgCodeAsync(orgCode);
+
+        //Assert
+        var response = actual as StatusCodeResult;
+        Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.UnprocessableEntity, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task UpdateUserProjectAndRoleDataAsync_SuccessProcessing_200StatusCode()
+    {
+        //Arrange
+        var sut = Setup();
+        var toUpdate = Fixture.Create<UserProjectRoleUpdateRequestModel>();
+        var userResponse = Fixture.Create<UserResponse>();
+
+        _serviceMock!
+            .Setup(x => x.UpdateUserProjectAndRoleDataAsync(toUpdate))
+            .ReturnsAsync((ResponseStatus.Successful, userResponse));
+        //Act
+        var actual = await sut.UpdateUserProjectAndRoleDataAsync(toUpdate);
+
+        //Assert
+        var response = actual as OkObjectResult;
+        Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task UpdateUserProjectAndRoleDataAsync_NonExistent_UnprocessableEntity_422StatusCode()
+    {
+        //Arrange
+        var sut = Setup();
+        var toUpdate = Fixture.Create<UserProjectRoleUpdateRequestModel>();
+
+        _serviceMock!
+            .Setup(x => x.UpdateUserProjectAndRoleDataAsync(toUpdate))
+            .ReturnsAsync((ResponseStatus.MissingInformation, null));
+        //Act
+        var actual = await sut.UpdateUserProjectAndRoleDataAsync(toUpdate);
+
+        //Assert
+        var response = actual as StatusCodeResult;
+        Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.UnprocessableEntity, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task InviteUserAsync_SuccessProcessing_200StatusCode()
+    {
+        //Arrange
+        var sut = Setup();
+        var toInvite = Fixture.Create<UserRequestModel>();
+        var userResponse = Fixture.Create<UserResponse>();
+
+        _serviceMock!
+            .Setup(x => x.InviteUserAsync(toInvite))
+            .ReturnsAsync((ResponseStatus.Successful, userResponse));
+        //Act
+        var actual = await sut.InviteUserAsync(toInvite);
+
+        //Assert
+        var response = actual as OkObjectResult;
+        Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task InviteUserAsync_NonExistent_UnprocessableEntity_422StatusCode()
+    {
+        //Arrange
+        var sut = Setup();
+        var toInvite = Fixture.Create<UserRequestModel>();
+
+        _serviceMock!
+            .Setup(x => x.InviteUserAsync(toInvite))
+            .ReturnsAsync((ResponseStatus.MissingInformation, null));
+        //Act
+        var actual = await sut.InviteUserAsync(toInvite);
+
+        //Assert
+        var response = actual as StatusCodeResult;
+        Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.UnprocessableEntity, response.StatusCode);
     }
 
     protected override UsersController Setup()

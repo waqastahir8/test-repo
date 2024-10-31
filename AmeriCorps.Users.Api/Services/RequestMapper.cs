@@ -1,11 +1,14 @@
 ﻿using AmeriCorps.Users.Data.Core;
-using AmeriCorps.Users.Models;
+using AmeriCorps.Users.Data.Core.Model;
 
 namespace AmeriCorps.Users.Api.Services;
 
 public interface IRequestMapper
 {
     User Map(UserRequestModel requestModel);
+
+    Role Map(RoleRequestModel roleRequestModel);
+
     SavedSearch Map(SavedSearchRequestModel requestModel);
 
     Collection Map(CollectionRequestModel requestModel);
@@ -13,13 +16,24 @@ public interface IRequestMapper
     List<Collection> Map(CollectionListRequestModel requestModel);
 
     Reference Map(ReferenceRequestModel requestModel);
+
+    Organization Map(OrganizationRequestModel requestModel);
+
+    Project Map(ProjectRequestModel requestModel);
+
+    UserRole Map(Role role);
+
+    Access Map(AccessRequestModel requestModel);
+
+    OperatingSite Map(OperatingSiteRequestModel requestModel);
+
+    SubGrantee Map(SubGranteeRequestModel requestModel);
 }
 
 public sealed class RequestMapper : IRequestMapper
 {
     public User Map(UserRequestModel requestModel) => new()
     {
-
         FirstName = requestModel.FirstName,
         LastName = requestModel.LastName,
         MiddleName = requestModel.MiddleName,
@@ -30,6 +44,13 @@ public sealed class RequestMapper : IRequestMapper
         Pronouns = requestModel.Pronouns,
         Suffix = requestModel.Suffix,
         Prefix = requestModel.Prefix,
+        OrgCode = requestModel.OrgCode,
+        UserAccountStatus = (UserAccountStatus)requestModel.UserAccountStatus,
+        EncryptedSocialSecurityNumber = requestModel.EncryptedSocialSecurityNumber,
+        CountryOfBirth = requestModel.CountryOfBirth,
+        CityOfBirth = requestModel.CityOfBirth,
+        CitzenShipStatus = (Data.Core.Model.CitizenshipStatus)requestModel.CitzenShipStatus,
+        InviteUserId = requestModel.InviteUserId,
 
         Attributes = MapperUtils.MapList<AttributeRequestModel, AmeriCorps.Users.Data.Core.Attribute>(
             requestModel.Attributes,
@@ -38,9 +59,7 @@ public sealed class RequestMapper : IRequestMapper
                 Id = a.Id,
                 Type = a.Type,
                 Value = a.Value,
-
             }),
-
 
         Languages = MapperUtils.MapList<LanguageRequestModel, Language>(
             requestModel.Languages, l =>
@@ -137,18 +156,15 @@ public sealed class RequestMapper : IRequestMapper
             requestModel.Collection, c =>
                 new Collection()
                 {
-
                     UserId = c.UserId,
                     Type = c.Type,
                     ListingId = c.ListingId,
                 }),
 
-
         References = MapperUtils.MapList<ReferenceRequestModel, Reference>(
             requestModel.References, r =>
                 new Reference
                 {
-
                     TypeId = r.TypeId,
                     Relationship = r.Relationship,
                     RelationshipLength = r.RelationshipLength,
@@ -163,6 +179,37 @@ public sealed class RequestMapper : IRequestMapper
                     Contacted = r.Contacted,
                     DateContacted = r.DateContacted
                 }),
+
+        Roles = MapperUtils.MapList<UserRoleRequestModel, UserRole>(
+            requestModel.UserRoles, c =>
+                new UserRole()
+                {
+                    //Id = c.Id,
+                    RoleName = c.RoleName,
+                    FunctionalName = c.FunctionalName
+                }),
+
+        UserProjects = MapperUtils.MapList<UserProjectRequestModel, UserProject>(
+            requestModel.UserProjects, p =>
+                new UserProject()
+                {
+                    ProjectName = p.ProjectName,
+                    ProjectCode = p.ProjectCode,
+                    ProjectType = p.ProjectType,
+                    ProjectOrg = p.ProjectOrg,
+                    Active = p.Active,
+                    ProjectRoles = Map(p.ProjectRoles),
+                    ProjectAccess = Map(p.ProjectAccess)
+                })
+    };
+
+    public Role Map(RoleRequestModel roleRequestModel) => new()
+    {
+        //Id = roleRequestModel.Id,
+        RoleName = roleRequestModel.RoleName,
+        FunctionalName = roleRequestModel.FunctionalName,
+        Description = roleRequestModel.Description,
+        RoleType = roleRequestModel.RoleType
     };
 
     public SavedSearch Map(SavedSearchRequestModel requestModel) => new()
@@ -213,4 +260,136 @@ public sealed class RequestMapper : IRequestMapper
         Contacted = requestModel.Contacted,
         DateContacted = requestModel.DateContacted
     };
+
+    public Organization Map(OrganizationRequestModel requestModel) => new()
+    {
+        OrgName = requestModel.OrgName,
+        OrgCode = requestModel.OrgCode,
+        Description = requestModel.Description
+    };
+
+    public Project Map(ProjectRequestModel requestModel) => new()
+    {
+        ProjectName = requestModel.ProjectName,
+        ProjectOrgCode = requestModel.ProjectOrgCode,
+        ProjectCode = requestModel.ProjectCode,
+        ProjectId = requestModel.ProjectId,
+        GspProjectId = requestModel.GspProjectId,
+        ProgramName = requestModel.ProgramName,
+        ProgramYear = requestModel.ProgramYear,
+        StreetAddress = requestModel.StreetAddress,
+        City = requestModel.City,
+        State = requestModel.State,
+        ZipCode = requestModel.ZipCode,
+
+
+        ProjectPeriodStartDt = requestModel.ProjectPeriodStartDt,
+        ProjectPeriodEndDt = requestModel.ProjectPeriodEndDt,
+        EnrollmentStartDt = requestModel.EnrollmentStartDt,
+        EnrollmentEndDt = requestModel.EnrollmentEndDt,
+
+        OperatingSites = Map(requestModel.OperatingSites),
+        SubGrantees = Map(requestModel.SubGrantees),
+
+        ProjectType = requestModel.ProjectType,
+        Description = requestModel.Description
+    };
+
+    public Access Map(AccessRequestModel requestModel) => new()
+    {
+        AccessName = requestModel.AccessName,
+        AccessLevel = requestModel.AccessLevel,
+        AccessType = requestModel.AccessType,
+        Description = requestModel.Description
+    };
+
+    public UserRole Map(Role role) => new()
+    {
+        RoleName = role.RoleName,
+        FunctionalName = role.FunctionalName
+    };
+
+    public List<ProjectRole> Map(List<ProjectRoleRequestModel> role) =>
+       MapperUtils.MapList<ProjectRoleRequestModel, ProjectRole>(
+                           role,
+                           a => new ProjectRole
+                           {
+                               RoleName = a.RoleName,
+                               FunctionalName = a.FunctionalName
+                           });
+
+    public List<ProjectAccess> Map(List<ProjectAccessRequestModel> access) =>
+       MapperUtils.MapList<ProjectAccessRequestModel, ProjectAccess>(
+                           access,
+                           a => new ProjectAccess
+                           {
+                               AccessName = a.AccessName,
+                               AccessLevel = a.AccessLevel
+                           });
+
+    public OperatingSite Map(OperatingSiteRequestModel requestModel) => new()
+    {
+        Id = requestModel.Id,
+        ProgramYear = requestModel.ProgramYear,
+        Active = requestModel.Active,
+        OperatingSiteName = requestModel.OperatingSiteName,
+        ContactName = requestModel.ContactName,
+        EmailAddress = requestModel.EmailAddress,
+        PhoneNumber = requestModel.PhoneNumber,
+        StreetAddress = requestModel.StreetAddress,
+        StreetAddress2 = requestModel.StreetAddress2,
+        City = requestModel.City,
+        State = requestModel.State,
+        ZipCode = requestModel.ZipCode,
+        Plus4 = requestModel.Plus4,
+        InviteUserId = requestModel.InviteUserId,
+        InviteDate = requestModel.InviteDate
+    };
+
+    public List<OperatingSite> Map(List<OperatingSiteRequestModel> operatingSite) =>
+       MapperUtils.MapList<OperatingSiteRequestModel, OperatingSite>(
+                           operatingSite,
+                           o => new OperatingSite
+                           {
+                               Id = o.Id,
+                               ProgramYear = o.ProgramYear,
+                               Active = o.Active,
+                               OperatingSiteName = o.OperatingSiteName,
+                               ContactName = o.ContactName,
+                               EmailAddress = o.EmailAddress,
+                               PhoneNumber = o.PhoneNumber,
+                               StreetAddress = o.StreetAddress,
+                               StreetAddress2 = o.StreetAddress2,
+                               City = o.City,
+                               State = o.State,
+                               ZipCode = o.ZipCode,
+                               Plus4 = o.Plus4,
+                               InviteUserId = o.InviteUserId,
+                               InviteDate = o.InviteDate
+                           });
+
+    public SubGrantee Map(SubGranteeRequestModel requestModel) => new()
+    {
+        GranteeCode = requestModel.GranteeCode,
+        GranteeName = requestModel.GranteeName,
+        Uei = requestModel.Uei,
+        StreetAddress = requestModel.StreetAddress,
+        City = requestModel.City,
+        State = requestModel.State,
+        ZipCode = requestModel.ZipCode
+    };
+
+    public List<SubGrantee> Map(List<SubGranteeRequestModel> requestModel) =>
+       MapperUtils.MapList<SubGranteeRequestModel, SubGrantee>(
+                           requestModel,
+                           o => new SubGrantee
+                           {
+                               GranteeCode = o.GranteeCode,
+                               GranteeName = o.GranteeName,
+                               Uei = o.Uei,
+                               StreetAddress = o.StreetAddress,
+                               City = o.City,
+                               State = o.State,
+                               ZipCode = o.ZipCode
+                           });
 }

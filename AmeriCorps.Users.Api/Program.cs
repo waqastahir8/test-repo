@@ -1,3 +1,5 @@
+using AmeriCorps.Users.Configuration;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
@@ -12,10 +14,22 @@ builder.Services
     .AddSingleton<IValidator, Validator>()
     .AddScoped<IContextFactory, DefaultContextFactory>()
     .AddScoped<IUserRepository, UserRepository>()
+    .AddScoped<IRoleRepository, RoleRepository>()
+    .AddScoped<IOrganizationRepository, OrganizationRepository>()
+    .AddScoped<IProjectRepository, ProjectRepository>()
+    .AddScoped<IAccessRepository, AccessRepository>()
     .AddScoped<IRequestMapper, RequestMapper>()
     .AddScoped<IResponseMapper, ResponseMapper>()
-    .AddScoped<IUsersControllerService, UsersControllerService>();
+    .AddScoped<IUsersControllerService, UsersControllerService>()
+    .AddScoped<IRolesControllerService, RolesControllerService>()
+    .AddScoped<IOrgControllerService, OrgControllerService>()
+    .AddScoped<IProjectControllerService, ProjectControllerService>()
+    .AddScoped<IAccessControllerService, AccessControllerService>()
+    .AddScoped<IUserHelperService, UserHelperService>()
+    .AddScoped<IEmailTemplatesService, EmailTemplatesService>();
 
+builder.Services.AddHttpClient()
+            .AddTransient<INotificationApiClient, NotificationApiClient>();
 var keyVaultUri = builder.Configuration["KeyVaultOptions:KeyVaultUri"]!;
 var tenantId = builder.Configuration["KeyVaultOptions:TenantId"];
 var clientId = builder.Configuration["KeyVaultOptions:ClientId"];
@@ -50,6 +64,9 @@ builder.Configuration
 
 builder.Services.Configure<UserContextOptions>(
     builder.Configuration.GetSection(nameof(UserContextOptions)));
+
+builder.Services.Configure<NotificationOptions>(
+    builder.Configuration.GetSection(nameof(NotificationOptions)));
 
 var app = builder.Build();
 

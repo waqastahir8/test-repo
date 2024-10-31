@@ -1,6 +1,6 @@
-﻿using Asp.Versioning;
+﻿using System.Net;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
 
 namespace AmeriCorps.Users.Controllers;
 
@@ -87,4 +87,34 @@ public sealed class UsersController(IUsersControllerService service) : Controlle
             _ => Ok()
         };
     }
+
+    //Associate a role with a user by passing userId and RoleID
+    [HttpPost("append/{userId}/role/{roleId}")]
+    public async Task<IActionResult> AssociateRoleAsync(int userId, int roleId) =>
+        await ServeAsync(async () => await _service.AssociateRoleAsync(userId, roleId));
+
+    //Add some roles to a user by passing userId
+    [HttpPost("append/{userId}/roles")]
+    public async Task<IActionResult> AddRoleToUserAsync(int userId, [FromBody] RoleRequestModel roleRequest) =>
+        await ServeAsync(async () => await _service.AddRoleToUserAsync(userId, roleRequest));
+
+    //Associate a role with a user by passing userId and RoleID
+    [HttpGet("project/add/{userId}/{projCode}")]
+    public async Task<IActionResult> AddUserToProjectAsync(int userId, string projCode) =>
+        await ServeAsync(async () => await _service.AddUserToProjectAsync(userId, projCode));
+
+    //Fetch List of Users by Org Code
+    [HttpGet("org/users/{orgCode}")]
+    public async Task<IActionResult> FetchUserListByOrgCodeAsync(String orgCode) =>
+        await ServeAsync(async () => await _service.FetchUserListByOrgCodeAsync(orgCode));
+
+    //Update User acces, roles and projects
+    [HttpPost("org/users/update")]
+    public async Task<IActionResult> UpdateUserProjectAndRoleDataAsync([FromBody] UserProjectRoleUpdateRequestModel toUpdate) =>
+        await ServeAsync(async () => await _service.UpdateUserProjectAndRoleDataAsync(toUpdate));
+
+    //Invite user to org
+    [HttpPost("org/users/invite")]
+    public async Task<IActionResult> InviteUserAsync([FromBody] UserRequestModel toInvite) =>
+        await ServeAsync(async () => await _service.InviteUserAsync(toInvite));
 }

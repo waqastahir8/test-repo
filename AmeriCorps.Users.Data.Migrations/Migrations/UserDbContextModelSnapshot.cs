@@ -18,10 +18,47 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("users")
-                .HasAnnotation("ProductVersion", "8.0.4")
+                .HasAnnotation("ProductVersion", "8.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("AmeriCorps.Users.Data.Core.Access", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AccessLevel")
+                        .HasColumnType("integer")
+                        .HasColumnName("access_level");
+
+                    b.Property<string>("AccessName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("access_name");
+
+                    b.Property<string>("AccessType")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("access_type");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("description");
+
+                    b.HasKey("Id")
+                        .HasName("pk_access");
+
+                    b.HasIndex("AccessName")
+                        .HasDatabaseName("ix_access_access_name");
+
+                    b.ToTable("access", "users");
+                });
 
             modelBuilder.Entity("AmeriCorps.Users.Data.Core.Address", b =>
                 {
@@ -118,6 +155,61 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                         .HasDatabaseName("ix_attribute_user_id");
 
                     b.ToTable("attribute", "users");
+                });
+
+            modelBuilder.Entity("AmeriCorps.Users.Data.Core.Award", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AwardCode")
+                        .IsRequired()
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("award_code");
+
+                    b.Property<string>("AwardName")
+                        .IsRequired()
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("award_name");
+
+                    b.Property<long>("Fain")
+                        .HasColumnType("bigint")
+                        .HasColumnName("fain");
+
+                    b.Property<string>("GspListingNumber")
+                        .IsRequired()
+                        .HasColumnType("varchar(32)")
+                        .HasColumnName("gsp_listing_number");
+
+                    b.Property<DateOnly?>("PerformanceEndDt")
+                        .HasColumnType("date")
+                        .HasColumnName("performance_end_dt");
+
+                    b.Property<DateOnly?>("PerformanceStartDt")
+                        .HasColumnType("date")
+                        .HasColumnName("performance_start_dt");
+
+                    b.Property<long>("Uei")
+                        .HasColumnType("bigint")
+                        .HasColumnName("uei");
+
+                    b.HasKey("Id")
+                        .HasName("pk_award");
+
+                    b.HasIndex("AwardCode")
+                        .HasDatabaseName("ix_award_award_code");
+
+                    b.HasIndex("AwardCode", "AwardName", "GspListingNumber")
+                        .HasDatabaseName("ix_award_award_code_award_name_gsp_listing_number")
+                        .HasAnnotation("Npgsql:TsVectorConfig", "english");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("AwardCode", "AwardName", "GspListingNumber"), "GIST");
+
+                    b.ToTable("award", "users");
                 });
 
             modelBuilder.Entity("AmeriCorps.Users.Data.Core.Collection", b =>
@@ -319,6 +411,332 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                     b.ToTable("military_service", "users");
                 });
 
+            modelBuilder.Entity("AmeriCorps.Users.Data.Core.OperatingSite", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("boolean")
+                        .HasColumnName("active");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("city");
+
+                    b.Property<string>("ContactName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("contact_name");
+
+                    b.Property<string>("EmailAddress")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("email_address");
+
+                    b.Property<DateTime?>("InviteDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("invite_date");
+
+                    b.Property<int>("InviteUserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("invite_user_id");
+
+                    b.Property<string>("OperatingSiteName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("operating_site_name");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("phone_number");
+
+                    b.Property<string>("Plus4")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("plus4");
+
+                    b.Property<string>("ProgramYear")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("program_year");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("integer")
+                        .HasColumnName("project_id");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("state");
+
+                    b.Property<string>("StreetAddress")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("street_address");
+
+                    b.Property<string>("StreetAddress2")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("street_address2");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_date");
+
+                    b.Property<string>("ZipCode")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("zip_code");
+
+                    b.HasKey("Id")
+                        .HasName("pk_operating_site");
+
+                    b.HasIndex("OperatingSiteName")
+                        .HasDatabaseName("ix_operating_site_operating_site_name");
+
+                    b.HasIndex("ProjectId")
+                        .HasDatabaseName("ix_operating_site_project_id");
+
+                    b.HasIndex("ProgramYear", "OperatingSiteName", "ContactName", "EmailAddress", "PhoneNumber", "StreetAddress", "StreetAddress2", "City", "State", "ZipCode")
+                        .HasDatabaseName("ix_operating_site_program_year_operating_site_name_contact_name")
+                        .HasAnnotation("Npgsql:TsVectorConfig", "english");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("ProgramYear", "OperatingSiteName", "ContactName", "EmailAddress", "PhoneNumber", "StreetAddress", "StreetAddress2", "City", "State", "ZipCode"), "GIST");
+
+                    b.ToTable("operatingSite", "users");
+                });
+
+            modelBuilder.Entity("AmeriCorps.Users.Data.Core.Organization", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("description");
+
+                    b.Property<string>("OrgCode")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("org_code");
+
+                    b.Property<string>("OrgName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("org_name");
+
+                    b.HasKey("Id")
+                        .HasName("pk_organization");
+
+                    b.HasIndex("OrgCode")
+                        .HasDatabaseName("ix_organization_org_code");
+
+                    b.ToTable("organization", "users");
+                });
+
+            modelBuilder.Entity("AmeriCorps.Users.Data.Core.Project", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("boolean")
+                        .HasColumnName("active");
+
+                    b.Property<int?>("AuthorizedRepId")
+                        .HasColumnType("integer")
+                        .HasColumnName("authorized_rep_id");
+
+                    b.Property<int>("AwardId")
+                        .HasColumnType("integer")
+                        .HasColumnName("award_id");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("city");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("description");
+
+                    b.Property<DateOnly?>("EnrollmentEndDt")
+                        .HasColumnType("date")
+                        .HasColumnName("enrollment_end_dt");
+
+                    b.Property<DateOnly?>("EnrollmentStartDt")
+                        .HasColumnType("date")
+                        .HasColumnName("enrollment_start_dt");
+
+                    b.Property<long>("GspProjectId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("gsp_project_id");
+
+                    b.Property<string>("ProgramName")
+                        .IsRequired()
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("program_name");
+
+                    b.Property<string>("ProgramYear")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("program_year");
+
+                    b.Property<string>("ProjectCode")
+                        .IsRequired()
+                        .HasColumnType("varchar(8)")
+                        .HasColumnName("project_code");
+
+                    b.Property<int?>("ProjectDirectorId")
+                        .HasColumnType("integer")
+                        .HasColumnName("project_director_id");
+
+                    b.Property<long>("ProjectId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("project_id");
+
+                    b.Property<string>("ProjectName")
+                        .IsRequired()
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("project_name");
+
+                    b.Property<string>("ProjectOrgCode")
+                        .IsRequired()
+                        .HasColumnType("varchar(8)")
+                        .HasColumnName("project_org_code");
+
+                    b.Property<DateOnly?>("ProjectPeriodEndDt")
+                        .HasColumnType("date")
+                        .HasColumnName("project_period_end_dt");
+
+                    b.Property<DateOnly?>("ProjectPeriodStartDt")
+                        .HasColumnType("date")
+                        .HasColumnName("project_period_start_dt");
+
+                    b.Property<string>("ProjectType")
+                        .IsRequired()
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("project_type");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("varchar(8)")
+                        .HasColumnName("state");
+
+                    b.Property<string>("StreetAddress")
+                        .IsRequired()
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("street_address");
+
+                    b.Property<string>("ZipCode")
+                        .IsRequired()
+                        .HasColumnType("varchar(8)")
+                        .HasColumnName("zip_code");
+
+                    b.HasKey("Id")
+                        .HasName("pk_project");
+
+                    b.HasIndex("AuthorizedRepId")
+                        .HasDatabaseName("ix_project_authorized_rep_id");
+
+                    b.HasIndex("AwardId")
+                        .HasDatabaseName("ix_project_award_id");
+
+                    b.HasIndex("ProjectCode")
+                        .HasDatabaseName("ix_project_project_code");
+
+                    b.HasIndex("ProjectDirectorId")
+                        .HasDatabaseName("ix_project_project_director_id");
+
+                    b.HasIndex("ProjectName", "ProjectOrgCode", "ProjectCode", "ProjectId", "GspProjectId", "ProgramName", "StreetAddress", "City", "State", "ProjectType", "Description")
+                        .HasDatabaseName("ix_project_project_name_project_org_code_project_code_project_")
+                        .HasAnnotation("Npgsql:TsVectorConfig", "english");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("ProjectName", "ProjectOrgCode", "ProjectCode", "ProjectId", "GspProjectId", "ProgramName", "StreetAddress", "City", "State", "ProjectType", "Description"), "GIST");
+
+                    b.ToTable("project", "users");
+                });
+
+            modelBuilder.Entity("AmeriCorps.Users.Data.Core.ProjectAccess", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AccessLevel")
+                        .HasColumnType("integer")
+                        .HasColumnName("access_level");
+
+                    b.Property<string>("AccessName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("access_name");
+
+                    b.Property<int>("UserProjectId")
+                        .HasColumnType("integer")
+                        .HasColumnName("user_project_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_project_access");
+
+                    b.HasIndex("UserProjectId")
+                        .HasDatabaseName("ix_project_access_user_project_id");
+
+                    b.ToTable("project_access", "users");
+                });
+
+            modelBuilder.Entity("AmeriCorps.Users.Data.Core.ProjectRole", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("FunctionalName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("functional_name");
+
+                    b.Property<string>("RoleName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("role_name");
+
+                    b.Property<int>("UserProjectId")
+                        .HasColumnType("integer")
+                        .HasColumnName("user_project_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_project_role");
+
+                    b.HasIndex("UserProjectId")
+                        .HasDatabaseName("ix_project_role_user_project_id");
+
+                    b.ToTable("project_role", "users");
+                });
+
             modelBuilder.Entity("AmeriCorps.Users.Data.Core.Reference", b =>
                 {
                     b.Property<int>("Id")
@@ -438,6 +856,44 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                     b.ToTable("relative", "users");
                 });
 
+            modelBuilder.Entity("AmeriCorps.Users.Data.Core.Role", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("description");
+
+                    b.Property<string>("FunctionalName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("functional_name");
+
+                    b.Property<string>("RoleName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("role_name");
+
+                    b.Property<string>("RoleType")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("role_type");
+
+                    b.HasKey("Id")
+                        .HasName("pk_role");
+
+                    b.HasIndex("RoleName")
+                        .HasDatabaseName("ix_role_role_name");
+
+                    b.ToTable("role", "users");
+                });
+
             modelBuilder.Entity("AmeriCorps.Users.Data.Core.SavedSearch", b =>
                 {
                     b.Property<int>("Id")
@@ -506,6 +962,65 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                     b.ToTable("skill", "users");
                 });
 
+            modelBuilder.Entity("AmeriCorps.Users.Data.Core.SubGrantee", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("varchar(32)")
+                        .HasColumnName("city");
+
+                    b.Property<string>("GranteeCode")
+                        .IsRequired()
+                        .HasColumnType("varchar(32)")
+                        .HasColumnName("grantee_code");
+
+                    b.Property<string>("GranteeName")
+                        .IsRequired()
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("grantee_name");
+
+                    b.Property<int?>("ProjectId")
+                        .HasColumnType("integer")
+                        .HasColumnName("project_id");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("varchar(8)")
+                        .HasColumnName("state");
+
+                    b.Property<string>("StreetAddress")
+                        .IsRequired()
+                        .HasColumnType("varchar(32)")
+                        .HasColumnName("street_address");
+
+                    b.Property<long>("Uei")
+                        .HasColumnType("bigint")
+                        .HasColumnName("uei");
+
+                    b.Property<string>("ZipCode")
+                        .IsRequired()
+                        .HasColumnType("varchar(8)")
+                        .HasColumnName("zip_code");
+
+                    b.HasKey("Id")
+                        .HasName("pk_sub_grantee");
+
+                    b.HasIndex("GranteeCode")
+                        .HasDatabaseName("ix_sub_grantee_grantee_code");
+
+                    b.HasIndex("ProjectId")
+                        .HasDatabaseName("ix_sub_grantee_project_id");
+
+                    b.ToTable("sub_grantee", "users");
+                });
+
             modelBuilder.Entity("AmeriCorps.Users.Data.Core.User", b =>
                 {
                     b.Property<int>("Id")
@@ -515,9 +1030,32 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("CityOfBirth")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("city_of_birth");
+
+                    b.Property<int>("CitzenShipStatus")
+                        .HasColumnType("integer")
+                        .HasColumnName("citzen_ship_status");
+
+                    b.Property<string>("CountryOfBirth")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("country_of_birth");
+
                     b.Property<DateOnly>("DateOfBirth")
                         .HasColumnType("date")
                         .HasColumnName("date_of_birth");
+
+                    b.Property<DateOnly?>("DocumentExpirationDate")
+                        .HasColumnType("date")
+                        .HasColumnName("document_expiration_date");
+
+                    b.Property<string>("EncryptedSocialSecurityNumber")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("encrypted_social_security_number");
 
                     b.Property<string>("ExternalAccountId")
                         .IsRequired()
@@ -529,6 +1067,14 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                         .HasColumnType("text")
                         .HasColumnName("first_name");
 
+                    b.Property<DateTime?>("InviteDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("invite_date");
+
+                    b.Property<int>("InviteUserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("invite_user_id");
+
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("text")
@@ -538,6 +1084,11 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("middle_name");
+
+                    b.Property<string>("OrgCode")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("org_code");
 
                     b.Property<string>("PreferredName")
                         .IsRequired()
@@ -553,13 +1104,29 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                         .HasColumnType("text")
                         .HasColumnName("pronouns");
 
+                    b.Property<string>("ResidentRegistrationNumber")
+                        .HasColumnType("text")
+                        .HasColumnName("resident_registration_number");
+
                     b.Property<bool>("Searchable")
                         .HasColumnType("boolean")
                         .HasColumnName("searchable");
 
+                    b.Property<string>("StateOfBirth")
+                        .HasColumnType("text")
+                        .HasColumnName("state_of_birth");
+
                     b.Property<string>("Suffix")
                         .HasColumnType("text")
                         .HasColumnName("suffix");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_date");
+
+                    b.Property<int>("UserAccountStatus")
+                        .HasColumnType("integer")
+                        .HasColumnName("user_account_status");
 
                     b.Property<string>("UserName")
                         .IsRequired()
@@ -569,7 +1136,88 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                     b.HasKey("Id")
                         .HasName("pk_user");
 
+                    b.HasIndex("OrgCode", "UserAccountStatus")
+                        .HasDatabaseName("ix_user_org_code_user_account_status");
+
                     b.ToTable("user", "users");
+                });
+
+            modelBuilder.Entity("AmeriCorps.Users.Data.Core.UserProject", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("boolean")
+                        .HasColumnName("active");
+
+                    b.Property<string>("ProjectCode")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("project_code");
+
+                    b.Property<string>("ProjectName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("project_name");
+
+                    b.Property<string>("ProjectOrg")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("project_org");
+
+                    b.Property<string>("ProjectType")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("project_type");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_user_project");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_user_project_user_id");
+
+                    b.ToTable("userProject", "users");
+                });
+
+            modelBuilder.Entity("AmeriCorps.Users.Data.Core.UserRole", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("FunctionalName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("functional_name");
+
+                    b.Property<string>("RoleName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("role_name");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_user_role");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_user_role_user_id");
+
+                    b.ToTable("user_role", "users");
                 });
 
             modelBuilder.Entity("AmeriCorps.Users.Data.Core.Address", b =>
@@ -642,6 +1290,62 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                         .HasConstraintName("fk_military_service_users_user_id");
                 });
 
+            modelBuilder.Entity("AmeriCorps.Users.Data.Core.OperatingSite", b =>
+                {
+                    b.HasOne("AmeriCorps.Users.Data.Core.Project", null)
+                        .WithMany("OperatingSites")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_operating_site_project_project_id");
+                });
+
+            modelBuilder.Entity("AmeriCorps.Users.Data.Core.Project", b =>
+                {
+                    b.HasOne("AmeriCorps.Users.Data.Core.User", "AuthorizedRep")
+                        .WithMany()
+                        .HasForeignKey("AuthorizedRepId")
+                        .HasConstraintName("fk_project_user_authorized_rep_id");
+
+                    b.HasOne("AmeriCorps.Users.Data.Core.Award", "Award")
+                        .WithMany()
+                        .HasForeignKey("AwardId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_project_award_award_id");
+
+                    b.HasOne("AmeriCorps.Users.Data.Core.User", "ProjectDirector")
+                        .WithMany()
+                        .HasForeignKey("ProjectDirectorId")
+                        .HasConstraintName("fk_project_user_project_director_id");
+
+                    b.Navigation("AuthorizedRep");
+
+                    b.Navigation("Award");
+
+                    b.Navigation("ProjectDirector");
+                });
+
+            modelBuilder.Entity("AmeriCorps.Users.Data.Core.ProjectAccess", b =>
+                {
+                    b.HasOne("AmeriCorps.Users.Data.Core.UserProject", null)
+                        .WithMany("ProjectAccess")
+                        .HasForeignKey("UserProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_project_access_user_projects_user_project_id");
+                });
+
+            modelBuilder.Entity("AmeriCorps.Users.Data.Core.ProjectRole", b =>
+                {
+                    b.HasOne("AmeriCorps.Users.Data.Core.UserProject", null)
+                        .WithMany("ProjectRoles")
+                        .HasForeignKey("UserProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_project_role_user_projects_user_project_id");
+                });
+
             modelBuilder.Entity("AmeriCorps.Users.Data.Core.Reference", b =>
                 {
                     b.HasOne("AmeriCorps.Users.Data.Core.User", null)
@@ -682,6 +1386,41 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                         .HasConstraintName("fk_skill_users_user_id");
                 });
 
+            modelBuilder.Entity("AmeriCorps.Users.Data.Core.SubGrantee", b =>
+                {
+                    b.HasOne("AmeriCorps.Users.Data.Core.Project", null)
+                        .WithMany("SubGrantees")
+                        .HasForeignKey("ProjectId")
+                        .HasConstraintName("fk_sub_grantee_projects_project_id");
+                });
+
+            modelBuilder.Entity("AmeriCorps.Users.Data.Core.UserProject", b =>
+                {
+                    b.HasOne("AmeriCorps.Users.Data.Core.User", null)
+                        .WithMany("UserProjects")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_user_project_user_user_id");
+                });
+
+            modelBuilder.Entity("AmeriCorps.Users.Data.Core.UserRole", b =>
+                {
+                    b.HasOne("AmeriCorps.Users.Data.Core.User", null)
+                        .WithMany("Roles")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_user_role_users_user_id");
+                });
+
+            modelBuilder.Entity("AmeriCorps.Users.Data.Core.Project", b =>
+                {
+                    b.Navigation("OperatingSites");
+
+                    b.Navigation("SubGrantees");
+                });
+
             modelBuilder.Entity("AmeriCorps.Users.Data.Core.User", b =>
                 {
                     b.Navigation("Addresses");
@@ -702,9 +1441,20 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
 
                     b.Navigation("Relatives");
 
+                    b.Navigation("Roles");
+
                     b.Navigation("SavedSearches");
 
                     b.Navigation("Skills");
+
+                    b.Navigation("UserProjects");
+                });
+
+            modelBuilder.Entity("AmeriCorps.Users.Data.Core.UserProject", b =>
+                {
+                    b.Navigation("ProjectAccess");
+
+                    b.Navigation("ProjectRoles");
                 });
 #pragma warning restore 612, 618
         }

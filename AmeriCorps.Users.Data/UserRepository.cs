@@ -1,5 +1,6 @@
 ﻿using AmeriCorps.Data;
 using AmeriCorps.Users.Data.Core;
+using AmeriCorps.Users.Data.Core.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -27,6 +28,9 @@ public sealed partial class UserRepository(
                 .Include(u => u.SavedSearches)
                 .Include(u => u.Relatives)
                 .Include(u => u.CommunicationMethods)
+                .Include(u => u.Roles)
+                .Include(u => u.UserProjects).ThenInclude(p => p.ProjectRoles)
+                .Include(u => u.UserProjects).ThenInclude(a => a.ProjectAccess)
                 .FirstOrDefaultAsync(x => x.Id == id));
 
     public async Task<User?> GetByExternalAccountIdAsync(string externalAccountId) =>
@@ -42,6 +46,9 @@ public sealed partial class UserRepository(
                 .Include(u => u.SavedSearches)
                 .Include(u => u.Relatives)
                 .Include(u => u.CommunicationMethods)
+                .Include(u => u.Roles)
+                .Include(u => u.UserProjects).ThenInclude(p => p.ProjectRoles)
+                .Include(u => u.UserProjects).ThenInclude(a => a.ProjectAccess)
                 .FirstOrDefaultAsync(x => x.ExternalAccountId == externalAccountId));
 
     public async Task<IEnumerable<User>?> GetByAttributeAsync(string type, string value) =>
@@ -57,6 +64,9 @@ public sealed partial class UserRepository(
                 .Include(u => u.SavedSearches)
                 .Include(u => u.Relatives)
                 .Include(u => u.CommunicationMethods)
+                .Include(u => u.Roles)
+                .Include(u => u.UserProjects).ThenInclude(p => p.ProjectRoles)
+                .Include(u => u.UserProjects).ThenInclude(a => a.ProjectAccess)
                 .Where(x => x.Attributes.Any(x => x.Type == type && x.Value == value))
                 .ToListAsync());
 
@@ -174,6 +184,8 @@ public sealed partial class UserRepository(
         UpdateEntities(user.Relatives, context, userId);
         UpdateEntities(user.Languages, context, userId);
         UpdateEntities(user.Skills, context, userId);
+        UpdateEntities(user.Roles, context, userId);
+        UpdateEntities(user.UserProjects, context, userId);
 
         return user;
     }
@@ -200,4 +212,53 @@ public sealed partial class UserRepository(
             context.Entry(entity).State = EntityState.Deleted;
         }
     }
+
+    public async Task<Role?> GetRoleAsync(int id) =>
+       await ExecuteAsync(async context => await context.Roles.FindAsync(id));
+
+    private Role? UpdateRole(Role role, RepositoryContext context)
+
+    {
+        var roleId = role.Id;
+
+        return role;
+    }
+
+    public async Task<UserList> FetchUserListByOrgCodeAsync(string orgCode)
+    {
+        List<User> users = await ExecuteAsync(async context =>
+                await context.Users
+                    .AsNoTracking()
+                    .Include(u => u.Attributes)
+                    .Include(u => u.Languages)
+                    .Include(u => u.Addresses)
+                    .Include(u => u.Education)
+                    .Include(u => u.Skills)
+                    .Include(u => u.MilitaryService)
+                    .Include(u => u.SavedSearches)
+                    .Include(u => u.Relatives)
+                    .Include(u => u.CommunicationMethods)
+                    .Include(u => u.Roles)
+                    .Include(u => u.UserProjects).ThenInclude(p => p.ProjectRoles)
+                    .Include(u => u.UserProjects).ThenInclude(a => a.ProjectAccess)
+                    .Where(x => x.OrgCode == orgCode).ToListAsync());
+
+        UserList? userList = new UserList()
+        {
+            OrgCode = orgCode,
+            Users = users
+        };
+
+        return userList;
+    }
+
+    public async Task<List<User>> FetchInvitedUsersForReminder(){
+
+        var inviteCheckDate = DateTime.UtcNow.AddDays(-14);
+
+        return await ExecuteAsync(async context => await context.Users
+            .Where(u => u.UserAccountStatus == UserAccountStatus.INVITED
+                && DateTime.Compare(u.InviteDate ?? DateTime.MaxValue, inviteCheckDate) <= 0).ToListAsync());
+    }
+
 }

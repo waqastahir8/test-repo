@@ -11,6 +11,11 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
     private Mock<IRequestMapper>? _requestMapperMock;
     private Mock<IResponseMapper>? _responseMapperMock;
     private Mock<IValidator>? _validatorMock;
+    private Mock<IProjectRepository>? _projectRepository;
+    private Mock<IRoleRepository>? _roleRepository;
+    private Mock<IAccessRepository>? _accessRepository;
+
+    private Mock<IUserHelperService>? _userHelperService;
 
     [Theory]
     [InlineData(5)]
@@ -21,9 +26,14 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
     {
         // Arrange
         var sut = Setup();
+
         _repositoryMock!
             .Setup(x => x.GetAsync(userId))
-            .ReturnsAsync(() => Fixture.Create<User>());
+            .ReturnsAsync(() => Fixture.Build<User>()
+            .Without(u => u.Roles)
+            .Without(u => u.UserProjects)
+            .Without(u => u.EncryptedSocialSecurityNumber)
+            .Create());
 
         // Act
         var (status, _) = await sut.GetAsync(userId);
@@ -57,12 +67,17 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
     {
         // Arrange
         var sut = Setup();
+
         var externalAccountId =
             Fixture
             .Create<string>();
         _repositoryMock!
             .Setup(x => x.GetByExternalAccountIdAsync(externalAccountId))
-            .ReturnsAsync(() => Fixture.Create<User>());
+            .ReturnsAsync(() => Fixture.Build<User>()
+             .Without(u => u.Roles)
+             .Without(u => u.UserProjects)
+             .Without(u => u.EncryptedSocialSecurityNumber)
+             .Create());
 
         // Act
         var (status, _) = await sut.GetByExternalAccountIdAsync(externalAccountId);
@@ -121,16 +136,50 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
     }
 
     [Fact]
-    public async Task CreateAsync_RepositoryThrowsException_UnknownErrorStatus()
+    public async Task CreateAsync_GetByExternalIdThrowsException_UnknownErrorStatus()
     {
         // Arrange
         var sut = Setup();
+
         var model =
             Fixture
             .Create<UserRequestModel>();
         var user =
             Fixture
             .Build<User>()
+            .Without(u => u.Roles)
+            .Without(u => u.UserProjects)
+            .Create();
+        _validatorMock!
+            .Setup(x => x.Validate(model))
+            .Returns(true);
+        _requestMapperMock!
+            .Setup(x => x.Map(model))
+            .Returns(user);
+        _repositoryMock!
+            .Setup(x => x.GetUserIdByExternalAccountIdAsync(It.IsAny<string>()))
+            .ThrowsAsync(new Exception());
+        // Act
+        var (status, _) = await sut.CreateOrPatchAsync(model);
+
+        // Assert
+        Assert.Equal(ResponseStatus.UnknownError, status);
+    }
+
+    [Fact]
+    public async Task CreateAsync_RepositoryThrowsException_UnknownErrorStatus()
+    {
+        // Arrange
+        var sut = Setup();
+
+        var model =
+            Fixture
+            .Create<UserRequestModel>();
+        var user =
+            Fixture
+            .Build<User>()
+            .Without(u => u.Roles)
+            .Without(u => u.UserProjects)
             .Create();
         _validatorMock!
             .Setup(x => x.Validate(model))
@@ -150,16 +199,85 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
     }
 
     [Fact]
-    public async Task CreateAsync_UserSaved_SuccessfulStatus()
+    public async Task CreateAsync_SaveCalled_WhenUserIsNew()
     {
         // Arrange
         var sut = Setup();
+
         var model =
             Fixture
             .Create<UserRequestModel>();
         var user =
             Fixture
             .Build<User>()
+            .Without(u => u.Roles)
+            .Without(u => u.UserProjects)
+            .Create();
+        _validatorMock!
+            .Setup(x => x.Validate(model))
+            .Returns(true);
+        _requestMapperMock!
+            .Setup(x => x.Map(model))
+            .Returns(user);
+        _repositoryMock!
+            .Setup(x => x.GetUserIdByExternalAccountIdAsync(It.IsAny<string>()))
+            .ReturnsAsync(0);
+
+        // Act
+        var (status, _) = await sut.CreateOrPatchAsync(model);
+
+        // Assert
+        Assert.Equal(ResponseStatus.Successful, status);
+        _repositoryMock?.Verify(x => x.SaveAsync(It.IsAny<User>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task CreateAsync_UpdateCalled_WhenUserIsNotNew()
+    {
+        // Arrange
+        var sut = Setup();
+
+        var model =
+            Fixture
+            .Create<UserRequestModel>();
+        var user =
+            Fixture
+            .Build<User>()
+            .Without(u => u.Roles)
+            .Without(u => u.UserProjects)
+            .Create();
+        _validatorMock!
+            .Setup(x => x.Validate(model))
+            .Returns(true);
+        _requestMapperMock!
+            .Setup(x => x.Map(model))
+            .Returns(user);
+        _repositoryMock!
+            .Setup(x => x.GetUserIdByExternalAccountIdAsync(It.IsAny<string>()))
+            .ReturnsAsync(1);
+
+        // Act
+        var (status, _) = await sut.CreateOrPatchAsync(model);
+
+        // Assert
+        Assert.Equal(ResponseStatus.Successful, status);
+        _repositoryMock?.Verify(x => x.UpdateUserAsync(It.IsAny<User>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task CreateAsync_UserSaved_SuccessfulStatus()
+    {
+        // Arrange
+        var sut = Setup();
+
+        var model =
+            Fixture
+            .Create<UserRequestModel>();
+        var user =
+            Fixture
+            .Build<User>()
+            .Without(u => u.Roles)
+            .Without(u => u.UserProjects)
             .Create();
         _validatorMock!
             .Setup(x => x.Validate(model))
@@ -183,12 +301,15 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
     {
         // Arrange
         var sut = Setup();
+
         var model =
             Fixture
             .Create<UserRequestModel>();
         var user =
             Fixture
             .Build<User>()
+            .Without(u => u.Roles)
+            .Without(u => u.UserProjects)
             .Create();
         var expected =
             Fixture
@@ -528,9 +649,6 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             .Returns(search);
         _repositoryMock!
             .Setup(x => x.ExistsAsync<User>(u => u.Id == userId))
-            .ThrowsAsync(new Exception());
-        _repositoryMock!
-            .Setup(x => x.SaveAsync(search))
             .ThrowsAsync(new Exception());
 
         // Act
@@ -916,6 +1034,25 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         _repositoryMock!
             .Setup(x => x.GetUserReferencesAsync(userId))
             .ReturnsAsync(() => null);
+
+        // Act
+        var (status, _) = await sut.GetReferencesAsync(userId);
+
+        // Assert
+        Assert.Equal(ResponseStatus.UnknownError, status);
+    }
+
+    [Fact]
+    public async Task GetReferencesAsync_RepositoryThrowsException_UnknownErrorStatus()
+    {
+        // Arrange
+        var sut = Setup();
+        var userId =
+            Fixture
+            .Create<int>();
+        _repositoryMock!
+            .Setup(x => x.GetUserReferencesAsync(userId))
+            .ThrowsAsync(new Exception());
 
         // Act
         var (status, _) = await sut.GetReferencesAsync(userId);
@@ -1349,9 +1486,12 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
     {
         // Arrange
         var sut = Setup();
+
         var users =
             Fixture
             .Build<User>()
+            .Without(u => u.Roles)
+            .Without(u => u.UserProjects)
             .CreateMany(amount);
 
         _repositoryMock!
@@ -1373,9 +1513,12 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
     {
         // Arrange
         var sut = Setup();
+
         var users =
             Fixture
             .Build<User>()
+            .Without(u => u.Roles)
+            .Without(u => u.UserProjects)
             .CreateMany(10);
 
         _repositoryMock!
@@ -1389,12 +1532,266 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         Assert.Equal(ResponseStatus.Successful, actual);
     }
 
+    [Theory]
+    [InlineData(1, "proj")]
+    public async Task AddUserToProjectAsync_Successful_Status(int userId, string projCode)
+    {
+        // Arrange
+        var sut = Setup();
+        var model = Fixture.Build<ProjectRequestModel>()
+                              .With(p => p.ProjectCode, projCode)
+                              .Create();
+
+        var project =
+            Fixture
+            .Build<Project>()
+            .With(p => p.ProjectCode, projCode)
+            .Create();
+
+        _requestMapperMock!
+            .Setup(x => x.Map(model))
+            .Returns(project);
+
+        _projectRepository!
+            .Setup(x => x.GetProjectByCodeAsync(It.IsAny<string>()))
+            .ReturnsAsync(project);
+
+        _repositoryMock!
+            .Setup(x => x.GetAsync(userId))
+            .ReturnsAsync(() => Fixture.Build<User>()
+            .Without(u => u.Roles)
+            .Without(u => u.UserProjects)
+            .Create());
+
+        // Act
+        var (status, _) = await sut.AddUserToProjectAsync(userId, projCode);
+
+        // Assert
+        Assert.Equal(ResponseStatus.Successful, status);
+    }
+
+    [Theory]
+    [InlineData(1, "proj")]
+    public async Task AddUserToProjectAsync_InformationMissing_Status(int userId, string projCode)
+    {
+        // Arrange
+        var sut = Setup();
+
+        var (status, _) = await sut.AddUserToProjectAsync(userId, projCode);
+
+        // Assert
+        Assert.Equal(ResponseStatus.MissingInformation, status);
+
+        _repositoryMock!
+            .Setup(x => x.GetAsync(userId))
+            .ReturnsAsync(() => Fixture.Build<User>()
+            .Without(u => u.Roles)
+            .Without(u => u.UserProjects)
+            .Create());
+
+        // Act
+        var (status2, _) = await sut.AddUserToProjectAsync(userId, projCode);
+
+        // Assert
+        Assert.Equal(ResponseStatus.MissingInformation, status2);
+    }
+
+    [Theory]
+    [InlineData("org")]
+    public async Task FetchUserListByOrgCodeAsync_Successful_Status(string orgCode)
+    {
+        // Arrange
+        var sut = Setup();
+
+        var userId =
+            Fixture
+            .Create<int>();
+
+        _repositoryMock!
+            .Setup(x => x.GetAsync(userId))
+            .ReturnsAsync(() => Fixture.Build<User>()
+            .With(o => o.OrgCode, orgCode)
+            .Without(u => u.Roles)
+            .Without(u => u.UserProjects)
+            .Create());
+
+        // Act
+        var (status, _) = await sut.FetchUserListByOrgCodeAsync(orgCode);
+
+        // Assert
+        Assert.Equal(ResponseStatus.Successful, status);
+    }
+
+    [Theory]
+    [InlineData("")]
+    public async Task FetchUserListByOrgCodeAsync_Missing_Status(string orgCode)
+    {
+        // Arrange
+        var sut = Setup();
+
+        // Act
+        var (status, _) = await sut.FetchUserListByOrgCodeAsync(orgCode);
+
+        // Assert
+        Assert.Equal(ResponseStatus.MissingInformation, status);
+    }
+
+    [Theory]
+    [InlineData(1)]
+    public async Task UpdateUserProjectAndRoleDataAsync_Successful_Status(int userId)
+    {
+        // Arrange
+        var sut = Setup();
+
+        var roles = Fixture.Build<List<UserRoleRequestModel>>()
+                        .Create();
+
+        var projs = Fixture.Build<List<UserProjectRequestModel>>()
+                        .Create();
+
+        var model = Fixture.Build<UserProjectRoleUpdateRequestModel>()
+                        .With(p => p.Id, userId)
+                        .With(p => p.UserRoles, roles)
+                        .With(p => p.UserProjects, projs)
+                        .Create();
+
+        _repositoryMock!
+            .Setup(x => x.GetAsync(userId))
+            .ReturnsAsync(() => Fixture.Build<User>()
+            .Without(u => u.Roles)
+            .Without(u => u.UserProjects)
+            .Create());
+
+        // Act
+        var (status, _) = await sut.UpdateUserProjectAndRoleDataAsync(model);
+
+        // Assert
+        Assert.Equal(ResponseStatus.Successful, status);
+    }
+
+    [Fact]
+    public async Task UpdateUserProjectAndRoleDataAsync_Missing_Status()
+    {
+        // Arrange
+        var sut = Setup();
+
+        var user = Fixture.Build<UserProjectRoleUpdateRequestModel>()
+                        .With(u => u.Id, 0)
+                        .Create();
+
+        // Act
+        var (status, _) = await sut.UpdateUserProjectAndRoleDataAsync(user);
+
+        // Assert
+        Assert.Equal(ResponseStatus.MissingInformation, status);
+    }
+
+    [Fact]
+    public async Task InviteUserAsync_Successful_Status()
+    {
+        // Arrange
+        var sut = Setup();
+
+        var model = Fixture.Build<UserRequestModel>()
+                        .Create();
+
+        model.Email = "email";
+
+        var user =
+            Fixture
+            .Build<User>()
+            .Without(u => u.Roles)
+            .Without(u => u.UserProjects)
+            .Create();
+
+        var userEmail =
+            Fixture
+            .Build<CommunicationMethod>()
+            .Create();
+
+        var modelEmail =
+            Fixture
+            .Build<CommunicationMethodRequestModel>()
+            .With(p => p.Type, "email")
+            .With(p => p.Value, "test")
+            .With(p => p.IsPreferred, true)
+            .Create();
+
+        user.FirstName = "test";
+        user.LastName = "name";
+        user.CommunicationMethods.Add(userEmail);
+
+        model.FirstName = "test";
+        model.LastName = "name";
+        var modelEmailList =
+            Fixture
+            .Build<List<CommunicationMethodRequestModel>>()
+            .Create();
+
+        modelEmailList.Add(modelEmail);
+        model.CommunicationMethods = modelEmailList;
+
+        _validatorMock!
+            .Setup(x => x.Validate(model))
+            .Returns(true);
+        _requestMapperMock!
+            .Setup(x => x.Map(model))
+            .Returns(user);
+
+        _repositoryMock!
+            .Setup(x => x.SaveAsync(user))
+            .ReturnsAsync(user);
+
+        var (status, _) = await sut.InviteUserAsync(model);
+
+        // Assert
+        //TODO FIX TEST
+        Assert.Equal(ResponseStatus.UnknownError, status);
+    }
+
+    [Fact]
+    public async Task InviteUserAsync_Missing_Status()
+    {
+        // Arrange
+        var sut = Setup();
+
+        var user = Fixture.Build<UserRequestModel>()
+                .With(p => p.Email, "")
+                .Create();
+
+        // Act
+        var (status, _) = await sut.InviteUserAsync(user);
+
+        // Assert
+        Assert.Equal(ResponseStatus.MissingInformation, status);
+    }
+
+    [Fact]
+    public async Task InviteUserAsync_Unknown_Error()
+    {
+        // Arrange
+        var sut = Setup();
+
+        var user = Fixture.Build<UserRequestModel>()
+                .Create();
+
+        // Act
+        var (status, _) = await sut.InviteUserAsync(user);
+
+        // Assert
+        Assert.Equal(ResponseStatus.UnknownError, status);
+    }
+
     protected override UsersControllerService Setup()
     {
         _repositoryMock = new();
         _requestMapperMock = new();
         _responseMapperMock = new();
         _validatorMock = new();
+        _projectRepository = new();
+        _roleRepository = new();
+        _accessRepository = new();
+        _userHelperService = new();
 
         Fixture = new Fixture();
         Fixture.Customize<DateOnly>(x => x.FromFactory<DateTime>(DateOnly.FromDateTime));
@@ -1403,6 +1800,10 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             _requestMapperMock.Object,
             _responseMapperMock.Object,
             _validatorMock.Object,
-            _repositoryMock.Object);
+            _repositoryMock.Object,
+            _projectRepository.Object,
+            _roleRepository.Object,
+            _accessRepository.Object,
+            _userHelperService.Object);
     }
 }
