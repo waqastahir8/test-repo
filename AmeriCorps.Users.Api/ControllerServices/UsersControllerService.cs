@@ -53,7 +53,7 @@ public interface IUsersControllerService
     Task<(ResponseStatus Status, UserResponse? Response)> LinkNewAccountToExistingUserAsync(ExistingUserSearchModel toLink);
 
     Task<(ResponseStatus Status, DirectDepositResponse? Response)> SaveDirectDepositFormAsync(int userId, DirectDepositRequestModel? toUpdate);
-    
+
     Task<(ResponseStatus Status, bool Response)> DeleteDirectDepositFormAsync(int userId, int directDepositId);
 }
 
@@ -996,7 +996,6 @@ public sealed class UsersControllerService : IUsersControllerService
 
     public async Task<(ResponseStatus Status, UserResponse? Response)> LinkNewAccountToExistingUserAsync(ExistingUserSearchModel toLink)
     {
-
         if (toLink == null || String.IsNullOrEmpty(toLink.UserEmail) || toLink.NewUser == null || String.IsNullOrEmpty(toLink.NewUser.OrgCode))
         {
             return (ResponseStatus.MissingInformation, null);
@@ -1014,7 +1013,7 @@ public sealed class UsersControllerService : IUsersControllerService
             return (ResponseStatus.UnknownError, null);
         }
 
-        if(existingUser != null)
+        if (existingUser != null)
         {
             existingUser.FirstName = toLink.NewUser.FirstName;
             existingUser.LastName = toLink.NewUser.LastName;
@@ -1037,13 +1036,12 @@ public sealed class UsersControllerService : IUsersControllerService
         }
 
         var response = _responseMapper.Map(existingUser);
-        
+
         return (ResponseStatus.Successful, response);
     }
 
     public async Task<(ResponseStatus Status, DirectDepositResponse? Response)> SaveDirectDepositFormAsync(int userId, DirectDepositRequestModel? toUpdate)
     {
-
         if (toUpdate == null)
         {
             return (ResponseStatus.MissingInformation, null);
@@ -1069,9 +1067,6 @@ public sealed class UsersControllerService : IUsersControllerService
                 deleted = DeleteDirectDepositFormAsync(userId, existingUser.DirectDeposits[0].Id).Result.Response;
             }
             directDeposit = await _repository.SaveAsync<DirectDeposit>(directDeposit);
-
-
-
         }
         catch (Exception e)
         {
@@ -1293,5 +1288,4 @@ public sealed class UsersControllerService : IUsersControllerService
         }
         return projectList;
     }
-
 }

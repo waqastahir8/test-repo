@@ -28,6 +28,7 @@ public interface IRequestMapper
     OperatingSite Map(OperatingSiteRequestModel requestModel);
 
     SubGrantee Map(SubGranteeRequestModel requestModel);
+
     DirectDeposit Map(DirectDepositRequestModel requestModel);
 }
 
@@ -294,7 +295,6 @@ public sealed class RequestMapper : IRequestMapper
         City = requestModel.City,
         State = requestModel.State,
         ZipCode = requestModel.ZipCode,
-
 
         ProjectPeriodStartDt = requestModel.ProjectPeriodStartDt,
         ProjectPeriodEndDt = requestModel.ProjectPeriodEndDt,
