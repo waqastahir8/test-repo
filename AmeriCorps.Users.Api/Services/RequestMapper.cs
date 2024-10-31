@@ -28,6 +28,7 @@ public interface IRequestMapper
     OperatingSite Map(OperatingSiteRequestModel requestModel);
 
     SubGrantee Map(SubGranteeRequestModel requestModel);
+    DirectDeposit Map(DirectDepositRequestModel requestModel);
 }
 
 public sealed class RequestMapper : IRequestMapper
@@ -200,6 +201,18 @@ public sealed class RequestMapper : IRequestMapper
                     Active = p.Active,
                     ProjectRoles = Map(p.ProjectRoles),
                     ProjectAccess = Map(p.ProjectAccess)
+                }),
+        DirectDeposits = MapperUtils.MapList<DirectDepositRequestModel, DirectDeposit>(
+            requestModel.DirectDeposits, d =>
+                new DirectDeposit
+                {
+                    AccountType = (Data.Core.Model.AccountType)d.AccountType,
+                    InstitutionName = d.InstitutionName,
+                    AchRoutingNumber = d.AchRoutingNumber,
+                    ReEnterAchRoutingNumber = d.ReEnterAchRoutingNumber,
+                    AccountNumber = d.AccountNumber,
+                    ReEnterAccountNumber = d.ReEnterAccountNumber,
+                    MailByPaycheck = d.MailByPaycheck
                 })
     };
 
@@ -392,4 +405,15 @@ public sealed class RequestMapper : IRequestMapper
                                State = o.State,
                                ZipCode = o.ZipCode
                            });
+
+    public DirectDeposit Map(DirectDepositRequestModel requestModel) => new()
+    {
+        AccountType = (Data.Core.Model.AccountType)requestModel.AccountType,
+        InstitutionName = requestModel.InstitutionName,
+        AchRoutingNumber = requestModel.AchRoutingNumber,
+        ReEnterAchRoutingNumber = requestModel.ReEnterAchRoutingNumber,
+        AccountNumber = requestModel.AccountNumber,
+        ReEnterAccountNumber = requestModel.ReEnterAccountNumber,
+        MailByPaycheck = requestModel.MailByPaycheck
+    };
 }
