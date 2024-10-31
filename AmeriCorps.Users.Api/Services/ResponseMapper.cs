@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using AmeriCorps.Users.Data.Core;
+using AmeriCorps.Users.Data.Core.Model;
 
 namespace AmeriCorps.Users.Api.Services;
 
@@ -12,6 +13,7 @@ public interface IResponseMapper
     SavedSearchResponseModel Map(SavedSearch search);
 
     ReferenceResponseModel Map(Reference reference);
+    DirectDepositResponse Map(DirectDeposit directDeposit);
 
     List<SavedSearchResponseModel> Map(List<SavedSearch> searches);
 
@@ -20,6 +22,7 @@ public interface IResponseMapper
     CollectionListResponseModel Map(List<Collection>? collection);
 
     List<ReferenceResponseModel> Map(List<Reference> references);
+    List<DirectDepositResponse> Map(List<DirectDeposit> directDeposits);
 
     List<RoleResponse> Map(List<Role> role);
 
@@ -134,6 +137,36 @@ public sealed class ResponseMapper : IResponseMapper
         Contacted = reference.Contacted,
         DateContacted = reference.DateContacted
     };
+
+    public List<DirectDepositResponse> Map(List<DirectDeposit> directDeposits) =>
+        MapperUtils.MapList<AmeriCorps.Users.Data.Core.Model.DirectDeposit, DirectDepositResponse>(
+                            directDeposits,
+                            d => new DirectDepositResponse
+                            {
+                                Id = d.Id,
+                                UserId = d.UserId,
+                                AccountType = (Models.AccountType)d.AccountType,
+                                InstitutionName = d.InstitutionName,
+                                AchRoutingNumber = d.AchRoutingNumber,
+                                ReEnterAchRoutingNumber = d.ReEnterAchRoutingNumber,
+                                AccountNumber = d.AccountNumber,
+                                ReEnterAccountNumber = d.ReEnterAccountNumber,
+                                MailByPaycheck = d.MailByPaycheck
+                            });
+
+    public DirectDepositResponse Map(DirectDeposit directDeposit) => new()
+    {
+        Id = directDeposit.Id,
+        UserId = directDeposit.UserId,
+        AccountType = (Models.AccountType)directDeposit.AccountType,
+        InstitutionName = directDeposit.InstitutionName,
+        AchRoutingNumber = directDeposit.AchRoutingNumber,
+        ReEnterAchRoutingNumber = directDeposit.ReEnterAchRoutingNumber,
+        AccountNumber = directDeposit.AccountNumber,
+        ReEnterAccountNumber = directDeposit.ReEnterAccountNumber,
+        MailByPaycheck = directDeposit.MailByPaycheck
+    };
+   
 
     public UserResponse? Map(User? user) => user == null ? null : new()
     {
@@ -302,6 +335,18 @@ public sealed class ResponseMapper : IResponseMapper
                     Active = p.Active,
                     ProjectRoles = Map(p.ProjectRoles),
                     ProjectAccess = Map(p.ProjectAccess)
+                }),
+        DirectDeposits = MapperUtils.MapList<DirectDeposit, DirectDepositRequestModel>(
+            user.DirectDeposits, d =>
+                new DirectDepositRequestModel()
+                {
+                    AccountType = (Models.AccountType)d.AccountType,
+                    InstitutionName = d.InstitutionName,
+                    AchRoutingNumber = d.AchRoutingNumber,
+                    ReEnterAchRoutingNumber = d.ReEnterAchRoutingNumber,
+                    AccountNumber = d.AccountNumber,
+                    ReEnterAccountNumber = d.ReEnterAccountNumber,
+                    MailByPaycheck = d.MailByPaycheck
                 })
     };
 
@@ -742,8 +787,21 @@ public sealed class ResponseMapper : IResponseMapper
                             Active = p.Active,
                             ProjectRoles = Map(p.ProjectRoles),
                             ProjectAccess = Map(p.ProjectAccess)
+                        }),
+                DirectDeposits = MapperUtils.MapList<DirectDeposit, DirectDepositRequestModel>(
+                    user.DirectDeposits, d =>
+                        new DirectDepositRequestModel()
+                        {
+                            AccountType = (Models.AccountType)d.AccountType,
+                            InstitutionName = d.InstitutionName,
+                            AchRoutingNumber = d.AchRoutingNumber,
+                            ReEnterAchRoutingNumber = d.ReEnterAchRoutingNumber,
+                            AccountNumber = d.AccountNumber,
+                            ReEnterAccountNumber = d.ReEnterAccountNumber,
+                            MailByPaycheck = d.MailByPaycheck
                         })
             }
         )
     };
+
 }

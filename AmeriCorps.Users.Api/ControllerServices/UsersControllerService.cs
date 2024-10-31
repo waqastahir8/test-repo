@@ -2,6 +2,7 @@
 using System.Security.Cryptography;
 using AmeriCorps.Users.Data.Core;
 using AmeriCorps.Users.Data.Core.Model;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace AmeriCorps.Users.Api;
 
@@ -50,6 +51,10 @@ public interface IUsersControllerService
     Task<(ResponseStatus Status, UserResponse? Response)> InviteUserAsync(UserRequestModel toInvite);
 
     Task<(ResponseStatus Status, UserResponse? Response)> LinkNewAccountToExistingUserAsync(ExistingUserSearchModel toLink);
+
+    Task<(ResponseStatus Status, DirectDepositResponse? Response)> SaveDirectDepositFormAsync(int userId, DirectDepositRequestModel? toUpdate);
+    
+    Task<(ResponseStatus Status, bool Response)> DeleteDirectDepositFormAsync(int userId, int directDepositId);
 }
 
 public sealed class UsersControllerService : IUsersControllerService
@@ -1032,8 +1037,72 @@ public sealed class UsersControllerService : IUsersControllerService
         }
 
         var response = _responseMapper.Map(existingUser);
+        
+        return (ResponseStatus.Successful, response);
+    }
+
+    public async Task<(ResponseStatus Status, DirectDepositResponse? Response)> SaveDirectDepositFormAsync(int userId, DirectDepositRequestModel? toUpdate)
+    {
+
+        if (toUpdate == null)
+        {
+            return (ResponseStatus.MissingInformation, null);
+        }
+        User? existingUser;
+        try
+        {
+            existingUser = await _repository.GetAsync(userId);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Could not retrieve existing user with given user id {Identifier}.", userId.ToString().Replace(Environment.NewLine, ""));
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        DirectDeposit directDeposit = _requestMapper.Map(toUpdate);
+        directDeposit.UserId = userId;
+        try
+        {
+            var deleted = true;
+            if (existingUser?.DirectDeposits.Count > 0)
+            {
+                deleted = DeleteDirectDepositFormAsync(userId, existingUser.DirectDeposits[0].Id).Result.Response;
+            }
+            directDeposit = await _repository.SaveAsync<DirectDeposit>(directDeposit);
+
+
+
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Unable to save direct deposit for user {userId}.");
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        var response = _responseMapper.Map(directDeposit);
 
         return (ResponseStatus.Successful, response);
+    }
+
+    public async Task<(ResponseStatus Status, bool Response)> DeleteDirectDepositFormAsync(int userId, int directDepositId)
+    {
+        var directDepositExists = await _repository.ExistsAsync<DirectDeposit>(d => d.UserId == userId && d.Id == directDepositId);
+        if (!directDepositExists)
+        {
+            _logger.LogInformation($"User with id {userId} does not contain a direct deposit with id {directDepositId}.");
+            return (ResponseStatus.MissingInformation, false);
+        }
+        bool deleted = true;
+        try
+        {
+            deleted = await _repository.DeleteAsync<DirectDeposit>(directDepositId);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Unable to delete direct deposit with id {directDepositId}.");
+            return (ResponseStatus.UnknownError, deleted);
+        }
+        return (ResponseStatus.Successful, deleted);
     }
 
     private string Encrypt(string plainText)
@@ -1224,4 +1293,5 @@ public sealed class UsersControllerService : IUsersControllerService
         }
         return projectList;
     }
+
 }
