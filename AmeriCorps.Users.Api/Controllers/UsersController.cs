@@ -117,6 +117,11 @@ public sealed class UsersController(IUsersControllerService service) : Controlle
     public async Task<IActionResult> InviteUserAsync([FromBody] UserRequestModel toInvite) =>
         await ServeAsync(async () => await _service.InviteUserAsync(toInvite));
 
+    //Link user to invite info
+    [HttpPost("org/users/link-existing")]
+    public async Task<IActionResult> LinkNewAccountToExistingUserAsync([FromBody] ExistingUserSearchModel toLink) =>
+        await ServeAsync(async () => await _service.LinkNewAccountToExistingUserAsync(toLink));
+        
     //Save Direct Deposit Information
     [HttpPost("directdeposit/{userId}")]
     public async Task<IActionResult> SaveDirectDepositFormAsync(int userId, [FromBody] DirectDepositRequestModel directDepositFormRequest) =>

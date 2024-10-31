@@ -261,4 +261,21 @@ public sealed partial class UserRepository(
                 && DateTime.Compare(u.InviteDate ?? DateTime.MaxValue, inviteCheckDate) <= 0).ToListAsync());
     }
 
+    public async Task<User?> FindInvitedUserInfo(string userEmail, string orgCode) =>
+        await ExecuteAsync(async context =>
+            await context.Users
+                .AsNoTracking()
+                .Include(u => u.Attributes)
+                .Include(u => u.Languages)
+                .Include(u => u.Addresses)
+                .Include(u => u.Education)
+                .Include(u => u.Skills)
+                .Include(u => u.MilitaryService)
+                .Include(u => u.SavedSearches)
+                .Include(u => u.Relatives)
+                .Include(u => u.CommunicationMethods)
+                .Include(u => u.Roles)
+                .Include(u => u.UserProjects).ThenInclude(p => p.ProjectRoles)
+                .Include(u => u.UserProjects).ThenInclude(a => a.ProjectAccess)
+                .FirstOrDefaultAsync(x => x.UserName == userEmail && x.OrgCode == orgCode && (x.UserAccountStatus == UserAccountStatus.INVITED || x.UserAccountStatus == UserAccountStatus.PENDING)));
 }

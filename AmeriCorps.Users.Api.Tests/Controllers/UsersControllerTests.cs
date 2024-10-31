@@ -640,6 +640,44 @@ public sealed partial class UsersControllerTests : BaseTests<UsersController>
         Assert.Equal((int)HttpStatusCode.UnprocessableEntity, response.StatusCode);
     }
 
+    [Fact]
+    public async Task LinkNewAccountToExistingUserAsync_SuccessProcessing_200StatusCode()
+    {
+        //Arrange
+        var sut = Setup();
+        var toLink = Fixture.Create<ExistingUserSearchModel>();
+        var userResponse = Fixture.Create<UserResponse>();
+
+        _serviceMock!
+            .Setup(x => x.LinkNewAccountToExistingUserAsync(toLink))
+            .ReturnsAsync((ResponseStatus.Successful, userResponse));
+        //Act
+        var actual = await sut.LinkNewAccountToExistingUserAsync(toLink);
+
+        //Assert
+        var response = actual as OkObjectResult;
+        Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task LinkNewAccountToExistingUserAsync_NonExistent_UnprocessableEntity_422StatusCode()
+    {
+        //Arrange
+        var sut = Setup();
+        var toLink = Fixture.Create<ExistingUserSearchModel>();
+
+        _serviceMock!
+            .Setup(x => x.LinkNewAccountToExistingUserAsync(toLink))
+            .ReturnsAsync((ResponseStatus.MissingInformation, null));
+        //Act
+        var actual = await sut.LinkNewAccountToExistingUserAsync(toLink);
+
+        //Assert
+        var response = actual as StatusCodeResult;
+        Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.UnprocessableEntity, response.StatusCode);
+    }
     protected override UsersController Setup()
     {
         _serviceMock = new();
