@@ -13,6 +13,7 @@ public interface IResponseMapper
     SavedSearchResponseModel Map(SavedSearch search);
 
     ReferenceResponseModel Map(Reference reference);
+
     DirectDepositResponse Map(DirectDeposit directDeposit);
 
     List<SavedSearchResponseModel> Map(List<SavedSearch> searches);
@@ -22,6 +23,7 @@ public interface IResponseMapper
     CollectionListResponseModel Map(List<Collection>? collection);
 
     List<ReferenceResponseModel> Map(List<Reference> references);
+
     List<DirectDepositResponse> Map(List<DirectDeposit> directDeposits);
 
     List<RoleResponse> Map(List<Role> role);
@@ -166,7 +168,6 @@ public sealed class ResponseMapper : IResponseMapper
         ReEnterAccountNumber = directDeposit.ReEnterAccountNumber,
         MailByPaycheck = directDeposit.MailByPaycheck
     };
-   
 
     public UserResponse? Map(User? user) => user == null ? null : new()
     {
@@ -803,5 +804,4 @@ public sealed class ResponseMapper : IResponseMapper
             }
         )
     };
-
 }

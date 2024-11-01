@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace AmeriCorps.Users.Models;
+
 public class DirectDepositRequestModel
 {
     public AccountType AccountType { get; set; }

@@ -31,6 +31,7 @@ public sealed partial class UserRepository(
                 .Include(u => u.Roles)
                 .Include(u => u.UserProjects).ThenInclude(p => p.ProjectRoles)
                 .Include(u => u.UserProjects).ThenInclude(a => a.ProjectAccess)
+                .Include(u => u.DirectDeposits)
                 .FirstOrDefaultAsync(x => x.Id == id));
 
     public async Task<User?> GetByExternalAccountIdAsync(string externalAccountId) =>
@@ -49,6 +50,7 @@ public sealed partial class UserRepository(
                 .Include(u => u.Roles)
                 .Include(u => u.UserProjects).ThenInclude(p => p.ProjectRoles)
                 .Include(u => u.UserProjects).ThenInclude(a => a.ProjectAccess)
+                .Include(u => u.DirectDeposits)
                 .FirstOrDefaultAsync(x => x.ExternalAccountId == externalAccountId));
 
     public async Task<IEnumerable<User>?> GetByAttributeAsync(string type, string value) =>
@@ -252,8 +254,8 @@ public sealed partial class UserRepository(
         return userList;
     }
 
-    public async Task<List<User>> FetchInvitedUsersForReminder(){
-
+    public async Task<List<User>> FetchInvitedUsersForReminder()
+    {
         var inviteCheckDate = DateTime.UtcNow.AddDays(-14);
 
         return await ExecuteAsync(async context => await context.Users
