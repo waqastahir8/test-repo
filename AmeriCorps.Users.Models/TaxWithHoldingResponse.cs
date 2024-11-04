@@ -5,9 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace AmeriCorps.Users.Models;
-
-public enum AccountType
+public class TaxWithHoldingResponse : TaxWithHoldingRequestModel
 {
-    Checking = 0,
-    Savings = 1
+    public int Id { get; set; }
+    public int UserId { get; set; }
 }

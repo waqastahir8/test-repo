@@ -32,6 +32,7 @@ public sealed partial class UserRepository(
                 .Include(u => u.UserProjects).ThenInclude(p => p.ProjectRoles)
                 .Include(u => u.UserProjects).ThenInclude(a => a.ProjectAccess)
                 .Include(u => u.DirectDeposits)
+                .Include(u => u.TaxWithHoldings)   
                 .FirstOrDefaultAsync(x => x.Id == id));
 
     public async Task<User?> GetByExternalAccountIdAsync(string externalAccountId) =>
@@ -51,6 +52,7 @@ public sealed partial class UserRepository(
                 .Include(u => u.UserProjects).ThenInclude(p => p.ProjectRoles)
                 .Include(u => u.UserProjects).ThenInclude(a => a.ProjectAccess)
                 .Include(u => u.DirectDeposits)
+                .Include(u => u.TaxWithHoldings)
                 .FirstOrDefaultAsync(x => x.ExternalAccountId == externalAccountId));
 
     public async Task<IEnumerable<User>?> GetByAttributeAsync(string type, string value) =>

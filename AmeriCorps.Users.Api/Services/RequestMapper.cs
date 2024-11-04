@@ -30,6 +30,7 @@ public interface IRequestMapper
     SubGrantee Map(SubGranteeRequestModel requestModel);
 
     DirectDeposit Map(DirectDepositRequestModel requestModel);
+    TaxWithHolding Map(TaxWithHoldingRequestModel requestModel);
 }
 
 public sealed class RequestMapper : IRequestMapper
@@ -214,6 +215,19 @@ public sealed class RequestMapper : IRequestMapper
                     AccountNumber = d.AccountNumber,
                     ReEnterAccountNumber = d.ReEnterAccountNumber,
                     MailByPaycheck = d.MailByPaycheck
+                }),
+        TaxWithHoldings = MapperUtils.MapList<TaxWithHoldingRequestModel, TaxWithHolding>(
+            requestModel.TaxWithHoldings, t =>
+                new TaxWithHolding
+                {
+                    TaxWithHoldingType = (Data.Core.Model.TaxWithHoldingType)t.TaxWithHoldingType,
+                    Step2Box1 = t.Step2Box1,
+                    Step2Box2 = t.Step2Box2,
+                    Step3Box1 = t.Step3Box1,
+                    Step3Box2 = t.Step3Box2,
+                    Step4Box1 = t.Step4Box1,
+                    Step4Box2 = t.Step4Box2,
+                    Step4Box3 = t.Step4Box3
                 })
     };
 
@@ -415,5 +429,17 @@ public sealed class RequestMapper : IRequestMapper
         AccountNumber = requestModel.AccountNumber,
         ReEnterAccountNumber = requestModel.ReEnterAccountNumber,
         MailByPaycheck = requestModel.MailByPaycheck
+    };
+
+    public TaxWithHolding Map(TaxWithHoldingRequestModel requestModel) => new()
+    {
+        TaxWithHoldingType = (Data.Core.Model.TaxWithHoldingType)requestModel.TaxWithHoldingType,
+        Step2Box1 = requestModel.Step2Box1,
+        Step2Box2 = requestModel.Step2Box2,
+        Step3Box1 = requestModel.Step3Box1,
+        Step3Box2 = requestModel.Step3Box2,
+        Step4Box1 = requestModel.Step4Box1,
+        Step4Box2 = requestModel.Step4Box2,
+        Step4Box3 = requestModel.Step4Box3
     };
 }

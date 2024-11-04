@@ -38,4 +38,5 @@ public class UserRequestModel
     public int InviteUserId { get; set; }
     public DateTime? InviteDate { get; set; }
     public List<DirectDepositRequestModel> DirectDeposits { get; set; } = new List<DirectDepositRequestModel>();
+    public List<TaxWithHoldingRequestModel> TaxWithHoldings { get; set; } = new List<TaxWithHoldingRequestModel>();
 }
