@@ -14,8 +14,6 @@ public interface IResponseMapper
 
     ReferenceResponseModel Map(Reference reference);
 
-    DirectDepositResponse Map(DirectDeposit directDeposit);
-
     List<SavedSearchResponseModel> Map(List<SavedSearch> searches);
 
     CollectionResponseModel Map(Collection collection);
@@ -49,6 +47,9 @@ public interface IResponseMapper
     AwardResponse Map(Award award);
 
     SubGranteeResponse Map(SubGrantee subGrantee);
+    DirectDepositResponse Map(DirectDeposit directDeposit);
+    TaxWithHoldingResponse Map(TaxWithHolding taxWithHolding);
+
 }
 
 public sealed class ResponseMapper : IResponseMapper
@@ -156,6 +157,26 @@ public sealed class ResponseMapper : IResponseMapper
                                 MailByPaycheck = d.MailByPaycheck
                             });
 
+
+
+    public List<TaxWithHoldingResponse> Map(List<TaxWithHolding> taxWithHolding) =>
+        MapperUtils.MapList<AmeriCorps.Users.Data.Core.Model.TaxWithHolding, TaxWithHoldingResponse>(
+            taxWithHolding,
+            t => new TaxWithHoldingResponse
+            {
+                Id = t.Id,
+                UserId = t.UserId,
+                TaxWithHoldingType = (Models.TaxWithHoldingType)t.TaxWithHoldingType,
+                Step2Box1 = t.Step2Box1,
+                Step2Box2 = t.Step2Box2,
+                Step3Box1 = t.Step3Box1,
+                Step3Box2 = t.Step3Box2,
+                Step4Box1 = t.Step4Box1,
+                Step4Box2 = t.Step4Box2,
+                Step4Box3 = t.Step4Box3
+            });
+
+
     public DirectDepositResponse Map(DirectDeposit directDeposit) => new()
     {
         Id = directDeposit.Id,
@@ -167,6 +188,20 @@ public sealed class ResponseMapper : IResponseMapper
         AccountNumber = directDeposit.AccountNumber,
         ReEnterAccountNumber = directDeposit.ReEnterAccountNumber,
         MailByPaycheck = directDeposit.MailByPaycheck
+    };
+
+    public TaxWithHoldingResponse Map(TaxWithHolding taxWithHolding) => new()
+    {
+        Id = taxWithHolding.Id,
+        UserId = taxWithHolding.UserId,
+        TaxWithHoldingType = (Models.TaxWithHoldingType)taxWithHolding.TaxWithHoldingType,
+        Step2Box1 = taxWithHolding.Step2Box1,
+        Step2Box2 = taxWithHolding.Step2Box2,
+        Step3Box1 = taxWithHolding.Step3Box1,
+        Step3Box2 = taxWithHolding.Step3Box2,
+        Step4Box1 = taxWithHolding.Step4Box1,
+        Step4Box2 = taxWithHolding.Step4Box2,
+        Step4Box3 = taxWithHolding.Step4Box3
     };
 
     public UserResponse? Map(User? user) => user == null ? null : new()
@@ -348,6 +383,19 @@ public sealed class ResponseMapper : IResponseMapper
                     AccountNumber = d.AccountNumber,
                     ReEnterAccountNumber = d.ReEnterAccountNumber,
                     MailByPaycheck = d.MailByPaycheck
+                }),
+        TaxWithHoldings = MapperUtils.MapList<TaxWithHolding, TaxWithHoldingRequestModel>(
+            user.TaxWithHoldings, t =>
+                new TaxWithHoldingRequestModel()
+                {
+                    TaxWithHoldingType = (Models.TaxWithHoldingType)t.TaxWithHoldingType,
+                    Step2Box1 = t.Step2Box1,
+                    Step2Box2 = t.Step2Box2,
+                    Step3Box1 = t.Step3Box1,
+                    Step3Box2 = t.Step3Box2,
+                    Step4Box1 = t.Step4Box1,
+                    Step4Box2 = t.Step4Box2,
+                    Step4Box3 = t.Step4Box3
                 })
     };
 
@@ -800,6 +848,19 @@ public sealed class ResponseMapper : IResponseMapper
                             AccountNumber = d.AccountNumber,
                             ReEnterAccountNumber = d.ReEnterAccountNumber,
                             MailByPaycheck = d.MailByPaycheck
+                        }),
+                TaxWithHoldings = MapperUtils.MapList<TaxWithHolding, TaxWithHoldingRequestModel>(
+                    user.TaxWithHoldings, t =>
+                        new TaxWithHoldingRequestModel()
+                        {
+                            TaxWithHoldingType = (Models.TaxWithHoldingType)t.TaxWithHoldingType,
+                            Step2Box1 = t.Step2Box1,
+                            Step2Box2 = t.Step2Box2,
+                            Step3Box1 = t.Step3Box1,
+                            Step3Box2 = t.Step3Box2,
+                            Step4Box1 = t.Step4Box1,
+                            Step4Box2 = t.Step4Box2,
+                            Step4Box3 = t.Step4Box3
                         })
             }
         )

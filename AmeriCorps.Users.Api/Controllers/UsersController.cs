@@ -131,4 +131,14 @@ public sealed class UsersController(IUsersControllerService service) : Controlle
     [HttpDelete("directdeposit/{userId}/{directDepositId}")]
     public async Task<IActionResult> DeleteDirectDepositFormAsync(int userId, int directDepositId) =>
         await ServeAsync(async () => await _service.DeleteDirectDepositFormAsync(userId, directDepositId));
+
+    //Save Tax Withholding Information
+    [HttpPost("taxwithholding/{userId}")]
+    public async Task<IActionResult> SaveTaxWithholdingFormAsync(int userId, [FromBody] TaxWithHoldingRequestModel taxWithholdingFormRequest) =>
+        await ServeAsync(async () => await _service.SaveTaxWithholdingFormAsync(userId, taxWithholdingFormRequest));
+
+    //Delete Tax Withholding Information with userId and taxWithholdingId
+    [HttpDelete("taxwithholding/{userId}/{taxWithholdingId}")]
+    public async Task<IActionResult> DeleteTaxWithholdingFormAsync(int userId, int taxWithholdingId) =>
+        await ServeAsync(async () => await _service.DeleteTaxWithholdingFormAsync(userId, taxWithholdingId));
 }

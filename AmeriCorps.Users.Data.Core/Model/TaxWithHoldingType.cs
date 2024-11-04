@@ -5,8 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace AmeriCorps.Users.Data.Core.Model;
-public enum AccountType
+
+public enum TaxWithHoldingType
 {
-    Checking = 0,
-    Savings = 1
+    SingleOrMarriedFilingSeparately = 0,
+    MarriedOrFilingJointlyOrQualifySpouse = 1,
+    HeadOfHousehold = 2,
 }

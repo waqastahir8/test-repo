@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using AmeriCorps.Users.Data.Core;
 using AmeriCorps.Users.Data.Core.Model;
 using Microsoft.EntityFrameworkCore.Storage;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace AmeriCorps.Users.Api;
 
@@ -55,6 +56,9 @@ public interface IUsersControllerService
     Task<(ResponseStatus Status, DirectDepositResponse? Response)> SaveDirectDepositFormAsync(int userId, DirectDepositRequestModel? toUpdate);
 
     Task<(ResponseStatus Status, bool Response)> DeleteDirectDepositFormAsync(int userId, int directDepositId);
+    Task<(ResponseStatus Status, TaxWithHoldingResponse? Response)> SaveTaxWithholdingFormAsync(int userId, TaxWithHoldingRequestModel? toUpdate);
+    Task<(ResponseStatus Status, bool Response)> DeleteTaxWithholdingFormAsync(int userId, int taxWithHoldingId);
+
 }
 
 public sealed class UsersControllerService : IUsersControllerService
@@ -1095,6 +1099,66 @@ public sealed class UsersControllerService : IUsersControllerService
         catch (Exception e)
         {
             _logger.LogError(e, $"Unable to delete direct deposit with id {directDepositId}.");
+            return (ResponseStatus.UnknownError, deleted);
+        }
+        return (ResponseStatus.Successful, deleted);
+    }
+
+    public async Task<(ResponseStatus Status, TaxWithHoldingResponse? Response)> SaveTaxWithholdingFormAsync(int userId, TaxWithHoldingRequestModel? taxWithHoldingRequestModel)
+    {
+        if (taxWithHoldingRequestModel == null)
+        {
+            return (ResponseStatus.MissingInformation, null);
+        }
+        User? existingUser;
+        try
+        {
+            existingUser = await _repository.GetAsync(userId);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Could not retrieve existing user with given user id {Identifier}.", userId.ToString().Replace(Environment.NewLine, ""));
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        TaxWithHolding taxWithHolding = _requestMapper.Map(taxWithHoldingRequestModel);
+        taxWithHolding.UserId = userId;
+        try
+        {
+            var deleted = true;
+            if (existingUser?.TaxWithHoldings.Count > 0)
+            {
+                deleted = DeleteTaxWithholdingFormAsync(userId, existingUser.TaxWithHoldings[0].Id).Result.Response;
+            }
+            taxWithHolding = await _repository.SaveAsync<TaxWithHolding>(taxWithHolding);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Unable to save tax witholding for user {userId}.");
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        var response = _responseMapper.Map(taxWithHolding);
+
+        return (ResponseStatus.Successful, response);
+    }
+
+    public async Task<(ResponseStatus Status, bool Response)> DeleteTaxWithholdingFormAsync(int userId, int taxWithHoldingId)
+    {
+        var taxWithHoldingExists = await _repository.ExistsAsync<TaxWithHolding>(t => t.UserId == userId && t.Id == taxWithHoldingId);
+        if (!taxWithHoldingExists)
+        {
+            _logger.LogInformation($"User with id {userId} does not contain a tax withholding with id {taxWithHoldingId}.");
+            return (ResponseStatus.MissingInformation, false);
+        }
+        bool deleted = true;
+        try
+        {
+            deleted = await _repository.DeleteAsync<TaxWithHolding>(taxWithHoldingId);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Unable to delete tax withholding with id {taxWithHoldingId}.");
             return (ResponseStatus.UnknownError, deleted);
         }
         return (ResponseStatus.Successful, deleted);
