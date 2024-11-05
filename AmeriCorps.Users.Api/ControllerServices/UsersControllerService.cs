@@ -179,7 +179,7 @@ public sealed class UsersControllerService : IUsersControllerService
 
         if (user == null)
         {
-            return (ResponseStatus.MissingInformation, null);
+            return (ResponseStatus.NotFound, null);
         }
 
         if (!string.IsNullOrWhiteSpace(user.EncryptedSocialSecurityNumber))

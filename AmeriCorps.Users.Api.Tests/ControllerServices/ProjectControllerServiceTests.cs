@@ -376,7 +376,6 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
 
         model.OperatingSites.Add(toInvite);
 
-
         //Act
         var (status, _) = await sut.InviteOperatingSiteAsync(model);
 
@@ -487,7 +486,6 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
         filters.Awarded = true;
         filters.Active = true;
         filters.OrgCode = orgCode;
-
 
         _repositoryMock!
             .Setup(x => x.SearchAwardedProjectsAsync(filters.Query, filters.OrgCode))

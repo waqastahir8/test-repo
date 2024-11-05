@@ -233,12 +233,14 @@ public sealed class ProjectControllerService : IProjectControllerService
             inviteSite.UpdatedDate = DateTime.UtcNow;
             inviteSite.InviteDate = DateTime.UtcNow;
 
-            if(string.IsNullOrEmpty(inviteSite.Id.ToString()) || inviteSite.Id < 1){
+            if (string.IsNullOrEmpty(inviteSite.Id.ToString()) || inviteSite.Id < 1)
+            {
                 foundProject.OperatingSites.Add(inviteSite);
             }
-            else{
-               foundProject.OperatingSites = foundProject.OperatingSites.Where(x => x.Id != inviteSite.Id).ToList();
-               foundProject.OperatingSites.Add(inviteSite);
+            else
+            {
+                foundProject.OperatingSites = foundProject.OperatingSites.Where(x => x.Id != inviteSite.Id).ToList();
+                foundProject.OperatingSites.Add(inviteSite);
             }
         }
         else
@@ -259,21 +261,21 @@ public sealed class ProjectControllerService : IProjectControllerService
         var success = false;
         try
         {
-            if(foundProject != null && foundProject.OperatingSites != null && foundProject.OperatingSites.Count > 0)
+            if (foundProject != null && foundProject.OperatingSites != null && foundProject.OperatingSites.Count > 0)
             {
                 foundProject.OperatingSites = foundProject.OperatingSites.OrderBy(s => s.UpdatedDate).ToList();
-                success = await _userHelperService.SendOperatingSiteInviteAsync(foundProject.OperatingSites[foundProject.OperatingSites.Count-1]);
+                success = await _userHelperService.SendOperatingSiteInviteAsync(foundProject.OperatingSites[foundProject.OperatingSites.Count - 1]);
             }
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Unable to send invite for Operating Site for {Identifier}.",  toInvite.ProjectName.ToString().Replace(Environment.NewLine, ""));
+            _logger.LogError(e, "Unable to send invite for Operating Site for {Identifier}.", toInvite.ProjectName.ToString().Replace(Environment.NewLine, ""));
             return (ResponseStatus.UnknownError, null);
         }
 
         if (!success)
         {
-            _logger.LogInformation("Invite email not sent for Operating Site for {Identifier}.",  toInvite.ProjectName.ToString().Replace(Environment.NewLine, ""));
+            _logger.LogInformation("Invite email not sent for Operating Site for {Identifier}.", toInvite.ProjectName.ToString().Replace(Environment.NewLine, ""));
             return (ResponseStatus.MissingInformation, null);
         }
 
@@ -291,20 +293,20 @@ public sealed class ProjectControllerService : IProjectControllerService
             return (ResponseStatus.MissingInformation, null);
         }
 
-        List<Project>? foundList;    
+        List<Project>? foundList;
         try
         {
             if (filters.Awarded && filters.Active)
             {
-                foundList = await _repository.SearchActiveAwardedProjectsAsync(filters.Query.Trim()+":*", filters.Active, filters.OrgCode);
+                foundList = await _repository.SearchActiveAwardedProjectsAsync(filters.Query.Trim() + ":*", filters.Active, filters.OrgCode);
             }
-            else if(filters.Awarded && !filters.Active)
+            else if (filters.Awarded && !filters.Active)
             {
-                foundList = await _repository.SearchAwardedProjectsAsync(filters.Query.Trim()+":*", filters.OrgCode);
+                foundList = await _repository.SearchAwardedProjectsAsync(filters.Query.Trim() + ":*", filters.OrgCode);
             }
             else
             {
-                foundList = await _repository.SearchAllProjectsAsync(filters.Query.Trim()+":*", filters.OrgCode);
+                foundList = await _repository.SearchAllProjectsAsync(filters.Query.Trim() + ":*", filters.OrgCode);
             }
         }
         catch (Exception e)
@@ -313,8 +315,10 @@ public sealed class ProjectControllerService : IProjectControllerService
             return (ResponseStatus.UnknownError, null);
         }
 
-        if(foundList != null){
-            foundList.ForEach(proj => {
+        if (foundList != null)
+        {
+            foundList.ForEach(proj =>
+            {
                 projectList.Add(proj);
             });
         }
@@ -336,7 +340,7 @@ public sealed class ProjectControllerService : IProjectControllerService
 
         try
         {
-            foundList = await _repository.SearchOperatingSitesAsync(filters.ProjectId, filters.Active, filters.Query.Trim()+":*");
+            foundList = await _repository.SearchOperatingSitesAsync(filters.ProjectId, filters.Active, filters.Query.Trim() + ":*");
         }
         catch (Exception e)
         {
@@ -344,8 +348,10 @@ public sealed class ProjectControllerService : IProjectControllerService
             return (ResponseStatus.UnknownError, null);
         }
 
-        if(foundList != null){
-            foundList.ForEach(site => {
+        if (foundList != null)
+        {
+            foundList.ForEach(site =>
+            {
                 opSiteList.Add(site);
             });
         }

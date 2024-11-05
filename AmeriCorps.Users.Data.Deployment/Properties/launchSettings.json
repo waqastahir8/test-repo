@@ -1,9 +1,0 @@
-{
-  "profiles": {
-    "AmeriCorps_Users_Data_Deployment": {
-      "commandName": "Project",
-      "commandLineArgs": "--port 7004",
-      "launchBrowser": false
-    }
-  }
-}

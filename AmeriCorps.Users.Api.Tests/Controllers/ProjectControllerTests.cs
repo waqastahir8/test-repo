@@ -294,7 +294,6 @@ public sealed partial class ProjectControllerTests : BaseTests<ProjectController
         model.OperatingSites.Add(toInvite);
 
         var projResponse = Fixture.Create<ProjectResponse>();
-        
 
         _serviceMock!
             .Setup(x => x.InviteOperatingSiteAsync(model))
@@ -409,7 +408,6 @@ public sealed partial class ProjectControllerTests : BaseTests<ProjectController
         Assert.Equal((int)HttpStatusCode.UnprocessableEntity, response.StatusCode);
     }
 
-
     [Fact]
     public async Task SearchOperatingSitesAsync_UnknownError_500StatusCode()
     {
@@ -467,7 +465,6 @@ public sealed partial class ProjectControllerTests : BaseTests<ProjectController
         Assert.NotNull(response);
         Assert.Equal((int)HttpStatusCode.UnprocessableEntity, response.StatusCode);
     }
-
 
     protected override ProjectController Setup()
     {

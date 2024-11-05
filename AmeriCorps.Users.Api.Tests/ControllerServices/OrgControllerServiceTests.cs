@@ -12,14 +12,13 @@ public sealed partial class OrgControllerServiceTests : BaseTests<OrgControllerS
     private Mock<IRequestMapper>? _requestMapperMock;
     private Mock<IResponseMapper>? _responseMapperMock;
 
-
     [Theory]
     [InlineData("org")]
     public async Task GetOrgByCodeAsync_Successful_Status(string orgCode)
     {
         // Arrange
         var sut = Setup();
-        
+
         _repositoryMock!
             .Setup(x => x.GetOrgByCodeAsync(orgCode))
             .ReturnsAsync(() => Fixture.Build<Organization>()
@@ -131,13 +130,12 @@ public sealed partial class OrgControllerServiceTests : BaseTests<OrgControllerS
         Assert.Equal(expected, actual);
     }
 
-
     [Fact]
     public async Task GetOrgListAsync_Successful_Status()
     {
         // Arrange
         var sut = Setup();
-        
+
         _repositoryMock!
             .Setup(x => x.GetOrgListAsync())
             .ReturnsAsync(() => Fixture.Build<List<Organization>>()
@@ -165,7 +163,6 @@ public sealed partial class OrgControllerServiceTests : BaseTests<OrgControllerS
         // Assert
         Assert.Equal(ResponseStatus.MissingInformation, status);
     }
-
 
     protected override OrgControllerService Setup()
     {
