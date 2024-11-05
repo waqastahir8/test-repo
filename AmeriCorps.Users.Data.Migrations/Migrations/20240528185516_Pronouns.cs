@@ -1,38 +1,34 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿#nullable disable
 
-#nullable disable
-
-namespace AmeriCorps.Users.Data.Migrations.Migrations
+namespace AmeriCorps.Users.Data.Migrations.Migrations;
+/// <inheritdoc />
+public partial class Pronouns : Migration
 {
     /// <inheritdoc />
-    public partial class Pronouns : Migration
+    protected override void Up(MigrationBuilder migrationBuilder)
     {
-        /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.AddColumn<string>(
-                name: "Pronouns",
-                schema: "users",
-                table: "user",
-                type: "text",
-                nullable: false,
-                defaultValue: "");
+        migrationBuilder.AddColumn<string>(
+            name: "Pronouns",
+            schema: "users",
+            table: "user",
+            type: "text",
+            nullable: false,
+            defaultValue: "");
 
-            migrationBuilder.RenameColumn(
-                name: "Pronouns",
-                schema: "users",
-                table: "user",
-                newName: "pronouns"
-            );
-        }
+        migrationBuilder.RenameColumn(
+            name: "Pronouns",
+            schema: "users",
+            table: "user",
+            newName: "pronouns"
+        );
+    }
 
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropColumn(
-                name: "pronouns",
-                schema: "users",
-                table: "user");
-        }
+    /// <inheritdoc />
+    protected override void Down(MigrationBuilder migrationBuilder)
+    {
+        migrationBuilder.DropColumn(
+            name: "pronouns",
+            schema: "users",
+            table: "user");
     }
 }

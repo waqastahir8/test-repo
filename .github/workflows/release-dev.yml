@@ -7,15 +7,16 @@ on:
     - dev
 
 env:
+  ENVIRONMENT: Development
   AZURE_WEBAPP_NAME: app-userservice-dev-001
-  AZURE_FUNCTIONAPP_NAME: func-usersdbupdater-dev
-  AZURE_WEBAPP_PACKAGE_PATH: './publish'
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: './publish-func'
+
+  DB_RG: rg-dbs-dev-westus001
+  DB_NAME: cospos-dev-west
+  EF_MIGRATIONS_PROJECT: ./AmeriCorps.Users.Data.Migrations
+  
   SOLUTION_FILE: ./AmeriCorpsUsers.sln
   API_PROJECT: ./AmeriCorps.Users.Api
   NUGET_PROJECT_FILE: ./AmeriCorps.Users.Models/AmeriCorps.Users.Models.csproj
-  FUNCTIONAPP_PROJECT: ./AmeriCorps.Users.Data.Deployment
-  AZURE_FUNCTIONAPP_URI: https://func-usersdbupdater-dev.azurewebsites.net/api/DatabaseUpdate
   BUILD_CONFIGURATION: Release
 
 jobs:
@@ -64,27 +65,34 @@ jobs:
           path: coveragereport/Summary.txt
           
       - name: .net publish
-        run: dotnet publish ${{ env.API_PROJECT }} --configuration Release --no-restore --output '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}'
+        run: dotnet publish ${{ env.API_PROJECT }} --configuration Release --no-restore --output './publish'
 
-      - name: build Azure Function
-        run: dotnet build ${{ env.FUNCTIONAPP_PROJECT }} --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore --output '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+      - name: Get runner IP
+        id: ip
+        uses: candidob/get-runner-ip@v1.0.0
 
-      - name: publish Azure Function
-        uses: Azure/functions-action@v1
-        with:
-          app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
-          package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
-          publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+      - name: run EF migration
+        run: |
+          az login --user ${{ secrets.AZURE_DB_USER }} --password ${{ secrets.AZURE_DB_PWD }} --tenant ${{ secrets.AZURE_DB_TENANT }}
+          az account set --subscription '${{ secrets.AZURE_DB_SUBSCRIPTION }}'
 
-      - name: run Azure Function DB migration
-        uses: satak/webrequest-action@master
-        with:
-          url: ${{ env.AZURE_FUNCTIONAPP_URI }}?code=${{ secrets.AZURE_FUNCTIONAPP_API_KEY }}
-          method: POST
+          
+          echo Whitelisting ${{ steps.ip.outputs.ipv4 }}
+          az cosmosdb postgres firewall-rule create -n git-hub-runner -g ${{ env.DB_RG }} --cluster-name ${{ env.DB_NAME }} --end-ip-address ${{ steps.ip.outputs.ipv4 }} --start-ip-address ${{ steps.ip.outputs.ipv4 }}
+          
+          dotnet tool install --global dotnet-ef
+          
+          export KeyVaultOptions__ClientSecret=${{secrets.KEYVAULT_CLIENT_SECRET_DEV}}
+          cd ${{env.EF_MIGRATIONS_PROJECT}}
+          dotnet ef database update -- --environment ${{env.ENVIRONMENT}}
+          unset KeyVaultOptions__ClientSecret
+
+          az cosmosdb postgres firewall-rule delete -n git-hub-runner -g ${{ env.DB_RG }} --cluster-name ${{ env.DB_NAME }} --yes
+          az logout
 
       - name: release App Service
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE_DEV }}
-          package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+          package: './publish'

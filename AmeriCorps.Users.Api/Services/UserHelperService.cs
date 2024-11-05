@@ -1,7 +1,5 @@
-using System.Data;
 using AmeriCorps.Users.Data.Core;
 using AmeriCorps.Users.Data.Core.Model;
-using AmeriCorps.Users.Models;
 
 namespace AmeriCorps.Users.Api.Services;
 
@@ -238,7 +236,7 @@ public class UserHelperService : IUserHelperService
 
         User? inviterUser = new User();
 
-        if(!string.IsNullOrEmpty(toInvite.InviteUserId.ToString()))
+        if (!string.IsNullOrEmpty(toInvite.InviteUserId.ToString()))
         {
             try
             {
@@ -249,7 +247,6 @@ public class UserHelperService : IUserHelperService
                 _logger.LogError(e, "Unable to find invitee for {Identifier}.", toInvite.OperatingSiteName.ToString().Replace(Environment.NewLine, ""));
             }
         }
-        
 
         if (inviterUser != null && !string.IsNullOrEmpty(inviterUser.FirstName) && !string.IsNullOrEmpty(inviterUser.LastName))
         {

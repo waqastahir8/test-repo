@@ -1,10 +1,8 @@
 ﻿using AmeriCorps.Data;
 using AmeriCorps.Users.Data.Core;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
-
 
 namespace AmeriCorps.Users.Data;
 
@@ -17,9 +15,8 @@ public sealed partial class RoleRepository(
     public async Task<Role?> GetAsync(int id) =>
         await ExecuteAsync(async context => await context.Roles.FindAsync(id));
 
-
     public async Task<List<Role>?> GetRoleListByTypeAsync(string roleType) =>
-        await ExecuteAsync(async context => await context.Roles.Where(o =>o.RoleType == roleType).ToListAsync());
+        await ExecuteAsync(async context => await context.Roles.Where(o => o.RoleType == roleType).ToListAsync());
 
     public async Task<T> SaveAsync<T>(T entity) where T : Entity =>
        await ExecuteAsync(async context =>
@@ -66,11 +63,8 @@ public sealed partial class RoleRepository(
 
     private Role? UpdateRole(Role role, RepositoryContext context)
 
-
     {
         var roleId = role.Id;
-
-
 
         return role;
     }
@@ -88,7 +82,6 @@ public sealed partial class RoleRepository(
             return false;
         });
 
-    
     public async Task<Role?> GetRoleByNameAsync(string roleName) =>
-        await ExecuteAsync(async context => await context.Roles.FirstOrDefaultAsync(r =>r.RoleName == roleName));
+        await ExecuteAsync(async context => await context.Roles.FirstOrDefaultAsync(r => r.RoleName == roleName));
 }

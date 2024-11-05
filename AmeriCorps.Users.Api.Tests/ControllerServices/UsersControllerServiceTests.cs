@@ -1782,7 +1782,6 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         Assert.Equal(ResponseStatus.UnknownError, status);
     }
 
-
     [Fact]
     public async Task LinkNewAccountToExistingUserAsync_Successful_Status()
     {
@@ -1834,9 +1833,9 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
                 .Create();
 
         _repositoryMock!
-            .Setup(x => x.FindInvitedUserInfo(It.IsAny<string>(),It.IsAny<string>()))
+            .Setup(x => x.FindInvitedUserInfo(It.IsAny<string>(), It.IsAny<string>()))
             .ThrowsAsync(new Exception());
-            
+
         // Act
         var (status, _) = await sut.LinkNewAccountToExistingUserAsync(toLink);
 
