@@ -31,6 +31,8 @@ public sealed partial class UserRepository(
                 .Include(u => u.Roles)
                 .Include(u => u.UserProjects).ThenInclude(p => p.ProjectRoles)
                 .Include(u => u.UserProjects).ThenInclude(a => a.ProjectAccess)
+                .Include(u => u.DirectDeposits)
+                .Include(u => u.TaxWithHoldings)   
                 .FirstOrDefaultAsync(x => x.Id == id));
 
     public async Task<User?> GetByExternalAccountIdAsync(string externalAccountId) =>
@@ -49,6 +51,8 @@ public sealed partial class UserRepository(
                 .Include(u => u.Roles)
                 .Include(u => u.UserProjects).ThenInclude(p => p.ProjectRoles)
                 .Include(u => u.UserProjects).ThenInclude(a => a.ProjectAccess)
+                .Include(u => u.DirectDeposits)
+                .Include(u => u.TaxWithHoldings)
                 .FirstOrDefaultAsync(x => x.ExternalAccountId == externalAccountId));
 
     public async Task<IEnumerable<User>?> GetByAttributeAsync(string type, string value) =>
@@ -252,8 +256,8 @@ public sealed partial class UserRepository(
         return userList;
     }
 
-    public async Task<List<User>> FetchInvitedUsersForReminder(){
-
+    public async Task<List<User>> FetchInvitedUsersForReminder()
+    {
         var inviteCheckDate = DateTime.UtcNow.AddDays(-14);
 
         return await ExecuteAsync(async context => await context.Users
@@ -261,4 +265,21 @@ public sealed partial class UserRepository(
                 && DateTime.Compare(u.InviteDate ?? DateTime.MaxValue, inviteCheckDate) <= 0).ToListAsync());
     }
 
+    public async Task<User?> FindInvitedUserInfo(string userEmail, string orgCode) =>
+        await ExecuteAsync(async context =>
+            await context.Users
+                .AsNoTracking()
+                .Include(u => u.Attributes)
+                .Include(u => u.Languages)
+                .Include(u => u.Addresses)
+                .Include(u => u.Education)
+                .Include(u => u.Skills)
+                .Include(u => u.MilitaryService)
+                .Include(u => u.SavedSearches)
+                .Include(u => u.Relatives)
+                .Include(u => u.CommunicationMethods)
+                .Include(u => u.Roles)
+                .Include(u => u.UserProjects).ThenInclude(p => p.ProjectRoles)
+                .Include(u => u.UserProjects).ThenInclude(a => a.ProjectAccess)
+                .FirstOrDefaultAsync(x => x.UserName == userEmail && x.OrgCode == orgCode && (x.UserAccountStatus == UserAccountStatus.INVITED || x.UserAccountStatus == UserAccountStatus.PENDING)));
 }

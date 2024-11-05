@@ -38,8 +38,10 @@ public sealed class User : Entity
     public string CityOfBirth { get; set; } = string.Empty;
     public string? ResidentRegistrationNumber { get; set; } = string.Empty;
     public DateOnly? DocumentExpirationDate { get; set; }
-    public UserAccountStatus UserAccountStatus { get; set; } 
+    public UserAccountStatus UserAccountStatus { get; set; }
     public DateTime? InviteDate { get; set; }
     public int InviteUserId { get; set; }
     public DateTime? UpdatedDate { get; set; }
+    public List<DirectDeposit> DirectDeposits { get; set; } = new List<DirectDeposit>();
+    public List<TaxWithHolding> TaxWithHoldings { get; set; } = new List<TaxWithHolding>();
 }

@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using AmeriCorps.Users.Data.Core;
+using AmeriCorps.Users.Data.Core.Model;
 
 namespace AmeriCorps.Users.Api.Services;
 
@@ -20,6 +21,8 @@ public interface IResponseMapper
     CollectionListResponseModel Map(List<Collection>? collection);
 
     List<ReferenceResponseModel> Map(List<Reference> references);
+
+    List<DirectDepositResponse> Map(List<DirectDeposit> directDeposits);
 
     List<RoleResponse> Map(List<Role> role);
 
@@ -44,6 +47,9 @@ public interface IResponseMapper
     AwardResponse Map(Award award);
 
     SubGranteeResponse Map(SubGrantee subGrantee);
+    DirectDepositResponse Map(DirectDeposit directDeposit);
+    TaxWithHoldingResponse Map(TaxWithHolding taxWithHolding);
+
 }
 
 public sealed class ResponseMapper : IResponseMapper
@@ -133,6 +139,69 @@ public sealed class ResponseMapper : IResponseMapper
         CanContact = reference.CanContact,
         Contacted = reference.Contacted,
         DateContacted = reference.DateContacted
+    };
+
+    public List<DirectDepositResponse> Map(List<DirectDeposit> directDeposits) =>
+        MapperUtils.MapList<AmeriCorps.Users.Data.Core.Model.DirectDeposit, DirectDepositResponse>(
+                            directDeposits,
+                            d => new DirectDepositResponse
+                            {
+                                Id = d.Id,
+                                UserId = d.UserId,
+                                AccountType = (Models.AccountType)d.AccountType,
+                                InstitutionName = d.InstitutionName,
+                                AchRoutingNumber = d.AchRoutingNumber,
+                                ReEnterAchRoutingNumber = d.ReEnterAchRoutingNumber,
+                                AccountNumber = d.AccountNumber,
+                                ReEnterAccountNumber = d.ReEnterAccountNumber,
+                                MailByPaycheck = d.MailByPaycheck
+                            });
+
+
+
+    public List<TaxWithHoldingResponse> Map(List<TaxWithHolding> taxWithHolding) =>
+        MapperUtils.MapList<AmeriCorps.Users.Data.Core.Model.TaxWithHolding, TaxWithHoldingResponse>(
+            taxWithHolding,
+            t => new TaxWithHoldingResponse
+            {
+                Id = t.Id,
+                UserId = t.UserId,
+                TaxWithHoldingType = (Models.TaxWithHoldingType)t.TaxWithHoldingType,
+                Step2Box1 = t.Step2Box1,
+                Step2Box2 = t.Step2Box2,
+                Step3Box1 = t.Step3Box1,
+                Step3Box2 = t.Step3Box2,
+                Step4Box1 = t.Step4Box1,
+                Step4Box2 = t.Step4Box2,
+                Step4Box3 = t.Step4Box3
+            });
+
+
+    public DirectDepositResponse Map(DirectDeposit directDeposit) => new()
+    {
+        Id = directDeposit.Id,
+        UserId = directDeposit.UserId,
+        AccountType = (Models.AccountType)directDeposit.AccountType,
+        InstitutionName = directDeposit.InstitutionName,
+        AchRoutingNumber = directDeposit.AchRoutingNumber,
+        ReEnterAchRoutingNumber = directDeposit.ReEnterAchRoutingNumber,
+        AccountNumber = directDeposit.AccountNumber,
+        ReEnterAccountNumber = directDeposit.ReEnterAccountNumber,
+        MailByPaycheck = directDeposit.MailByPaycheck
+    };
+
+    public TaxWithHoldingResponse Map(TaxWithHolding taxWithHolding) => new()
+    {
+        Id = taxWithHolding.Id,
+        UserId = taxWithHolding.UserId,
+        TaxWithHoldingType = (Models.TaxWithHoldingType)taxWithHolding.TaxWithHoldingType,
+        Step2Box1 = taxWithHolding.Step2Box1,
+        Step2Box2 = taxWithHolding.Step2Box2,
+        Step3Box1 = taxWithHolding.Step3Box1,
+        Step3Box2 = taxWithHolding.Step3Box2,
+        Step4Box1 = taxWithHolding.Step4Box1,
+        Step4Box2 = taxWithHolding.Step4Box2,
+        Step4Box3 = taxWithHolding.Step4Box3
     };
 
     public UserResponse? Map(User? user) => user == null ? null : new()
@@ -302,6 +371,31 @@ public sealed class ResponseMapper : IResponseMapper
                     Active = p.Active,
                     ProjectRoles = Map(p.ProjectRoles),
                     ProjectAccess = Map(p.ProjectAccess)
+                }),
+        DirectDeposits = MapperUtils.MapList<DirectDeposit, DirectDepositRequestModel>(
+            user.DirectDeposits, d =>
+                new DirectDepositRequestModel()
+                {
+                    AccountType = (Models.AccountType)d.AccountType,
+                    InstitutionName = d.InstitutionName,
+                    AchRoutingNumber = d.AchRoutingNumber,
+                    ReEnterAchRoutingNumber = d.ReEnterAchRoutingNumber,
+                    AccountNumber = d.AccountNumber,
+                    ReEnterAccountNumber = d.ReEnterAccountNumber,
+                    MailByPaycheck = d.MailByPaycheck
+                }),
+        TaxWithHoldings = MapperUtils.MapList<TaxWithHolding, TaxWithHoldingRequestModel>(
+            user.TaxWithHoldings, t =>
+                new TaxWithHoldingRequestModel()
+                {
+                    TaxWithHoldingType = (Models.TaxWithHoldingType)t.TaxWithHoldingType,
+                    Step2Box1 = t.Step2Box1,
+                    Step2Box2 = t.Step2Box2,
+                    Step3Box1 = t.Step3Box1,
+                    Step3Box2 = t.Step3Box2,
+                    Step4Box1 = t.Step4Box1,
+                    Step4Box2 = t.Step4Box2,
+                    Step4Box3 = t.Step4Box3
                 })
     };
 
@@ -742,6 +836,31 @@ public sealed class ResponseMapper : IResponseMapper
                             Active = p.Active,
                             ProjectRoles = Map(p.ProjectRoles),
                             ProjectAccess = Map(p.ProjectAccess)
+                        }),
+                DirectDeposits = MapperUtils.MapList<DirectDeposit, DirectDepositRequestModel>(
+                    user.DirectDeposits, d =>
+                        new DirectDepositRequestModel()
+                        {
+                            AccountType = (Models.AccountType)d.AccountType,
+                            InstitutionName = d.InstitutionName,
+                            AchRoutingNumber = d.AchRoutingNumber,
+                            ReEnterAchRoutingNumber = d.ReEnterAchRoutingNumber,
+                            AccountNumber = d.AccountNumber,
+                            ReEnterAccountNumber = d.ReEnterAccountNumber,
+                            MailByPaycheck = d.MailByPaycheck
+                        }),
+                TaxWithHoldings = MapperUtils.MapList<TaxWithHolding, TaxWithHoldingRequestModel>(
+                    user.TaxWithHoldings, t =>
+                        new TaxWithHoldingRequestModel()
+                        {
+                            TaxWithHoldingType = (Models.TaxWithHoldingType)t.TaxWithHoldingType,
+                            Step2Box1 = t.Step2Box1,
+                            Step2Box2 = t.Step2Box2,
+                            Step3Box1 = t.Step3Box1,
+                            Step3Box2 = t.Step3Box2,
+                            Step4Box1 = t.Step4Box1,
+                            Step4Box2 = t.Step4Box2,
+                            Step4Box3 = t.Step4Box3
                         })
             }
         )

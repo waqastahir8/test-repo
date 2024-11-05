@@ -1782,6 +1782,68 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         Assert.Equal(ResponseStatus.UnknownError, status);
     }
 
+
+    [Fact]
+    public async Task LinkNewAccountToExistingUserAsync_Successful_Status()
+    {
+        // Arrange
+        var sut = Setup();
+
+        var model = Fixture.Build<ExistingUserSearchModel>()
+                        .Create();
+
+        model.UserEmail = "email";
+
+        var user =
+            Fixture
+            .Build<UserRequestModel>()
+            .Create();
+
+        model.NewUser = user;
+
+        var (status, _) = await sut.LinkNewAccountToExistingUserAsync(model);
+
+        Assert.Equal(ResponseStatus.Successful, status);
+    }
+
+    [Fact]
+    public async Task LinkNewAccountToExistingUserAsync_Missing_Status()
+    {
+        // Arrange
+        var sut = Setup();
+
+        var toLink = Fixture.Build<ExistingUserSearchModel>()
+                .Create();
+
+        toLink.UserEmail = "";
+
+        // Act
+        var (status, _) = await sut.LinkNewAccountToExistingUserAsync(toLink);
+
+        // Assert
+        Assert.Equal(ResponseStatus.MissingInformation, status);
+    }
+
+    [Fact]
+    public async Task LinkNewAccountToExistingUserAsync_Unknown_Error()
+    {
+        // Arrange
+        var sut = Setup();
+
+        var toLink = Fixture.Build<ExistingUserSearchModel>()
+                .Create();
+
+        _repositoryMock!
+            .Setup(x => x.FindInvitedUserInfo(It.IsAny<string>(),It.IsAny<string>()))
+            .ThrowsAsync(new Exception());
+            
+        // Act
+        var (status, _) = await sut.LinkNewAccountToExistingUserAsync(toLink);
+
+        // Assert
+        Assert.Equal(ResponseStatus.UnknownError, status);
+    }
+
     protected override UsersControllerService Setup()
     {
         _repositoryMock = new();

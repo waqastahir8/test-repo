@@ -117,4 +117,29 @@ public sealed class UsersController(IUsersControllerService service) : Controlle
     [HttpPost("org/users/invite")]
     public async Task<IActionResult> InviteUserAsync([FromBody] UserRequestModel toInvite) =>
         await ServeAsync(async () => await _service.InviteUserAsync(toInvite));
+
+    //Link user to invite info
+    [HttpPost("org/users/link-existing")]
+    public async Task<IActionResult> LinkNewAccountToExistingUserAsync([FromBody] ExistingUserSearchModel toLink) =>
+        await ServeAsync(async () => await _service.LinkNewAccountToExistingUserAsync(toLink));
+
+    //Save Direct Deposit Information
+    [HttpPost("directdeposit/{userId}")]
+    public async Task<IActionResult> SaveDirectDepositFormAsync(int userId, [FromBody] DirectDepositRequestModel directDepositFormRequest) =>
+        await ServeAsync(async () => await _service.SaveDirectDepositFormAsync(userId, directDepositFormRequest));
+
+    //Delete direct deposit information with userId and directDepositId
+    [HttpDelete("directdeposit/{userId}/{directDepositId}")]
+    public async Task<IActionResult> DeleteDirectDepositFormAsync(int userId, int directDepositId) =>
+        await ServeAsync(async () => await _service.DeleteDirectDepositFormAsync(userId, directDepositId));
+
+    //Save Tax Withholding Information
+    [HttpPost("taxwithholding/{userId}")]
+    public async Task<IActionResult> SaveTaxWithholdingFormAsync(int userId, [FromBody] TaxWithHoldingRequestModel taxWithholdingFormRequest) =>
+        await ServeAsync(async () => await _service.SaveTaxWithholdingFormAsync(userId, taxWithholdingFormRequest));
+
+    //Delete Tax Withholding Information with userId and taxWithholdingId
+    [HttpDelete("taxwithholding/{userId}/{taxWithholdingId}")]
+    public async Task<IActionResult> DeleteTaxWithholdingFormAsync(int userId, int taxWithholdingId) =>
+        await ServeAsync(async () => await _service.DeleteTaxWithholdingFormAsync(userId, taxWithholdingId));
 }

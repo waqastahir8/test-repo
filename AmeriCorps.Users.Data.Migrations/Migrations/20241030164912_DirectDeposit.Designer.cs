@@ -3,6 +3,7 @@ using System;
 using AmeriCorps.Users.Data.Migrations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AmeriCorps.Users.Data.Migrations.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    partial class UserDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241030164912_DirectDeposit")]
+    partial class DirectDeposit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -461,63 +464,10 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                         .HasName("pk_direct_deposit");
 
                     b.HasIndex("UserId")
+                        .IsUnique()
                         .HasDatabaseName("ix_direct_deposit_user_id");
 
                     b.ToTable("direct_deposit", "users");
-                });
-
-            modelBuilder.Entity("AmeriCorps.Users.Data.Core.Model.TaxWithHolding", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Step2Box1")
-                        .HasColumnType("text")
-                        .HasColumnName("step2box1");
-
-                    b.Property<string>("Step2Box2")
-                        .HasColumnType("text")
-                        .HasColumnName("step2box2");
-
-                    b.Property<string>("Step3Box1")
-                        .HasColumnType("text")
-                        .HasColumnName("step3box1");
-
-                    b.Property<string>("Step3Box2")
-                        .HasColumnType("text")
-                        .HasColumnName("step3box2");
-
-                    b.Property<string>("Step4Box1")
-                        .HasColumnType("text")
-                        .HasColumnName("step4box1");
-
-                    b.Property<string>("Step4Box2")
-                        .HasColumnType("text")
-                        .HasColumnName("step4box2");
-
-                    b.Property<string>("Step4Box3")
-                        .HasColumnType("text")
-                        .HasColumnName("step4box3");
-
-                    b.Property<int>("TaxWithHoldingType")
-                        .HasColumnType("integer")
-                        .HasColumnName("tax_with_holding_type");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer")
-                        .HasColumnName("user_id");
-
-                    b.HasKey("Id")
-                        .HasName("pk_tax_with_holding");
-
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("ix_tax_with_holding_user_id");
-
-                    b.ToTable("tax_with_holding", "users");
                 });
 
             modelBuilder.Entity("AmeriCorps.Users.Data.Core.OperatingSite", b =>
@@ -1402,21 +1352,11 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
             modelBuilder.Entity("AmeriCorps.Users.Data.Core.Model.DirectDeposit", b =>
                 {
                     b.HasOne("AmeriCorps.Users.Data.Core.User", null)
-                        .WithMany("DirectDeposits")
-                        .HasForeignKey("UserId")
+                        .WithOne("DirectDepositForm")
+                        .HasForeignKey("AmeriCorps.Users.Data.Core.Model.DirectDeposit", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_direct_deposit_users_user_id");
-                });
-
-            modelBuilder.Entity("AmeriCorps.Users.Data.Core.Model.TaxWithHolding", b =>
-                {
-                    b.HasOne("AmeriCorps.Users.Data.Core.User", null)
-                        .WithMany("TaxWithHoldings")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_tax_with_holding_users_user_id");
                 });
 
             modelBuilder.Entity("AmeriCorps.Users.Data.Core.OperatingSite", b =>
@@ -1560,7 +1500,8 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
 
                     b.Navigation("CommunicationMethods");
 
-                    b.Navigation("DirectDeposits");
+                    b.Navigation("DirectDepositForm")
+                        .IsRequired();
 
                     b.Navigation("Education");
 
@@ -1577,8 +1518,6 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                     b.Navigation("SavedSearches");
 
                     b.Navigation("Skills");
-
-                    b.Navigation("TaxWithHoldings");
 
                     b.Navigation("UserProjects");
                 });
