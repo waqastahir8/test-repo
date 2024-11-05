@@ -102,7 +102,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         var (status, _) = await sut.GetByExternalAccountIdAsync(externalAccountId);
 
         // Assert
-        Assert.Equal(ResponseStatus.MissingInformation, status);
+        Assert.Equal(ResponseStatus.NotFound, status);
     }
 
     [Fact]
