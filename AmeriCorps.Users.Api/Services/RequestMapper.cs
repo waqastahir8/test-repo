@@ -221,13 +221,14 @@ public sealed class RequestMapper : IRequestMapper
                 new TaxWithHolding
                 {
                     TaxWithHoldingType = (Data.Core.Model.TaxWithHoldingType)t.TaxWithHoldingType,
-                    Step2Box1 = t.Step2Box1,
-                    Step2Box2 = t.Step2Box2,
-                    Step3Box1 = t.Step3Box1,
-                    Step3Box2 = t.Step3Box2,
-                    Step4Box1 = t.Step4Box1,
-                    Step4Box2 = t.Step4Box2,
-                    Step4Box3 = t.Step4Box3
+                    AdditionalWithHoldings = t.AdditionalWithHoldings,
+                    AdditionalWithHoldings2 = t.AdditionalWithHoldings2,
+                    DependentsUnder17 = t.DependentsUnder17,
+                    DependentsOver17 = t.DependentsOver17,
+                    OtherIncome = t.OtherIncome,
+                    Deductions = t.Deductions,
+                    ExtraWithHoldingAmount = t.ExtraWithHoldingAmount,
+                    ModifiedDate = t.ModifiedDate
                 })
     };
 
@@ -434,12 +435,13 @@ public sealed class RequestMapper : IRequestMapper
     public TaxWithHolding Map(TaxWithHoldingRequestModel requestModel) => new()
     {
         TaxWithHoldingType = (Data.Core.Model.TaxWithHoldingType)requestModel.TaxWithHoldingType,
-        Step2Box1 = requestModel.Step2Box1,
-        Step2Box2 = requestModel.Step2Box2,
-        Step3Box1 = requestModel.Step3Box1,
-        Step3Box2 = requestModel.Step3Box2,
-        Step4Box1 = requestModel.Step4Box1,
-        Step4Box2 = requestModel.Step4Box2,
-        Step4Box3 = requestModel.Step4Box3
+        AdditionalWithHoldings = requestModel.AdditionalWithHoldings,
+        AdditionalWithHoldings2 = requestModel.AdditionalWithHoldings2,
+        DependentsUnder17 = requestModel.DependentsUnder17,
+        DependentsOver17 = requestModel.DependentsOver17,
+        OtherIncome = requestModel.OtherIncome,
+        Deductions = requestModel.Deductions,
+        ExtraWithHoldingAmount = requestModel.ExtraWithHoldingAmount,
+        ModifiedDate = requestModel.ModifiedDate
     };
 }
