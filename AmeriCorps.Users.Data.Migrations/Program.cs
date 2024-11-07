@@ -4,7 +4,7 @@ var builder = Host.CreateApplicationBuilder(args);
 
 builder.Configuration
      .AddJsonFile("appsettings.json", optional: false)
-     .AddJsonFile("appsettings.{env.EnvironmentName}.json", optional: true)
+     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
      .AddJsonFile("appsettings.local.json", optional: true);
 
 var keyVaultUri = builder.Configuration["KeyVaultOptions:KeyVaultUri"]!;
