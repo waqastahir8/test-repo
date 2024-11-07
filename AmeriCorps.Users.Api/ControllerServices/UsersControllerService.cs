@@ -1134,6 +1134,8 @@ public sealed class UsersControllerService : IUsersControllerService
         List<TaxWithHolding>? taxWithholdings;
         taxWithHolding.ModifiedDate = DateTime.UtcNow;
 
+        taxWithHolding = await _repository.SaveAsync<TaxWithHolding>(taxWithHolding);
+
         var response = _responseMapper.Map(taxWithHolding);
 
         List<string> recipients = new List<string>();
