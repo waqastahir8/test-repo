@@ -57,6 +57,8 @@ public interface IUsersControllerService
 
     Task<(ResponseStatus Status, bool Response)> DeleteDirectDepositFormAsync(int userId, int directDepositId);
     Task<(ResponseStatus Status, TaxWithHoldingResponse? Response)> SaveTaxWithholdingFormAsync(int userId, TaxWithHoldingRequestModel? toUpdate);
+    //Task<(ResponseStatus Status, TaxWithHoldingResponse? Response)> GetTaxWithholdingFormAsync(int id);
+
     Task<(ResponseStatus Status, bool Response)> DeleteTaxWithholdingFormAsync(int userId, int taxWithHoldingId);
 
 }
@@ -80,6 +82,8 @@ public sealed class UsersControllerService : IUsersControllerService
     private readonly IUserHelperService _userHelperService;
 
     private readonly IAccessRepository _accessRepository;
+    private readonly INotificationApiClient _notificationApiClient;
+
 
     public UsersControllerService(
         ILogger<UsersControllerService> logger,
@@ -90,7 +94,8 @@ public sealed class UsersControllerService : IUsersControllerService
         IProjectRepository projectRepository,
         IRoleRepository roleRepository,
         IAccessRepository accessRepository,
-        IUserHelperService userHelperService)
+        IUserHelperService userHelperService,
+        INotificationApiClient notificationApiClient)
     {
         _logger = logger;
         _requestMapper = requestMapper;
@@ -101,6 +106,7 @@ public sealed class UsersControllerService : IUsersControllerService
         _roleRepository = roleRepository;
         _accessRepository = accessRepository;
         _userHelperService = userHelperService;
+        _notificationApiClient = notificationApiClient;
     }
 
     public async Task<(ResponseStatus Status, UserResponse? Response)> GetAsync(int id)
@@ -126,6 +132,7 @@ public sealed class UsersControllerService : IUsersControllerService
         {
             user.EncryptedSocialSecurityNumber = Decrypt(user.EncryptedSocialSecurityNumber);
         }
+        user.TaxWithHoldings = user.TaxWithHoldings.OrderByDescending(t => t.ModifiedDate).ToList();
 
         var response = _responseMapper.Map(user);
 
@@ -186,6 +193,8 @@ public sealed class UsersControllerService : IUsersControllerService
         {
             user.EncryptedSocialSecurityNumber = Decrypt(user.EncryptedSocialSecurityNumber);
         }
+
+        user.TaxWithHoldings = user.TaxWithHoldings.OrderByDescending(t => t.ModifiedDate).ToList();
 
         var response = _responseMapper.Map(user);
 
@@ -1123,25 +1132,54 @@ public sealed class UsersControllerService : IUsersControllerService
 
         TaxWithHolding taxWithHolding = _requestMapper.Map(taxWithHoldingRequestModel);
         taxWithHolding.UserId = userId;
-        try
-        {
-            var deleted = true;
-            if (existingUser?.TaxWithHoldings.Count > 0)
-            {
-                deleted = DeleteTaxWithholdingFormAsync(userId, existingUser.TaxWithHoldings[0].Id).Result.Response;
-            }
-            taxWithHolding = await _repository.SaveAsync<TaxWithHolding>(taxWithHolding);
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, $"Unable to save tax witholding for user {userId}.");
-            return (ResponseStatus.UnknownError, null);
-        }
+        List<TaxWithHolding>? taxWithholdings;
+        taxWithHolding.ModifiedDate = DateTime.UtcNow;
 
         var response = _responseMapper.Map(taxWithHolding);
 
+        List<string> recipients = new List<string>();
+
+        if (existingUser?.CommunicationMethods != null)
+        {
+            for (int i = 0; i < existingUser.CommunicationMethods.Count; i++)
+            {
+                if (existingUser.CommunicationMethods[i].Type == "email" && existingUser.CommunicationMethods[i].IsPreferred)
+                {
+                    recipients.Add(existingUser.CommunicationMethods[i].Value);
+                }
+            }
+        }
+
+        if (recipients.Count > 0)
+        {
+            var emailModel = new EmailModel
+            {
+                Recipients = recipients,
+                Subject = "Tax Withholding Form Saved",
+                Content = "Your tax withholding form has been successfully saved."
+            };
+
+            try
+            {
+                var emailResponse = await _notificationApiClient.SendUserInviteEmailAsync(emailModel);
+                if (!emailResponse.Successful)
+                {
+                    _logger.LogWarning("Failed to send tax withholding email notification to user {Identifier}.", userId);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Exception occurred while sending tax withholding email notification to user {Identifier}.", userId);
+            }
+        }
+        else
+        {
+            _logger.LogWarning("No preferred email found for user {Identifier}. Email notification was not sent.", userId);
+        }
+
         return (ResponseStatus.Successful, response);
     }
+
 
     public async Task<(ResponseStatus Status, bool Response)> DeleteTaxWithholdingFormAsync(int userId, int taxWithHoldingId)
     {
