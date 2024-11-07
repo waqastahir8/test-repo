@@ -5,5 +5,6 @@ public enum ResponseStatus
     None,
     Successful,
     MissingInformation,
-    UnknownError
+    UnknownError,
+    NotFound
 }

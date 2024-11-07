@@ -1,10 +1,8 @@
 using AmeriCorps.Data;
 using AmeriCorps.Users.Data.Core;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
-
 
 namespace AmeriCorps.Users.Data;
 
@@ -17,7 +15,6 @@ public interface IOrganizationRepository
     Task<T> SaveAsync<T>(T entity) where T : Entity;
 }
 
-
 public sealed partial class OrganizationRepository(
     ILogger<OrganizationRepository> logger,
     IContextFactory contextFactory,
@@ -26,7 +23,7 @@ public sealed partial class OrganizationRepository(
     IOrganizationRepository
 {
     public async Task<Organization?> GetOrgByCodeAsync(string orgCode) =>
-        await ExecuteAsync(async context => await context.Organizations.FirstOrDefaultAsync(o =>o.OrgCode == orgCode));
+        await ExecuteAsync(async context => await context.Organizations.FirstOrDefaultAsync(o => o.OrgCode == orgCode));
 
     public async Task<List<Organization>?> GetOrgListAsync() =>
         await ExecuteAsync(async context => await context.Organizations.ToListAsync());

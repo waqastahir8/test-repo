@@ -1,11 +1,8 @@
-using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
-
 namespace AmeriCorps.Users.Data.Core;
 
 public sealed class UserProject : EntityWithUserId
 {
-    public string ProjectName { get; set; }  = string.Empty;
+    public string ProjectName { get; set; } = string.Empty;
 
     public string ProjectCode { get; set; } = string.Empty;
 
@@ -15,7 +12,7 @@ public sealed class UserProject : EntityWithUserId
 
     public bool Active { get; set; } = true;
 
-    public List<ProjectRole> ProjectRoles { get; set; } = new List<ProjectRole>();
+    public List<ProjectRole> ProjectRoles { get; set; } = [];
 
-    public List<ProjectAccess> ProjectAccess { get; set; } = new List<ProjectAccess>();
+    public List<ProjectAccess> ProjectAccess { get; set; } = [];
 }

@@ -1,10 +1,10 @@
-﻿using AmeriCorps.Data;
+﻿using System.Linq.Expressions;
+using AmeriCorps.Data;
 using AmeriCorps.Users.Data.Core;
 using AmeriCorps.Users.Data.Core.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System.Linq.Expressions;
 
 namespace AmeriCorps.Users.Data;
 
@@ -32,7 +32,7 @@ public sealed partial class UserRepository(
                 .Include(u => u.UserProjects).ThenInclude(p => p.ProjectRoles)
                 .Include(u => u.UserProjects).ThenInclude(a => a.ProjectAccess)
                 .Include(u => u.DirectDeposits)
-                .Include(u => u.TaxWithHoldings)   
+                .Include(u => u.TaxWithHoldings)
                 .FirstOrDefaultAsync(x => x.Id == id));
 
     public async Task<User?> GetByExternalAccountIdAsync(string externalAccountId) =>

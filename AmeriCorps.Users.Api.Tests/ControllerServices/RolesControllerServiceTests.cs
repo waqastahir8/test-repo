@@ -19,7 +19,7 @@ public sealed partial class RolesControllerServiceTests : BaseTests<RolesControl
     {
         // Arrange
         var sut = Setup();
-        
+
         _repositoryMock!
             .Setup(x => x.GetRoleListByTypeAsync(role))
             .ReturnsAsync(() => Fixture.Build<List<Role>>()
