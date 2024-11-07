@@ -1075,6 +1075,67 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                     b.ToTable("skill", "users");
                 });
 
+            modelBuilder.Entity("AmeriCorps.Users.Data.Core.SocialSecurityVerification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CitizenshipCode")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("citizenship_code");
+
+                    b.Property<int>("CitizenshipStatus")
+                        .HasColumnType("integer")
+                        .HasColumnName("citizenship_status");
+
+                    b.Property<DateTime?>("CitizenshipUpdatedDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("citizenship_updated_date");
+
+                    b.Property<int>("LastSubmitUser")
+                        .HasColumnType("integer")
+                        .HasColumnName("last_submit_user");
+
+                    b.Property<DateTime?>("ProcessStartDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("process_start_date");
+
+                    b.Property<int>("SocialSecurityStatus")
+                        .HasColumnType("integer")
+                        .HasColumnName("social_security_status");
+
+                    b.Property<DateTime?>("SocialSecurityUpdatedDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("social_security_updated_date");
+
+                    b.Property<int>("SubmitCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("submit_count");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("user_id");
+
+                    b.Property<string>("VerificationCode")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("verification_code");
+
+                    b.HasKey("Id")
+                        .HasName("pk_social_security_verification");
+
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_social_security_verification_user_id");
+
+                    b.ToTable("socialSecurityVerification", "users");
+                });
+
             modelBuilder.Entity("AmeriCorps.Users.Data.Core.SubGrantee", b =>
                 {
                     b.Property<int>("Id")
@@ -1519,6 +1580,16 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                         .HasConstraintName("fk_skill_users_user_id");
                 });
 
+            modelBuilder.Entity("AmeriCorps.Users.Data.Core.SocialSecurityVerification", b =>
+                {
+                    b.HasOne("AmeriCorps.Users.Data.Core.User", null)
+                        .WithOne("SocialSecurityVerification")
+                        .HasForeignKey("AmeriCorps.Users.Data.Core.SocialSecurityVerification", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_social_security_verification_user_user_id");
+                });
+
             modelBuilder.Entity("AmeriCorps.Users.Data.Core.SubGrantee", b =>
                 {
                     b.HasOne("AmeriCorps.Users.Data.Core.Project", null)
@@ -1581,6 +1652,9 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                     b.Navigation("SavedSearches");
 
                     b.Navigation("Skills");
+
+                    b.Navigation("SocialSecurityVerification")
+                        .IsRequired();
 
                     b.Navigation("TaxWithHoldings");
 

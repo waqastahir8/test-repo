@@ -878,13 +878,15 @@ public sealed class ResponseMapper : IResponseMapper
     {
         Id = status.Id,
         UserId = status.UserId,
-        Status =  (VerificationStatusResponse)status.Status,
-        ProcessId = status.ProcessId,
-        StatusCode = status.StatusCode,
+        CitizenshipStatus =  (VerificationStatusResponse)status.CitizenshipStatus,
+        SocialSecurityStatus = (VerificationStatusResponse)status.SocialSecurityStatus,
+        VerificationCode = status.VerificationCode,
+        CitizenshipCode = status.CitizenshipCode,
         ProcessStartDate = status.ProcessStartDate,
-        UpdatedDate = status.UpdatedDate,
-        LastUpdateUser = status.LastUpdateUser,
-        SubmitCount = status.SubmitCount
+        CitizenshipUpdatedDate = status.CitizenshipUpdatedDate,
+        SocialSecurityUpdatedDate = status.SocialSecurityUpdatedDate,
+        SubmitCount = status.SubmitCount,
+        LastSubmitUser = status.LastSubmitUser
     };
     
 }

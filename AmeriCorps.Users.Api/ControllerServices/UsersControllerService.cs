@@ -1207,7 +1207,7 @@ public sealed class UsersControllerService : IUsersControllerService
 
     public async Task<(ResponseStatus Status, SocialSecurityVerificationResponse? Response)> UpdateUserSSAInfo(int userId, SocialSecurityVerificationRequestModel verificationUpdate)
     {
-        if (verificationUpdate == null || userId < 1 || verificationUpdate.Status == null)
+        if (verificationUpdate == null || userId < 1)
         {
             return (ResponseStatus.MissingInformation, null);
         }
@@ -1225,11 +1225,19 @@ public sealed class UsersControllerService : IUsersControllerService
         }
 
         if(userStatus != null){
-            userStatus.UpdatedDate = DateTime.UtcNow;
-            userStatus.LastUpdateUser = verificationUpdate.LastUpdateUser;
-            userStatus.Status = (VerificationStatus)verificationUpdate.Status;
+            userStatus.LastSubmitUser = verificationUpdate.LastSubmitUser;
+            if(userStatus.CitizenshipStatus != (VerificationStatus)verificationUpdate.CitizenshipStatus)
+            {
+                userStatus.CitizenshipStatus = (VerificationStatus)verificationUpdate.CitizenshipStatus;
+                userStatus.CitizenshipUpdatedDate = DateTime.UtcNow;
+            }
+            if(userStatus.SocialSecurityStatus != (VerificationStatus)verificationUpdate.SocialSecurityStatus)
+            {
+                userStatus.SocialSecurityStatus = (VerificationStatus)verificationUpdate.SocialSecurityStatus;
+                userStatus.SocialSecurityUpdatedDate = DateTime.UtcNow;
+            }
 
-            if(userStatus.Status == VerificationStatus.Resubmit && userStatus.SubmitCount < 6){
+            if((userStatus.SocialSecurityStatus == VerificationStatus.Resubmit || userStatus.CitizenshipStatus == VerificationStatus.Resubmit)&& userStatus.SubmitCount < 5){
                 //ReSubmit Package
                 userStatus.SubmitCount++;
             }

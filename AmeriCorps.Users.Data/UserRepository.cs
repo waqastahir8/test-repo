@@ -295,9 +295,11 @@ public sealed partial class UserRepository(
 
         return await ExecuteAsync(async context => await context.Users
             .Include(u => u.SocialSecurityVerification)
-            .Include(u => u.CommunicationMethods)     
-            .Where(x => x.SocialSecurityVerification != null && x.SocialSecurityVerification.Status == VerificationStatus.Rejected
-                && DateTime.Compare(x.SocialSecurityVerification.UpdatedDate ?? DateTime.MaxValue, updatedDate) <= 0).ToListAsync());
+            .Include(u => u.CommunicationMethods)
+            .Where(x => x.SocialSecurityVerification != null && (x.SocialSecurityVerification.CitizenshipStatus == VerificationStatus.Failed &&
+                DateTime.Compare(x.SocialSecurityVerification.SocialSecurityUpdatedDate ?? DateTime.MaxValue, updatedDate) <= 0)
+                || (x.SocialSecurityVerification.SocialSecurityStatus == VerificationStatus.Failed &&
+                DateTime.Compare(x.SocialSecurityVerification.CitizenshipUpdatedDate ?? DateTime.MaxValue, updatedDate) <= 0)).ToListAsync());
     }
 
     public async Task<List<User>> FetchVistaRecipientsAsync()
