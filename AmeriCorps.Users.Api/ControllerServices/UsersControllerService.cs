@@ -57,7 +57,6 @@ public interface IUsersControllerService
 
     Task<(ResponseStatus Status, bool Response)> DeleteDirectDepositFormAsync(int userId, int directDepositId);
     Task<(ResponseStatus Status, TaxWithHoldingResponse? Response)> SaveTaxWithholdingFormAsync(int userId, TaxWithHoldingRequestModel? toUpdate);
-    //Task<(ResponseStatus Status, TaxWithHoldingResponse? Response)> GetTaxWithholdingFormAsync(int id);
 
     Task<(ResponseStatus Status, bool Response)> DeleteTaxWithholdingFormAsync(int userId, int taxWithHoldingId);
 
