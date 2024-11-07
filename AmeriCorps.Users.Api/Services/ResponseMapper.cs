@@ -171,13 +171,14 @@ public sealed class ResponseMapper : IResponseMapper
                 Id = t.Id,
                 UserId = t.UserId,
                 TaxWithHoldingType = (Models.TaxWithHoldingType)t.TaxWithHoldingType,
-                Step2Box1 = t.Step2Box1,
-                Step2Box2 = t.Step2Box2,
-                Step3Box1 = t.Step3Box1,
-                Step3Box2 = t.Step3Box2,
-                Step4Box1 = t.Step4Box1,
-                Step4Box2 = t.Step4Box2,
-                Step4Box3 = t.Step4Box3
+                AdditionalWithHoldings = t.AdditionalWithHoldings,
+                AdditionalWithHoldings2 = t.AdditionalWithHoldings2,
+                DependentsUnder17 = t.DependentsUnder17,
+                DependentsOver17 = t.DependentsOver17,
+                OtherIncome = t.OtherIncome,
+                Deductions = t.Deductions,
+                ExtraWithHoldingAmount = t.ExtraWithHoldingAmount,
+                ModifiedDate = t.ModifiedDate
             });
 
 
@@ -199,13 +200,14 @@ public sealed class ResponseMapper : IResponseMapper
         Id = taxWithHolding.Id,
         UserId = taxWithHolding.UserId,
         TaxWithHoldingType = (Models.TaxWithHoldingType)taxWithHolding.TaxWithHoldingType,
-        Step2Box1 = taxWithHolding.Step2Box1,
-        Step2Box2 = taxWithHolding.Step2Box2,
-        Step3Box1 = taxWithHolding.Step3Box1,
-        Step3Box2 = taxWithHolding.Step3Box2,
-        Step4Box1 = taxWithHolding.Step4Box1,
-        Step4Box2 = taxWithHolding.Step4Box2,
-        Step4Box3 = taxWithHolding.Step4Box3
+        AdditionalWithHoldings = taxWithHolding.AdditionalWithHoldings,
+        AdditionalWithHoldings2 = taxWithHolding.AdditionalWithHoldings2,
+        DependentsUnder17 = taxWithHolding.DependentsUnder17,
+        DependentsOver17 = taxWithHolding.DependentsOver17,
+        OtherIncome = taxWithHolding.OtherIncome,
+        Deductions = taxWithHolding.Deductions,
+        ExtraWithHoldingAmount = taxWithHolding.ExtraWithHoldingAmount,
+        ModifiedDate = taxWithHolding.ModifiedDate
     };
 
     public UserResponse? Map(User? user) => user == null ? null : new()
@@ -393,13 +395,14 @@ public sealed class ResponseMapper : IResponseMapper
                 new TaxWithHoldingRequestModel()
                 {
                     TaxWithHoldingType = (Models.TaxWithHoldingType)t.TaxWithHoldingType,
-                    Step2Box1 = t.Step2Box1,
-                    Step2Box2 = t.Step2Box2,
-                    Step3Box1 = t.Step3Box1,
-                    Step3Box2 = t.Step3Box2,
-                    Step4Box1 = t.Step4Box1,
-                    Step4Box2 = t.Step4Box2,
-                    Step4Box3 = t.Step4Box3
+                    AdditionalWithHoldings = t.AdditionalWithHoldings,
+                    AdditionalWithHoldings2 = t.AdditionalWithHoldings2,
+                    DependentsUnder17 = t.DependentsUnder17,
+                    DependentsOver17 = t.DependentsOver17,
+                    OtherIncome = t.OtherIncome,
+                    Deductions = t.Deductions,
+                    ExtraWithHoldingAmount = t.ExtraWithHoldingAmount,
+                    ModifiedDate = t.ModifiedDate
                 })
     };
 
@@ -858,13 +861,14 @@ public sealed class ResponseMapper : IResponseMapper
                         new TaxWithHoldingRequestModel()
                         {
                             TaxWithHoldingType = (Models.TaxWithHoldingType)t.TaxWithHoldingType,
-                            Step2Box1 = t.Step2Box1,
-                            Step2Box2 = t.Step2Box2,
-                            Step3Box1 = t.Step3Box1,
-                            Step3Box2 = t.Step3Box2,
-                            Step4Box1 = t.Step4Box1,
-                            Step4Box2 = t.Step4Box2,
-                            Step4Box3 = t.Step4Box3
+                            AdditionalWithHoldings = t.AdditionalWithHoldings,
+                            AdditionalWithHoldings2 = t.AdditionalWithHoldings2,
+                            DependentsUnder17 = t.DependentsUnder17,
+                            DependentsOver17 = t.DependentsOver17,
+                            OtherIncome = t.OtherIncome,
+                            Deductions = t.Deductions,
+                            ExtraWithHoldingAmount = t.ExtraWithHoldingAmount,
+                            ModifiedDate = t.ModifiedDate
                         })
             }
         )

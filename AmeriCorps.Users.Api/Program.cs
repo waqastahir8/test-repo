@@ -38,7 +38,7 @@ var clientSecret = builder.Configuration["KeyVaultOptions:ClientSecret"];
 builder.Configuration
     .AddJsonFile("appsettings.local.json", optional: true)
     .AddJsonFile("appsettings.json", optional: false)
-    .AddJsonFile("appsettings.{env.EnvironmentName}.json", optional: true);
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true);
 
 if (!string.IsNullOrEmpty(keyVaultUri) &&
     !string.IsNullOrEmpty(tenantId) &&

@@ -1,6 +1,7 @@
 ﻿using AmeriCorps.Users.Api.Services;
 using AmeriCorps.Users.Data;
 using AmeriCorps.Users.Data.Core;
+using AmeriCorps.Users.Http;
 using Microsoft.Extensions.Logging;
 
 namespace AmeriCorps.Users.Api.Tests;
@@ -16,6 +17,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
     private Mock<IAccessRepository>? _accessRepository;
 
     private Mock<IUserHelperService>? _userHelperService;
+    private Mock<INotificationApiClient>? _notificationApiClient;
 
     [Theory]
     [InlineData(5)]
@@ -1853,6 +1855,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         _roleRepository = new();
         _accessRepository = new();
         _userHelperService = new();
+        _notificationApiClient = new();
 
         Fixture = new Fixture();
         Fixture.Customize<DateOnly>(x => x.FromFactory<DateTime>(DateOnly.FromDateTime));
@@ -1865,6 +1868,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             _projectRepository.Object,
             _roleRepository.Object,
             _accessRepository.Object,
-            _userHelperService.Object);
+            _userHelperService.Object,
+            _notificationApiClient.Object);
     }
 }
