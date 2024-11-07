@@ -26,7 +26,10 @@ public abstract class NpgsqlContext : ContextBase
     public DbSet<UserProject> UserProjects { get; set; }
 
     public DbSet<Access> Access { get; set; }
+
     public DbSet<OperatingSite> OperatingSites { get; set; }
+
+    public DbSet<SocialSecurityVerification> SocialSecurityVerification { get; set; }
 
     public static string Schema => "users";
 
@@ -77,6 +80,8 @@ public abstract class NpgsqlContext : ContextBase
         var collection = Create<Collection>("collection");
 
         var operatingSite = Create<OperatingSite>("operatingSite");
+
+        var socialSecurityVerification = Create<SocialSecurityVerification>("socialSecurityVerification");
 
         modelBuilder.Entity<Project>()
             .HasIndex(p => new

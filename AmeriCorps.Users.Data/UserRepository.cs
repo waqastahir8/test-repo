@@ -256,7 +256,7 @@ public sealed partial class UserRepository(
         return userList;
     }
 
-    public async Task<List<User>> FetchInvitedUsersForReminder()
+    public async Task<List<User>> FetchInvitedUsersForReminderAsync()
     {
         var inviteCheckDate = DateTime.UtcNow.AddDays(-14);
 
@@ -282,4 +282,51 @@ public sealed partial class UserRepository(
                 .Include(u => u.UserProjects).ThenInclude(p => p.ProjectRoles)
                 .Include(u => u.UserProjects).ThenInclude(a => a.ProjectAccess)
                 .FirstOrDefaultAsync(x => x.UserName == userEmail && x.OrgCode == orgCode && (x.UserAccountStatus == UserAccountStatus.INVITED || x.UserAccountStatus == UserAccountStatus.PENDING)));
+
+
+    public async Task<SocialSecurityVerification?> FindSocialSecurityVerificationByUserId(int userId) =>
+        await ExecuteAsync(async context => await context.SocialSecurityVerification
+            .FirstOrDefaultAsync(p => p.UserId == userId));
+
+
+    public async Task<List<User>> FetchFailedSSAChecksAsync()
+    {
+        var updatedDate = DateTime.UtcNow.AddDays(-1);
+
+        return await ExecuteAsync(async context => await context.Users
+            .Include(u => u.SocialSecurityVerification)
+            .Include(u => u.CommunicationMethods)     
+            .Where(x => x.SocialSecurityVerification != null && x.SocialSecurityVerification.Status == VerificationStatus.Rejected
+                && DateTime.Compare(x.SocialSecurityVerification.UpdatedDate ?? DateTime.MaxValue, updatedDate) <= 0).ToListAsync());
+    }
+
+    public async Task<List<User>> FetchVistaRecipientsAsync()
+    {
+
+        return await ExecuteAsync(async context => await context.Users
+            .Include(u => u.CommunicationMethods)
+            .Include(u => u.Roles)
+            .Include(u => u.UserProjects)
+            .Where(x => x.SocialSecurityVerification != null).ToListAsync());
+    }
+
+    public async Task<List<User>> FetchAsnRecipientsAsync()
+    {
+
+        return await ExecuteAsync(async context => await context.Users
+            .Include(u => u.CommunicationMethods)    
+            .Include(u => u.Roles)
+            .Include(u => u.UserProjects) 
+            .Where(x => x.SocialSecurityVerification != null).ToListAsync());
+    }
+
+    public async Task<List<User>> FetchNcccRecipientsAsync()
+    {
+
+        return await ExecuteAsync(async context => await context.Users
+            .Include(u => u.CommunicationMethods)     
+            .Include(u => u.Roles)
+            .Include(u => u.UserProjects)
+            .Where(x => x.SocialSecurityVerification != null).ToListAsync());
+    }
 }

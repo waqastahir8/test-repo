@@ -59,6 +59,8 @@ public interface IUsersControllerService
     Task<(ResponseStatus Status, TaxWithHoldingResponse? Response)> SaveTaxWithholdingFormAsync(int userId, TaxWithHoldingRequestModel? toUpdate);
     Task<(ResponseStatus Status, bool Response)> DeleteTaxWithholdingFormAsync(int userId, int taxWithHoldingId);
 
+    Task<(ResponseStatus Status, SocialSecurityVerificationResponse? Response)> UpdateUserSSAInfo(int userId, SocialSecurityVerificationRequestModel verificationUpdate);
+
 }
 
 public sealed class UsersControllerService : IUsersControllerService
@@ -1163,6 +1165,53 @@ public sealed class UsersControllerService : IUsersControllerService
         }
         return (ResponseStatus.Successful, deleted);
     }
+
+    public async Task<(ResponseStatus Status, SocialSecurityVerificationResponse? Response)> UpdateUserSSAInfo(int userId, SocialSecurityVerificationRequestModel verificationUpdate)
+    {
+        if (verificationUpdate == null || userId < 1 || verificationUpdate.Status == null)
+        {
+            return (ResponseStatus.MissingInformation, null);
+        }
+
+        SocialSecurityVerification? userStatus;
+
+        try
+        {
+            userStatus = await _repository.FindSocialSecurityVerificationByUserId(userId);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Unable to check if verification for {userId} exists.");
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        if(userStatus != null){
+            userStatus.UpdatedDate = DateTime.UtcNow;
+            userStatus.LastUpdateUser = verificationUpdate.LastUpdateUser;
+            userStatus.Status = (VerificationStatus)verificationUpdate.Status;
+
+            if(userStatus.Status == VerificationStatus.Resubmit && userStatus.SubmitCount < 6){
+                //ReSubmit Package
+                userStatus.SubmitCount++;
+            }
+
+            try
+            {
+                // userStatus = await _repository.SaveSSAInfo(userStatus);
+                userStatus = await _repository.SaveAsync(userStatus);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"Unable to save update for user {userId} exists.");
+                return (ResponseStatus.UnknownError, null);
+            }
+        }
+
+        var response = _responseMapper.Map(userStatus);
+
+        return (ResponseStatus.Successful, response);
+    }
+
 
     private string Encrypt(string plainText)
     {

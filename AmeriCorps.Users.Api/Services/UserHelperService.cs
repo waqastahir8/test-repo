@@ -12,6 +12,8 @@ public interface IUserHelperService
     Task<bool> ResendAllUserInvitesAsync();
 
     Task<bool> SendOperatingSiteInviteAsync(OperatingSite toInvite);
+
+    Task<bool> SendSSAFailureEmailAsync(List<int> userIds);
 }
 
 public class UserHelperService : IUserHelperService
@@ -40,7 +42,7 @@ public class UserHelperService : IUserHelperService
     {
         if (toInvite != null && (toInvite.CommunicationMethods != null && toInvite.CommunicationMethods.Count > 0) && (!string.IsNullOrEmpty(toInvite.FirstName) && !string.IsNullOrEmpty(toInvite.LastName)))
         {
-            EmailModel email = await FormatUserInviteEmail(toInvite);
+            EmailModel email = await FormatUserInviteEmailAsync(toInvite);
 
             try
             {
@@ -70,7 +72,7 @@ public class UserHelperService : IUserHelperService
         if (toInvite.Id.ToString() != null && (toInvite.CommunicationMethods != null && toInvite.CommunicationMethods.Count > 0) && toInvite.UserAccountStatus == UserAccountStatus.INVITED
             && dateInvited != DateTime.MinValue && DateTime.Compare(currentDate, dateInvited.AddDays(14)) > 0)
         {
-            EmailModel email = await FormatUserInviteEmail(toInvite);
+            EmailModel email = await FormatUserInviteEmailAsync(toInvite);
 
             try
             {
@@ -97,7 +99,7 @@ public class UserHelperService : IUserHelperService
 
         try
         {
-            userList = await _repository.FetchInvitedUsersForReminder();
+            userList = await _repository.FetchInvitedUsersForReminderAsync();
         }
         catch (Exception e)
         {
@@ -139,7 +141,7 @@ public class UserHelperService : IUserHelperService
     {
         if (toInvite != null && !string.IsNullOrEmpty(toInvite.EmailAddress))
         {
-            EmailModel email = await FormatOperatingSiteInviteEmail(toInvite);
+            EmailModel email = await FormatOperatingSiteInviteEmailAsync(toInvite);
 
             try
             {
@@ -160,7 +162,77 @@ public class UserHelperService : IUserHelperService
         }
     }
 
-    private async Task<EmailModel> FormatUserInviteEmail(User toInvite)
+    public async Task<bool> SendSSAFailureEmailAsync(List<int> userIds)
+    {
+        List<User> userList;
+
+        try
+        {
+            userList = await _repository.FetchFailedSSAChecksAsync();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error fetching users for invite reminder.");
+            return false;
+        }
+
+        var errorCount = 0;
+
+        if (userList != null && userList.Count > 0)
+        {
+            for (int i = 0; i < userList.Count; i++)
+            {
+                var success = await SendFailedSsaNotificationAsync(userList[i]);
+
+                if (!success)
+                {
+                    errorCount++;
+                }
+            }
+        }
+        else
+        {
+            _logger.LogInformation("No users found for email notification.");
+        }
+
+        if (errorCount > 0)
+        {
+            _logger.LogInformation("Notification email unsuccessful for {Identifier} number of users.", errorCount.ToString().Replace(Environment.NewLine, ""));
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+
+    private async Task<bool> SendFailedSsaNotificationAsync(User toNotify)
+    {
+
+        if (toNotify.Id.ToString() != null && (toNotify.CommunicationMethods != null && toNotify.CommunicationMethods.Count > 0))
+        {
+            EmailModel email = await FormatSSAEmailAsync(toNotify);
+
+            try
+            {
+                await _apiService.SendNotificationEmailAsync(email);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Unable to send notification email for {Identifier}.", toNotify.UserName.ToString().Replace(Environment.NewLine, ""));
+                return false;
+            }
+
+            _logger.LogInformation("notification email sent for {Identifier}.", toNotify.UserName.ToString().Replace(Environment.NewLine, ""));
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    private async Task<EmailModel> FormatUserInviteEmailAsync(User toInvite)
     {
         EmailModel email = new EmailModel();
 
@@ -217,7 +289,7 @@ public class UserHelperService : IUserHelperService
         return email;
     }
 
-    private async Task<EmailModel> FormatOperatingSiteInviteEmail(OperatingSite toInvite)
+    private async Task<EmailModel> FormatOperatingSiteInviteEmailAsync(OperatingSite toInvite)
     {
         EmailModel email = new EmailModel();
 
@@ -264,5 +336,102 @@ public class UserHelperService : IUserHelperService
             email.Content = htmlContent;
         }
         return email;
+    }
+
+    private async Task<EmailModel> FormatSSAEmailAsync(User toNotify)
+    {
+        EmailModel email = new EmailModel();
+
+        string htmlTemplate = _templates.InviteUserTemplate();
+
+        List<string> recipients = new List<string>();
+
+        if (toNotify.CommunicationMethods != null)
+        {
+            for (int i = 0; i < toNotify.CommunicationMethods.Count; i++)
+            {
+                if (toNotify.CommunicationMethods[i].Type == "email" && toNotify.CommunicationMethods[i].IsPreferred)
+                {
+                    recipients.Add(toNotify.CommunicationMethods[i].Value);
+                }
+            }
+        }
+
+        string subject = "Verification Failed";
+        string fullName = "";
+        if (!string.IsNullOrEmpty(toNotify.FirstName) && !string.IsNullOrEmpty(toNotify.LastName))
+        {
+            fullName = toNotify.FirstName + ' ' + toNotify.LastName;
+        }
+
+        List<User>? notifyList = new List<User>();
+
+        try
+        {
+            notifyList = await FetchOtherRecipients(toNotify);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Unable to find other users for notification for {Identifier}.", toNotify.UserName.ToString().Replace(Environment.NewLine, ""));
+        }
+
+        if (notifyList != null && notifyList.Count > 0)
+        {
+            for(int i = 0; i < notifyList.Count; i++)
+            {
+                if (notifyList[i].CommunicationMethods != null)
+                {
+                    for (int j = 0; j < notifyList[i].CommunicationMethods.Count; j++)
+                    {
+                        if (notifyList[i].CommunicationMethods[j].Type == "email" && notifyList[i].CommunicationMethods[j].IsPreferred)
+                        {
+                            recipients.Add(notifyList[i].CommunicationMethods[j].Value);
+                        }
+                    }
+                }
+            }
+
+        }
+
+        string link = "";
+        string htmlContent = "";
+        if (!string.IsNullOrEmpty(htmlTemplate))
+        {
+            htmlContent = string.Format(htmlTemplate, fullName, link);
+
+            email.Recipients = recipients;
+            email.Subject = subject;
+            email.Content = htmlContent;
+        }
+
+        return email;
+    }
+
+    private async Task<List<User>> FetchOtherRecipients(User toNotify)
+    {
+        List<User> userList = [];
+
+        try
+        {
+            if(!string.IsNullOrEmpty(toNotify.OrgCode) && toNotify.OrgCode == "VISTA")
+            {
+                userList = await _repository.FetchVistaRecipientsAsync();
+            }
+            else if(!string.IsNullOrEmpty(toNotify.OrgCode) && toNotify.OrgCode == "ASN")
+            {
+                userList = await _repository.FetchAsnRecipientsAsync();
+            }
+            else if(!string.IsNullOrEmpty(toNotify.OrgCode) && toNotify.OrgCode == "NCCC")
+            {
+                userList = await _repository.FetchNcccRecipientsAsync();
+            }
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error fetching users for invite reminder.");
+            return userList;
+        }
+
+        return userList;
     }
 }

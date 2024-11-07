@@ -47,8 +47,12 @@ public interface IResponseMapper
     AwardResponse Map(Award award);
 
     SubGranteeResponse Map(SubGrantee subGrantee);
+
     DirectDepositResponse Map(DirectDeposit directDeposit);
+
     TaxWithHoldingResponse Map(TaxWithHolding taxWithHolding);
+
+    SocialSecurityVerificationResponse Map(SocialSecurityVerification status);
 
 }
 
@@ -865,4 +869,18 @@ public sealed class ResponseMapper : IResponseMapper
             }
         )
     };
+
+    public SocialSecurityVerificationResponse Map(SocialSecurityVerification status) => new()
+    {
+        Id = status.Id,
+        UserId = status.UserId,
+        Status =  (VerificationStatusResponse)status.Status,
+        ProcessId = status.ProcessId,
+        StatusCode = status.StatusCode,
+        ProcessStartDate = status.ProcessStartDate,
+        UpdatedDate = status.UpdatedDate,
+        LastUpdateUser = status.LastUpdateUser,
+        SubmitCount = status.SubmitCount
+    };
+    
 }

@@ -35,7 +35,18 @@ public interface IUserRepository
 
     Task<UserList> FetchUserListByOrgCodeAsync(string orgCode);
 
-    Task<List<User>> FetchInvitedUsersForReminder();
+    Task<List<User>> FetchInvitedUsersForReminderAsync();
 
     Task<User?> FindInvitedUserInfo(string userEmail, string orgCode);
+
+    Task<SocialSecurityVerification?> FindSocialSecurityVerificationByUserId(int userId);
+
+    Task<List<User>> FetchFailedSSAChecksAsync();
+
+    Task<List<User>> FetchVistaRecipientsAsync();
+
+    Task<List<User>> FetchAsnRecipientsAsync();
+
+    Task<List<User>> FetchNcccRecipientsAsync();
+
 }

@@ -9,6 +9,8 @@ public interface INotificationApiClient
     Task<ServiceResponse<UserResponse>> SendUserInviteEmailAsync(EmailModel email);
 
     Task<ServiceResponse<OperatingSiteResponse>> SendOperatingSiteInviteEmailAsync(EmailModel email);
+
+    Task<ServiceResponse<bool>> SendNotificationEmailAsync(EmailModel email);
 }
 
 public sealed class NotificationApiClient(
@@ -30,6 +32,13 @@ public sealed class NotificationApiClient(
     {
         var uri = new Uri(_options.ApiUrl, $"/api/Email/send").ToString();
         var response = await PostAsync<OperatingSiteResponse>(uri, email);
+        return response;
+    }
+
+    public async Task<ServiceResponse<bool>> SendNotificationEmailAsync(EmailModel email)
+    {
+        var uri = new Uri(_options.ApiUrl, $"/api/Email/send").ToString();
+        var response = await PostAsync<bool>(uri, email);
         return response;
     }
 }
