@@ -1,5 +1,4 @@
 ﻿using System.Data;
-using System.Security.Cryptography;
 using AmeriCorps.Users.Data.Core;
 using AmeriCorps.Users.Data.Core.Model;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -60,6 +59,8 @@ public interface IUsersControllerService
 
     Task<(ResponseStatus Status, bool Response)> DeleteTaxWithholdingFormAsync(int userId, int taxWithHoldingId);
 
+    Task<(ResponseStatus Status, SocialSecurityVerificationResponse? Response)> UpdateUserSSAInfo(int userId, SocialSecurityVerificationRequestModel verificationUpdate);
+
 }
 
 public sealed class UsersControllerService : IUsersControllerService
@@ -81,7 +82,10 @@ public sealed class UsersControllerService : IUsersControllerService
     private readonly IUserHelperService _userHelperService;
 
     private readonly IAccessRepository _accessRepository;
-    private readonly INotificationApiClient _notificationApiClient;
+
+    private readonly INotificationApiClient _notificationApiClient; 
+
+    private readonly IEncryptionService _encryptionService;
 
 
     public UsersControllerService(
@@ -94,7 +98,8 @@ public sealed class UsersControllerService : IUsersControllerService
         IRoleRepository roleRepository,
         IAccessRepository accessRepository,
         IUserHelperService userHelperService,
-        INotificationApiClient notificationApiClient)
+        INotificationApiClient notificationApiClient,
+        IEncryptionService encryptionService)
     {
         _logger = logger;
         _requestMapper = requestMapper;
@@ -106,6 +111,7 @@ public sealed class UsersControllerService : IUsersControllerService
         _accessRepository = accessRepository;
         _userHelperService = userHelperService;
         _notificationApiClient = notificationApiClient;
+        _encryptionService = encryptionService;
     }
 
     public async Task<(ResponseStatus Status, UserResponse? Response)> GetAsync(int id)
@@ -129,7 +135,7 @@ public sealed class UsersControllerService : IUsersControllerService
 
         if (!string.IsNullOrWhiteSpace(user.EncryptedSocialSecurityNumber))
         {
-            user.EncryptedSocialSecurityNumber = Decrypt(user.EncryptedSocialSecurityNumber);
+            user.EncryptedSocialSecurityNumber = _encryptionService.Decrypt(user.EncryptedSocialSecurityNumber);
         }
         user.TaxWithHoldings = user.TaxWithHoldings.OrderByDescending(t => t.ModifiedDate).ToList();
 
@@ -190,7 +196,7 @@ public sealed class UsersControllerService : IUsersControllerService
 
         if (!string.IsNullOrWhiteSpace(user.EncryptedSocialSecurityNumber))
         {
-            user.EncryptedSocialSecurityNumber = Decrypt(user.EncryptedSocialSecurityNumber);
+            user.EncryptedSocialSecurityNumber = _encryptionService.Decrypt(user.EncryptedSocialSecurityNumber);
         }
 
         user.TaxWithHoldings = user.TaxWithHoldings.OrderByDescending(t => t.ModifiedDate).ToList();
@@ -268,7 +274,7 @@ public sealed class UsersControllerService : IUsersControllerService
 
         if (!string.IsNullOrWhiteSpace(userRequest.EncryptedSocialSecurityNumber))
         {
-            userRequest.EncryptedSocialSecurityNumber = Encrypt(userRequest.EncryptedSocialSecurityNumber);
+            userRequest.EncryptedSocialSecurityNumber = _encryptionService.Encrypt(userRequest.EncryptedSocialSecurityNumber);
         }
 
         var user = _requestMapper.Map(userRequest);
@@ -1203,50 +1209,58 @@ public sealed class UsersControllerService : IUsersControllerService
         return (ResponseStatus.Successful, deleted);
     }
 
-    private string Encrypt(string plainText)
+    public async Task<(ResponseStatus Status, SocialSecurityVerificationResponse? Response)> UpdateUserSSAInfo(int userId, SocialSecurityVerificationRequestModel verificationUpdate)
     {
-        using (var aes = Aes.Create())
+        if (verificationUpdate == null || userId < 1)
         {
-            aes.Key = Convert.FromBase64String("69PhJU1v1SMbE6mRBWalOIQlBqAmvHQ5WCMX4IoCwZ0=");
-            aes.IV = Convert.FromBase64String("vNWAOAbK+6wi0NDXbCAncA==");
+            return (ResponseStatus.MissingInformation, null);
+        }
 
-            var encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
+        SocialSecurityVerification? userStatus;
 
-            using (var ms = new MemoryStream())
+        try
+        {
+            userStatus = await _repository.FindSocialSecurityVerificationByUserId(userId);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Unable to check if verification for {userId} exists.");
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        if(userStatus != null){
+            userStatus.LastSubmitUser = verificationUpdate.LastSubmitUser;
+            if(userStatus.CitizenshipStatus != (VerificationStatus)verificationUpdate.CitizenshipStatus)
             {
-                using (var cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
-                {
-                    using (var sw = new StreamWriter(cs))
-                    {
-                        sw.Write(plainText);
-                    }
-                }
+                userStatus.CitizenshipStatus = (VerificationStatus)verificationUpdate.CitizenshipStatus;
+                userStatus.CitizenshipUpdatedDate = DateTime.UtcNow;
+            }
+            if(userStatus.SocialSecurityStatus != (VerificationStatus)verificationUpdate.SocialSecurityStatus)
+            {
+                userStatus.SocialSecurityStatus = (VerificationStatus)verificationUpdate.SocialSecurityStatus;
+                userStatus.SocialSecurityUpdatedDate = DateTime.UtcNow;
+            }
 
-                return Convert.ToBase64String(ms.ToArray());
+            if((userStatus.SocialSecurityStatus == VerificationStatus.Resubmit || userStatus.CitizenshipStatus == VerificationStatus.Resubmit)&& userStatus.SubmitCount < 5){
+                //ReSubmit Package
+                userStatus.SubmitCount++;
+            }
+
+            try
+            {
+                // userStatus = await _repository.SaveSSAInfo(userStatus);
+                userStatus = await _repository.SaveAsync(userStatus);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"Unable to save update for user {userId} exists.");
+                return (ResponseStatus.UnknownError, null);
             }
         }
-    }
 
-    private string Decrypt(string cipherText)
-    {
-        using (var aes = Aes.Create())
-        {
-            aes.Key = Convert.FromBase64String("69PhJU1v1SMbE6mRBWalOIQlBqAmvHQ5WCMX4IoCwZ0=");
-            aes.IV = Convert.FromBase64String("vNWAOAbK+6wi0NDXbCAncA==");
+        var response = _responseMapper.Map(userStatus);
 
-            var decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
-
-            using (var ms = new MemoryStream(Convert.FromBase64String(cipherText)))
-            {
-                using (var cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read))
-                {
-                    using (var sr = new StreamReader(cs))
-                    {
-                        return sr.ReadToEnd();
-                    }
-                }
-            }
-        }
+        return (ResponseStatus.Successful, response);
     }
 
     private async Task UpdateUserAccountStatusAsync(User updatedUser, UserAccountStatus newStatus)
