@@ -1,5 +1,4 @@
 ﻿using System.Data;
-using System.Security.Cryptography;
 using AmeriCorps.Users.Data.Core;
 using AmeriCorps.Users.Data.Core.Model;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -83,7 +82,10 @@ public sealed class UsersControllerService : IUsersControllerService
     private readonly IUserHelperService _userHelperService;
 
     private readonly IAccessRepository _accessRepository;
-    private readonly INotificationApiClient _notificationApiClient;
+
+    private readonly INotificationApiClient _notificationApiClient; 
+
+    private readonly IEncryptionService _encryptionService;
 
 
     public UsersControllerService(
@@ -96,7 +98,8 @@ public sealed class UsersControllerService : IUsersControllerService
         IRoleRepository roleRepository,
         IAccessRepository accessRepository,
         IUserHelperService userHelperService,
-        INotificationApiClient notificationApiClient)
+        INotificationApiClient notificationApiClient,
+        IEncryptionService encryptionService)
     {
         _logger = logger;
         _requestMapper = requestMapper;
@@ -108,6 +111,7 @@ public sealed class UsersControllerService : IUsersControllerService
         _accessRepository = accessRepository;
         _userHelperService = userHelperService;
         _notificationApiClient = notificationApiClient;
+        _encryptionService = encryptionService;
     }
 
     public async Task<(ResponseStatus Status, UserResponse? Response)> GetAsync(int id)
@@ -131,7 +135,7 @@ public sealed class UsersControllerService : IUsersControllerService
 
         if (!string.IsNullOrWhiteSpace(user.EncryptedSocialSecurityNumber))
         {
-            user.EncryptedSocialSecurityNumber = Decrypt(user.EncryptedSocialSecurityNumber);
+            user.EncryptedSocialSecurityNumber = _encryptionService.Decrypt(user.EncryptedSocialSecurityNumber);
         }
         user.TaxWithHoldings = user.TaxWithHoldings.OrderByDescending(t => t.ModifiedDate).ToList();
 
@@ -192,7 +196,7 @@ public sealed class UsersControllerService : IUsersControllerService
 
         if (!string.IsNullOrWhiteSpace(user.EncryptedSocialSecurityNumber))
         {
-            user.EncryptedSocialSecurityNumber = Decrypt(user.EncryptedSocialSecurityNumber);
+            user.EncryptedSocialSecurityNumber = _encryptionService.Decrypt(user.EncryptedSocialSecurityNumber);
         }
 
         user.TaxWithHoldings = user.TaxWithHoldings.OrderByDescending(t => t.ModifiedDate).ToList();
@@ -270,7 +274,7 @@ public sealed class UsersControllerService : IUsersControllerService
 
         if (!string.IsNullOrWhiteSpace(userRequest.EncryptedSocialSecurityNumber))
         {
-            userRequest.EncryptedSocialSecurityNumber = Encrypt(userRequest.EncryptedSocialSecurityNumber);
+            userRequest.EncryptedSocialSecurityNumber = _encryptionService.Encrypt(userRequest.EncryptedSocialSecurityNumber);
         }
 
         var user = _requestMapper.Map(userRequest);
@@ -1257,53 +1261,6 @@ public sealed class UsersControllerService : IUsersControllerService
         var response = _responseMapper.Map(userStatus);
 
         return (ResponseStatus.Successful, response);
-    }
-
-
-    private string Encrypt(string plainText)
-    {
-        using (var aes = Aes.Create())
-        {
-            aes.Key = Convert.FromBase64String("69PhJU1v1SMbE6mRBWalOIQlBqAmvHQ5WCMX4IoCwZ0=");
-            aes.IV = Convert.FromBase64String("vNWAOAbK+6wi0NDXbCAncA==");
-
-            var encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
-
-            using (var ms = new MemoryStream())
-            {
-                using (var cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
-                {
-                    using (var sw = new StreamWriter(cs))
-                    {
-                        sw.Write(plainText);
-                    }
-                }
-
-                return Convert.ToBase64String(ms.ToArray());
-            }
-        }
-    }
-
-    private string Decrypt(string cipherText)
-    {
-        using (var aes = Aes.Create())
-        {
-            aes.Key = Convert.FromBase64String("69PhJU1v1SMbE6mRBWalOIQlBqAmvHQ5WCMX4IoCwZ0=");
-            aes.IV = Convert.FromBase64String("vNWAOAbK+6wi0NDXbCAncA==");
-
-            var decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
-
-            using (var ms = new MemoryStream(Convert.FromBase64String(cipherText)))
-            {
-                using (var cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read))
-                {
-                    using (var sr = new StreamReader(cs))
-                    {
-                        return sr.ReadToEnd();
-                    }
-                }
-            }
-        }
     }
 
     private async Task UpdateUserAccountStatusAsync(User updatedUser, UserAccountStatus newStatus)

@@ -52,7 +52,7 @@ public interface IResponseMapper
 
     TaxWithHoldingResponse Map(TaxWithHolding taxWithHolding);
 
-    SocialSecurityVerificationResponse Map(SocialSecurityVerification status);
+    SocialSecurityVerificationResponse? Map(SocialSecurityVerification? status);
 
 }
 
@@ -874,7 +874,7 @@ public sealed class ResponseMapper : IResponseMapper
         )
     };
 
-    public SocialSecurityVerificationResponse Map(SocialSecurityVerification status) => new()
+    public SocialSecurityVerificationResponse? Map(SocialSecurityVerification? status) => status == null ? null : new()
     {
         Id = status.Id,
         UserId = status.UserId,

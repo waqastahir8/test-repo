@@ -331,4 +331,12 @@ public sealed partial class UserRepository(
             .Include(u => u.UserProjects)
             .Where(x => x.SocialSecurityVerification != null).ToListAsync());
     }
+
+    public async Task<User?> FetchUserByEncryptedSSNAsync(string encryptedId) =>
+        await ExecuteAsync(async context =>
+            await context.Users
+                .AsNoTracking()
+                .Include(u => u.SocialSecurityVerification)
+                .FirstOrDefaultAsync(x => x.EncryptedSocialSecurityNumber == encryptedId));
+
 }

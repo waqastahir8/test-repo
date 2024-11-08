@@ -16,10 +16,3 @@ public sealed class SocialSecurityVerification : EntityWithUserId
     public int SubmitCount { get; set; } = 0;
     public int LastSubmitUser { get; set; }
 }
-
-//Fix current ssa build
-//user function to bulk update verification
-//proxy for bulk update
-//Update model to match pdf
-//Schedule process for emailing based on status
-//Return list of Users + verification status by org? project?

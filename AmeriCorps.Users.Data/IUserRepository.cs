@@ -49,4 +49,5 @@ public interface IUserRepository
 
     Task<List<User>> FetchNcccRecipientsAsync();
 
+    Task<User?> FetchUserByEncryptedSSNAsync(string encryptedId);
 }
