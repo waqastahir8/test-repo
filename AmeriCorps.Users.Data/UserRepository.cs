@@ -316,9 +316,9 @@ public sealed partial class UserRepository(
     {
 
         return await ExecuteAsync(async context => await context.Users
-            .Include(u => u.CommunicationMethods)    
+            .Include(u => u.CommunicationMethods)
             .Include(u => u.Roles)
-            .Include(u => u.UserProjects) 
+            .Include(u => u.UserProjects)
             .Where(x => x.SocialSecurityVerification != null).ToListAsync());
     }
 
@@ -326,7 +326,7 @@ public sealed partial class UserRepository(
     {
 
         return await ExecuteAsync(async context => await context.Users
-            .Include(u => u.CommunicationMethods)     
+            .Include(u => u.CommunicationMethods)
             .Include(u => u.Roles)
             .Include(u => u.UserProjects)
             .Where(x => x.SocialSecurityVerification != null).ToListAsync());

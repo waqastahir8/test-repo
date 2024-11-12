@@ -377,7 +377,7 @@ public class UserHelperService : IUserHelperService
 
         if (notifyList != null && notifyList.Count > 0)
         {
-            for(int i = 0; i < notifyList.Count; i++)
+            for (int i = 0; i < notifyList.Count; i++)
             {
                 if (notifyList[i].CommunicationMethods != null)
                 {
@@ -413,15 +413,15 @@ public class UserHelperService : IUserHelperService
 
         try
         {
-            if(!string.IsNullOrEmpty(toNotify.OrgCode) && toNotify.OrgCode == "VISTA")
+            if (!string.IsNullOrEmpty(toNotify.OrgCode) && toNotify.OrgCode == "VISTA")
             {
                 userList = await _repository.FetchVistaRecipientsAsync();
             }
-            else if(!string.IsNullOrEmpty(toNotify.OrgCode) && toNotify.OrgCode == "ASN")
+            else if (!string.IsNullOrEmpty(toNotify.OrgCode) && toNotify.OrgCode == "ASN")
             {
                 userList = await _repository.FetchAsnRecipientsAsync();
             }
-            else if(!string.IsNullOrEmpty(toNotify.OrgCode) && toNotify.OrgCode == "NCCC")
+            else if (!string.IsNullOrEmpty(toNotify.OrgCode) && toNotify.OrgCode == "NCCC")
             {
                 userList = await _repository.FetchNcccRecipientsAsync();
             }

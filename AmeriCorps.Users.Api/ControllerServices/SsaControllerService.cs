@@ -40,17 +40,17 @@ public sealed class SsaControllerService : ISsaControllerService
 
     public async Task<(ResponseStatus Status, bool? Response)> BulkUpdateVerificationDataAsync(List<SocialSecurityVerificationRequestModel> updateList)
     {
-        if(updateList == null || updateList.Count < 1)
+        if (updateList == null || updateList.Count < 1)
         {
             return (ResponseStatus.MissingInformation, false);
 
         }
 
-        for(int i = 0; i < updateList.Count; i++)
+        for (int i = 0; i < updateList.Count; i++)
         {
             var encryptedId = _encryptionService.Encrypt(updateList[i].SocialSecurity);
 
-            if(!string.IsNullOrWhiteSpace(encryptedId))
+            if (!string.IsNullOrWhiteSpace(encryptedId))
             {
                 User? foundUser = new User();
                 try
@@ -62,16 +62,17 @@ public sealed class SsaControllerService : ISsaControllerService
                     _logger.LogError(e, "Error searching for user with encrypted ID for SSA update {Identifier}.", encryptedId.ToString().Replace(Environment.NewLine, ""));
                 }
 
-                if(foundUser != null && foundUser.SocialSecurityVerification != null){
+                if (foundUser != null && foundUser.SocialSecurityVerification != null)
+                {
 
-                    if(foundUser.SocialSecurityVerification.SocialSecurityStatus != VerificationStatus.Verified)
+                    if (foundUser.SocialSecurityVerification.SocialSecurityStatus != VerificationStatus.Verified)
                     {
                         foundUser.SocialSecurityVerification.SocialSecurityStatus = (VerificationStatus)updateList[i].SocialSecurityStatus;
                         foundUser.SocialSecurityVerification.VerificationCode = updateList[i].VerificationCode;
                         foundUser.SocialSecurityVerification.SocialSecurityUpdatedDate = DateTime.UtcNow;
                     }
 
-                    if(foundUser.SocialSecurityVerification.CitizenshipStatus != VerificationStatus.Verified)
+                    if (foundUser.SocialSecurityVerification.CitizenshipStatus != VerificationStatus.Verified)
                     {
                         foundUser.SocialSecurityVerification.CitizenshipStatus = (VerificationStatus)updateList[i].CitizenshipStatus;
                         foundUser.SocialSecurityVerification.CitizenshipCode = updateList[i].CitizenshipCode;
@@ -89,7 +90,7 @@ public sealed class SsaControllerService : ISsaControllerService
                 }
             }
         }
-        return (ResponseStatus.Successful, true); 
+        return (ResponseStatus.Successful, true);
     }
 
 }
