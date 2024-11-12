@@ -18,6 +18,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
 
     private Mock<IUserHelperService>? _userHelperService;
     private Mock<INotificationApiClient>? _notificationApiClient;
+    private Mock<IEncryptionService>? _encryptionService;
 
     [Theory]
     [InlineData(5)]
@@ -1856,6 +1857,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
         _accessRepository = new();
         _userHelperService = new();
         _notificationApiClient = new();
+        _encryptionService = new();
 
         Fixture = new Fixture();
         Fixture.Customize<DateOnly>(x => x.FromFactory<DateTime>(DateOnly.FromDateTime));
@@ -1869,6 +1871,7 @@ public sealed partial class UsersControllerServiceTests : BaseTests<UsersControl
             _roleRepository.Object,
             _accessRepository.Object,
             _userHelperService.Object,
-            _notificationApiClient.Object);
+            _notificationApiClient.Object,
+            _encryptionService.Object);
     }
 }
