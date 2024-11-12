@@ -143,8 +143,4 @@ public sealed class UsersController(IUsersControllerService service) : Controlle
     public async Task<IActionResult> DeleteTaxWithholdingFormAsync(int userId, int taxWithholdingId) =>
         await ServeAsync(async () => await _service.DeleteTaxWithholdingFormAsync(userId, taxWithholdingId));
 
-    //Update User's SSA Verification Info
-    [HttpPost("SSA/update/{userId}")]
-    public async Task<IActionResult> UpdateUserSSAInfo(int userId, [FromBody] SocialSecurityVerificationRequestModel verificationUpdate) =>
-        await ServeAsync(async () => await _service.UpdateUserSSAInfo(userId, verificationUpdate));
 }

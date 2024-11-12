@@ -10,6 +10,9 @@ public interface ISsaControllerService
 {
     Task<(ResponseStatus Status, bool? Response)> BulkUpdateVerificationDataAsync(List<SocialSecurityVerificationRequestModel> updateList);
 
+    Task<(ResponseStatus Status, SocialSecurityVerificationResponse? Response)> UpdateUserSSAInfo(int userId, SocialSecurityVerificationRequestModel verificationUpdate);
+
+    Task<(ResponseStatus Status, UserResponse? Response)> SubmitInfoForVerificationAsync(int userId);
 }
 
 public sealed class SsaControllerService : ISsaControllerService
@@ -90,6 +93,158 @@ public sealed class SsaControllerService : ISsaControllerService
             }
         }
         return (ResponseStatus.Successful, true); 
+    }
+
+
+    public async Task<(ResponseStatus Status, SocialSecurityVerificationResponse? Response)> UpdateUserSSAInfo(int userId, SocialSecurityVerificationRequestModel verificationUpdate)
+    {
+        if (verificationUpdate == null || userId < 1)
+        {
+            return (ResponseStatus.MissingInformation, null);
+        }
+
+        SocialSecurityVerification? userStatus;
+
+        try
+        {
+            userStatus = await _userRepository.FindSocialSecurityVerificationByUserId(userId);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Unable to check if verification for {userId} exists.");
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        if(userStatus != null){
+            userStatus.LastSubmitUser = verificationUpdate.LastSubmitUser;
+            if(userStatus.CitizenshipStatus != (VerificationStatus)verificationUpdate.CitizenshipStatus)
+            {
+                userStatus.CitizenshipStatus = (VerificationStatus)verificationUpdate.CitizenshipStatus;
+                userStatus.CitizenshipUpdatedDate = DateTime.UtcNow;
+            }
+            if(userStatus.SocialSecurityStatus != (VerificationStatus)verificationUpdate.SocialSecurityStatus)
+            {
+                userStatus.SocialSecurityStatus = (VerificationStatus)verificationUpdate.SocialSecurityStatus;
+                userStatus.SocialSecurityUpdatedDate = DateTime.UtcNow;
+            }
+
+            if((userStatus.SocialSecurityStatus == VerificationStatus.Resubmit || userStatus.CitizenshipStatus == VerificationStatus.Resubmit)&& userStatus.SubmitCount < 5){
+                userStatus.SubmitCount++;
+
+                await SendVerificationInformationAsync(userStatus, null);
+            }
+
+            try
+            {
+                userStatus = await _ssvRepository.SaveAsync(userStatus);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"Unable to save update for user {userId} exists.");
+                return (ResponseStatus.UnknownError, null);
+            }
+        }
+
+        var response = _responseMapper.Map(userStatus);
+
+        return (ResponseStatus.Successful, response);
+    }
+
+    public async Task<(ResponseStatus Status, UserResponse? Response)> SubmitInfoForVerificationAsync(int userId)
+    {
+        if (userId < 1)
+        {
+            return (ResponseStatus.MissingInformation, null);
+        }
+
+        User? user;
+        try
+        {
+            user = await _userRepository.GetAsync(userId);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Could not retrieve user with id {userId}.");
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        if (user == null || !string.IsNullOrEmpty(user.EncryptedSocialSecurityNumber))
+        {
+            return (ResponseStatus.MissingInformation, null);
+        }
+
+        SocialSecurityVerification userStatus =  new SocialSecurityVerification()
+        {
+            UserId = user.Id,
+            CitizenshipStatus = VerificationStatus.Pending,
+            SocialSecurityStatus = VerificationStatus.Pending,
+
+            ProcessStartDate = DateTime.UtcNow,
+            SubmitCount = 1,
+            LastSubmitUser = 0
+        };
+
+        user.SocialSecurityVerification = userStatus;
+
+        await SendVerificationInformationAsync(userStatus, user);
+
+        try
+        {
+            await _ssvRepository.SaveAsync(userStatus);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error saving new social security verification for user {Identifier}.", user.UserName.ToString().Replace(Environment.NewLine, ""));
+        }
+
+        var response = _responseMapper.Map(user);
+
+        return (ResponseStatus.Successful, response);
+    }
+
+
+    private async Task<(ResponseStatus Status, SocialSecurityVerification? Response)> SendVerificationInformationAsync(SocialSecurityVerification userStatus, User? user)
+    {
+        if (userStatus == null || (userStatus.UserId < 1 && (user == null)))
+        {
+            return (ResponseStatus.MissingInformation, userStatus);
+        }
+
+        if(user == null && userStatus.UserId > 1)
+        {
+            try
+            {
+                user = await _userRepository.GetAsync(userStatus.UserId);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"Could not retrieve user with id { userStatus.UserId}.");
+                return (ResponseStatus.UnknownError, userStatus);
+            }
+        }
+
+        SocialSecurityInformationPackageModel package = new SocialSecurityInformationPackageModel()
+        {
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            MiddleName = user.MiddleName,
+            DateOfBirth = user.DateOfBirth,
+
+            SocialSecurity = _encryptionService.Decrypt(user.EncryptedSocialSecurityNumber)
+        };
+
+        try
+        {
+            // Send Package
+        }
+        catch (Exception e)
+        {
+            userStatus.CitizenshipStatus = VerificationStatus.Error;
+            userStatus.SocialSecurityStatus = VerificationStatus.Error;
+            _logger.LogError(e, "Error sending verification package for user {Identifier}.", user.UserName.ToString().Replace(Environment.NewLine, ""));
+        }
+
+        return (ResponseStatus.Successful, userStatus);
     }
 
 }
