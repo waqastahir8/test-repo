@@ -2,42 +2,41 @@
 
 #nullable disable
 
-namespace AmeriCorps.Users.Data.Migrations.Migrations
+namespace AmeriCorps.Users.Data.Migrations.Migrations;
+
+/// <inheritdoc />
+public partial class SSAFileVerification : Migration
 {
     /// <inheritdoc />
-    public partial class SSAFileVerification : Migration
+    protected override void Up(MigrationBuilder migrationBuilder)
     {
-        /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.AddColumn<int>(
-                name: "file_status",
-                schema: "users",
-                table: "socialSecurityVerification",
-                type: "integer",
-                nullable: false,
-                defaultValue: 0);
+        migrationBuilder.AddColumn<int>(
+            name: "file_status",
+            schema: "users",
+            table: "socialSecurityVerification",
+            type: "integer",
+            nullable: false,
+            defaultValue: 0);
 
-            migrationBuilder.AddColumn<string>(
-                name: "ssa_verification_task_id",
-                schema: "users",
-                table: "socialSecurityVerification",
-                type: "text",
-                nullable: true);
-        }
+        migrationBuilder.AddColumn<string>(
+            name: "ssa_verification_task_id",
+            schema: "users",
+            table: "socialSecurityVerification",
+            type: "text",
+            nullable: true);
+    }
 
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropColumn(
-                name: "file_status",
-                schema: "users",
-                table: "socialSecurityVerification");
+    /// <inheritdoc />
+    protected override void Down(MigrationBuilder migrationBuilder)
+    {
+        migrationBuilder.DropColumn(
+            name: "file_status",
+            schema: "users",
+            table: "socialSecurityVerification");
 
-            migrationBuilder.DropColumn(
-                name: "ssa_verification_task_id",
-                schema: "users",
-                table: "socialSecurityVerification");
-        }
+        migrationBuilder.DropColumn(
+            name: "ssa_verification_task_id",
+            schema: "users",
+            table: "socialSecurityVerification");
     }
 }

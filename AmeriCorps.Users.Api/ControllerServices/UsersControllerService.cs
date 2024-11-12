@@ -83,7 +83,7 @@ public sealed class UsersControllerService : IUsersControllerService
 
     private readonly IAccessRepository _accessRepository;
 
-    private readonly INotificationApiClient _notificationApiClient; 
+    private readonly INotificationApiClient _notificationApiClient;
 
     private readonly IEncryptionService _encryptionService;
 
@@ -1228,20 +1228,22 @@ public sealed class UsersControllerService : IUsersControllerService
             return (ResponseStatus.UnknownError, null);
         }
 
-        if(userStatus != null){
+        if (userStatus != null)
+        {
             userStatus.LastSubmitUser = verificationUpdate.LastSubmitUser;
-            if(userStatus.CitizenshipStatus != (VerificationStatus)verificationUpdate.CitizenshipStatus)
+            if (userStatus.CitizenshipStatus != (VerificationStatus)verificationUpdate.CitizenshipStatus)
             {
                 userStatus.CitizenshipStatus = (VerificationStatus)verificationUpdate.CitizenshipStatus;
                 userStatus.CitizenshipUpdatedDate = DateTime.UtcNow;
             }
-            if(userStatus.SocialSecurityStatus != (VerificationStatus)verificationUpdate.SocialSecurityStatus)
+            if (userStatus.SocialSecurityStatus != (VerificationStatus)verificationUpdate.SocialSecurityStatus)
             {
                 userStatus.SocialSecurityStatus = (VerificationStatus)verificationUpdate.SocialSecurityStatus;
                 userStatus.SocialSecurityUpdatedDate = DateTime.UtcNow;
             }
 
-            if((userStatus.SocialSecurityStatus == VerificationStatus.Resubmit || userStatus.CitizenshipStatus == VerificationStatus.Resubmit)&& userStatus.SubmitCount < 5){
+            if ((userStatus.SocialSecurityStatus == VerificationStatus.Resubmit || userStatus.CitizenshipStatus == VerificationStatus.Resubmit) && userStatus.SubmitCount < 5)
+            {
                 //ReSubmit Package
                 userStatus.SubmitCount++;
             }

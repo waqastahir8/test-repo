@@ -16,5 +16,5 @@ public sealed class SocialSecurityVerification : EntityWithUserId
     public int SubmitCount { get; set; } = 0;
     public int LastSubmitUser { get; set; }
     public SSAFileStatus FileStatus { get; set; } = new SSAFileStatus();
-    public string? SSAVerificationTaskId {get; set;}
+    public string? SSAVerificationTaskId { get; set; }
 }
