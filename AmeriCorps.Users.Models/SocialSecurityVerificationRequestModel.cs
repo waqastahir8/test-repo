@@ -19,5 +19,7 @@ public class SocialSecurityVerificationRequestModel
     public DateTime? SocialSecurityUpdatedDate { get; set; }
     public int SubmitCount { get; set; } = 0;
     public int LastSubmitUser { get; set; }
+    public SSAFileStatusRequestModel FileStatus { get; set; } = new SSAFileStatusRequestModel();
+    public string? SSAVerificationTaskId { get; set; }
 }
 

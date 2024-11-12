@@ -878,7 +878,7 @@ public sealed class ResponseMapper : IResponseMapper
     {
         Id = status.Id,
         UserId = status.UserId,
-        CitizenshipStatus =  (VerificationStatusResponse)status.CitizenshipStatus,
+        CitizenshipStatus = (VerificationStatusResponse)status.CitizenshipStatus,
         SocialSecurityStatus = (VerificationStatusResponse)status.SocialSecurityStatus,
         VerificationCode = status.VerificationCode,
         CitizenshipCode = status.CitizenshipCode,
@@ -888,5 +888,5 @@ public sealed class ResponseMapper : IResponseMapper
         SubmitCount = status.SubmitCount,
         LastSubmitUser = status.LastSubmitUser
     };
-    
+
 }

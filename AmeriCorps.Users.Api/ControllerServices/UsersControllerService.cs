@@ -82,7 +82,7 @@ public sealed class UsersControllerService : IUsersControllerService
 
     private readonly IAccessRepository _accessRepository;
 
-    private readonly INotificationApiClient _notificationApiClient; 
+    private readonly INotificationApiClient _notificationApiClient;
 
     private readonly IEncryptionService _encryptionService;
 

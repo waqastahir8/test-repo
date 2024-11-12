@@ -15,7 +15,7 @@ public interface IEncryptionService
 
 public sealed class EncryptionService : IEncryptionService
 {
-   
+
     public string Encrypt(string plainText)
     {
         using (var aes = Aes.Create())
