@@ -20,9 +20,15 @@ public sealed class SsaController(ISsaControllerService service) : ControllerBas
     public async Task<IActionResult> UpdateUserSSAInfo(int userId, [FromBody] SocialSecurityVerificationRequestModel verificationUpdate) =>
         await ServeAsync(async () => await _service.UpdateUserSSAInfo(userId, verificationUpdate));
 
+    //Update user status to ready for file process
     [HttpGet("submit/{userId}")]
     public async Task<IActionResult> SubmitInfoForVerificationAsync(int userId) =>
         await ServeAsync(async () => await _service.SubmitInfoForVerificationAsync(userId));
+
+    //Fetch list of users ready to add to file
+    [HttpGet("fetch-pending")]
+    public async Task<IActionResult> FetchPendingUsersForSSAVerificationAsync() =>
+        await ServeAsync(async () => await _service.FetchPendingUsersForSSAVerificationAsync());
 
     private async Task<IActionResult> ServeAsync<T>(Func<Task<(ResponseStatus, T)>> callAsync)
     {

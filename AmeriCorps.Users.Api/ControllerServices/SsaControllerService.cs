@@ -13,6 +13,8 @@ public interface ISsaControllerService
     Task<(ResponseStatus Status, SocialSecurityVerificationResponse? Response)> UpdateUserSSAInfo(int userId, SocialSecurityVerificationRequestModel verificationUpdate);
 
     Task<(ResponseStatus Status, UserResponse? Response)> SubmitInfoForVerificationAsync(int userId);
+
+    Task<(ResponseStatus Status, List<UserResponse>? Response)> FetchPendingUsersForSSAVerificationAsync();
 }
 
 public sealed class SsaControllerService : ISsaControllerService
@@ -82,6 +84,8 @@ public sealed class SsaControllerService : ISsaControllerService
                         foundUser.SocialSecurityVerification.CitizenshipUpdatedDate = DateTime.UtcNow;
                     }
 
+                    foundUser.SocialSecurityVerification.FileStatus = SSAFileStatus.OnFile;
+
                     try
                     {
                         await _ssvRepository.SaveAsync(foundUser.SocialSecurityVerification);
@@ -132,7 +136,7 @@ public sealed class SsaControllerService : ISsaControllerService
             if((userStatus.SocialSecurityStatus == VerificationStatus.Resubmit || userStatus.CitizenshipStatus == VerificationStatus.Resubmit)&& userStatus.SubmitCount < 5){
                 userStatus.SubmitCount++;
 
-                await SendVerificationInformationAsync(userStatus, null);
+                userStatus.FileStatus = SSAFileStatus.PendingToSend;
             }
 
             try
@@ -169,7 +173,7 @@ public sealed class SsaControllerService : ISsaControllerService
             return (ResponseStatus.UnknownError, null);
         }
 
-        if (user == null || !string.IsNullOrEmpty(user.EncryptedSocialSecurityNumber))
+        if (user == null || string.IsNullOrEmpty(user.EncryptedSocialSecurityNumber))
         {
             return (ResponseStatus.MissingInformation, null);
         }
@@ -182,12 +186,11 @@ public sealed class SsaControllerService : ISsaControllerService
 
             ProcessStartDate = DateTime.UtcNow,
             SubmitCount = 1,
-            LastSubmitUser = 0
+            LastSubmitUser = 0,
+            FileStatus = SSAFileStatus.PendingToSend
         };
 
         user.SocialSecurityVerification = userStatus;
-
-        await SendVerificationInformationAsync(userStatus, user);
 
         try
         {
@@ -204,48 +207,36 @@ public sealed class SsaControllerService : ISsaControllerService
     }
 
 
-    private async Task<(ResponseStatus Status, SocialSecurityVerification? Response)> SendVerificationInformationAsync(SocialSecurityVerification userStatus, User? user)
+    public async Task<(ResponseStatus Status, List<UserResponse>? Response)> FetchPendingUsersForSSAVerificationAsync()
     {
-        if (userStatus == null || (userStatus.UserId < 1 && (user == null)))
-        {
-            return (ResponseStatus.MissingInformation, userStatus);
-        }
-
-        if(user == null && userStatus.UserId > 1)
-        {
-            try
-            {
-                user = await _userRepository.GetAsync(userStatus.UserId);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, $"Could not retrieve user with id { userStatus.UserId}.");
-                return (ResponseStatus.UnknownError, userStatus);
-            }
-        }
-
-        SocialSecurityInformationPackageModel package = new SocialSecurityInformationPackageModel()
-        {
-            FirstName = user.FirstName,
-            LastName = user.LastName,
-            MiddleName = user.MiddleName,
-            DateOfBirth = user.DateOfBirth,
-
-            SocialSecurity = _encryptionService.Decrypt(user.EncryptedSocialSecurityNumber)
-        };
+        List<User>? userList;
 
         try
         {
-            // Send Package
+            userList = await _userRepository.FetchPendingUsersForSSAVerificationAsync();
         }
         catch (Exception e)
         {
-            userStatus.CitizenshipStatus = VerificationStatus.Error;
-            userStatus.SocialSecurityStatus = VerificationStatus.Error;
-            _logger.LogError(e, "Error sending verification package for user {Identifier}.", user.UserName.ToString().Replace(Environment.NewLine, ""));
+            _logger.LogError(e, "Error fetching pending users for ssa verification.");
+            return (ResponseStatus.UnknownError, null);
         }
 
-        return (ResponseStatus.Successful, userStatus);
+        List<UserResponse> response = new List<UserResponse>();
+
+        if(userList != null && userList.Count > 0)
+        {
+            for(int i = 0; i < userList.Count; i++)
+            {
+                var mapped = _responseMapper.Map(userList[i]);
+                if(mapped != null)
+                {
+                    mapped.EncryptedSocialSecurityNumber = _encryptionService.Decrypt(mapped.EncryptedSocialSecurityNumber);
+                    response.Add(mapped);
+                }
+            }
+        }
+
+        return (ResponseStatus.Successful, response);
     }
 
 }
