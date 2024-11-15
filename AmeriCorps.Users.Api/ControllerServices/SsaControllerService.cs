@@ -10,6 +10,13 @@ public interface ISsaControllerService
 {
     Task<(ResponseStatus Status, bool? Response)> BulkUpdateVerificationDataAsync(List<SocialSecurityVerificationRequestModel> updateList);
 
+    Task<(ResponseStatus Status, SocialSecurityVerificationResponse? Response)> UpdateUserSSAInfoAsync(int userId, SocialSecurityVerificationRequestModel verificationUpdate);
+
+    Task<(ResponseStatus Status, UserResponse? Response)> SubmitInfoForVerificationAsync(int userId);
+
+    Task<(ResponseStatus Status, List<UserResponse>? Response)> FetchPendingUsersForSSAVerificationAsync();
+
+    Task<(ResponseStatus Status, bool? Response)> NotifyFailedUserVerificationsAsync();
 }
 
 public sealed class SsaControllerService : ISsaControllerService
@@ -20,6 +27,7 @@ public sealed class SsaControllerService : ISsaControllerService
     private readonly IUserRepository _userRepository;
     private readonly ISocialSecurityVerificationRepository _ssvRepository;
     private readonly IEncryptionService _encryptionService;
+    private readonly IUserHelperService _userHelperService;
 
     public SsaControllerService(
     ILogger<SsaControllerService> logger,
@@ -27,7 +35,8 @@ public sealed class SsaControllerService : ISsaControllerService
     IResponseMapper responseMapper,
     IUserRepository userRepository,
     IEncryptionService encryptionService,
-    ISocialSecurityVerificationRepository ssvRepository)
+    ISocialSecurityVerificationRepository ssvRepository,
+    IUserHelperService userHelperService)
     {
         _logger = logger;
         _requestMapper = requestMapper;
@@ -35,6 +44,7 @@ public sealed class SsaControllerService : ISsaControllerService
         _userRepository = userRepository;
         _ssvRepository = ssvRepository;
         _encryptionService = encryptionService;
+        _userHelperService = userHelperService;
     }
 
 
@@ -79,6 +89,8 @@ public sealed class SsaControllerService : ISsaControllerService
                         foundUser.SocialSecurityVerification.CitizenshipUpdatedDate = DateTime.UtcNow;
                     }
 
+                    foundUser.SocialSecurityVerification.FileStatus = SSAFileStatus.OnFile;
+
                     try
                     {
                         await _ssvRepository.SaveAsync(foundUser.SocialSecurityVerification);
@@ -93,4 +105,165 @@ public sealed class SsaControllerService : ISsaControllerService
         return (ResponseStatus.Successful, true);
     }
 
+
+    public async Task<(ResponseStatus Status, SocialSecurityVerificationResponse? Response)> UpdateUserSSAInfoAsync(int userId, SocialSecurityVerificationRequestModel verificationUpdate)
+    {
+        if (verificationUpdate == null || userId < 1)
+        {
+            return (ResponseStatus.MissingInformation, null);
+        }
+
+        SocialSecurityVerification? userStatus;
+
+        try
+        {
+            userStatus = await _userRepository.FindSocialSecurityVerificationByUserId(userId);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Unable to check if verification for {userId} exists.");
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        if(userStatus != null){
+            userStatus.LastSubmitUser = verificationUpdate.LastSubmitUser;
+            if(userStatus.CitizenshipStatus != (VerificationStatus)verificationUpdate.CitizenshipStatus)
+            {
+                userStatus.CitizenshipStatus = (VerificationStatus)verificationUpdate.CitizenshipStatus;
+                userStatus.CitizenshipUpdatedDate = DateTime.UtcNow;
+            }
+            if(userStatus.SocialSecurityStatus != (VerificationStatus)verificationUpdate.SocialSecurityStatus)
+            {
+                userStatus.SocialSecurityStatus = (VerificationStatus)verificationUpdate.SocialSecurityStatus;
+                userStatus.SocialSecurityUpdatedDate = DateTime.UtcNow;
+            }
+
+            if((userStatus.SocialSecurityStatus == VerificationStatus.Resubmit || userStatus.CitizenshipStatus == VerificationStatus.Resubmit)&& userStatus.SubmitCount < 5){
+                userStatus.SubmitCount++;
+
+                userStatus.FileStatus = SSAFileStatus.PendingToSend;
+            }
+
+            try
+            {
+                userStatus = await _ssvRepository.SaveAsync(userStatus);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"Unable to save update for user {userId} exists.");
+                return (ResponseStatus.UnknownError, null);
+            }
+        }
+
+        var response = _responseMapper.Map(userStatus);
+
+        return (ResponseStatus.Successful, response);
+    }
+
+    public async Task<(ResponseStatus Status, UserResponse? Response)> SubmitInfoForVerificationAsync(int userId)
+    {
+        if (userId < 1)
+        {
+            return (ResponseStatus.MissingInformation, null);
+        }
+
+        User? user;
+        try
+        {
+            user = await _userRepository.GetAsync(userId);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Could not retrieve user with id {userId}.");
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        if (user == null || string.IsNullOrEmpty(user.EncryptedSocialSecurityNumber))
+        {
+            return (ResponseStatus.MissingInformation, null);
+        }
+
+        SocialSecurityVerification userStatus =  new SocialSecurityVerification()
+        {
+            UserId = user.Id,
+            CitizenshipStatus = VerificationStatus.Pending,
+            SocialSecurityStatus = VerificationStatus.Pending,
+
+            ProcessStartDate = DateTime.UtcNow,
+            SubmitCount = 1,
+            LastSubmitUser = 0,
+            FileStatus = SSAFileStatus.PendingToSend
+        };
+
+        user.SocialSecurityVerification = userStatus;
+
+        try
+        {
+            await _ssvRepository.SaveAsync(userStatus);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error saving new social security verification for user {Identifier}.", user.UserName.ToString().Replace(Environment.NewLine, ""));
+        }
+
+        var response = _responseMapper.Map(user);
+
+        return (ResponseStatus.Successful, response);
+    }
+
+
+    public async Task<(ResponseStatus Status, List<UserResponse>? Response)> FetchPendingUsersForSSAVerificationAsync()
+    {
+        List<User>? userList;
+
+        try
+        {
+            userList = await _userRepository.FetchPendingUsersForSSAVerificationAsync();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error fetching pending users for ssa verification.");
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        List<UserResponse> response = new List<UserResponse>();
+
+        if(userList != null && userList.Count > 0)
+        {
+            for(int i = 0; i < userList.Count; i++)
+            {
+                var mapped = _responseMapper.Map(userList[i]);
+                if(mapped != null)
+                {
+                    mapped.EncryptedSocialSecurityNumber = _encryptionService.Decrypt(mapped.EncryptedSocialSecurityNumber);
+                    response.Add(mapped);
+                }
+            }
+        }
+
+        return (ResponseStatus.Successful, response);
+    }
+
+    public async Task<(ResponseStatus Status, bool? Response)> NotifyFailedUserVerificationsAsync()
+    {
+        List<User>? userList;
+        try
+        {
+            userList = await _userRepository.FetchFailedSSAChecksAsync();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error fetching pending users for ssa verification.");
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        if (userList == null || userList.Count < 1)
+        {
+            return (ResponseStatus.MissingInformation, false);
+        }
+
+        var success = await _userHelperService.SendSSAFailureEmailAsync(userList);
+
+        return (ResponseStatus.Successful, success);
+    }
 }

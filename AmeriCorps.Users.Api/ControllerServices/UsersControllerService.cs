@@ -59,7 +59,6 @@ public interface IUsersControllerService
 
     Task<(ResponseStatus Status, bool Response)> DeleteTaxWithholdingFormAsync(int userId, int taxWithHoldingId);
 
-    Task<(ResponseStatus Status, SocialSecurityVerificationResponse? Response)> UpdateUserSSAInfo(int userId, SocialSecurityVerificationRequestModel verificationUpdate);
 
 }
 
@@ -1207,62 +1206,6 @@ public sealed class UsersControllerService : IUsersControllerService
             return (ResponseStatus.UnknownError, deleted);
         }
         return (ResponseStatus.Successful, deleted);
-    }
-
-    public async Task<(ResponseStatus Status, SocialSecurityVerificationResponse? Response)> UpdateUserSSAInfo(int userId, SocialSecurityVerificationRequestModel verificationUpdate)
-    {
-        if (verificationUpdate == null || userId < 1)
-        {
-            return (ResponseStatus.MissingInformation, null);
-        }
-
-        SocialSecurityVerification? userStatus;
-
-        try
-        {
-            userStatus = await _repository.FindSocialSecurityVerificationByUserId(userId);
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, $"Unable to check if verification for {userId} exists.");
-            return (ResponseStatus.UnknownError, null);
-        }
-
-        if (userStatus != null)
-        {
-            userStatus.LastSubmitUser = verificationUpdate.LastSubmitUser;
-            if (userStatus.CitizenshipStatus != (VerificationStatus)verificationUpdate.CitizenshipStatus)
-            {
-                userStatus.CitizenshipStatus = (VerificationStatus)verificationUpdate.CitizenshipStatus;
-                userStatus.CitizenshipUpdatedDate = DateTime.UtcNow;
-            }
-            if (userStatus.SocialSecurityStatus != (VerificationStatus)verificationUpdate.SocialSecurityStatus)
-            {
-                userStatus.SocialSecurityStatus = (VerificationStatus)verificationUpdate.SocialSecurityStatus;
-                userStatus.SocialSecurityUpdatedDate = DateTime.UtcNow;
-            }
-
-            if ((userStatus.SocialSecurityStatus == VerificationStatus.Resubmit || userStatus.CitizenshipStatus == VerificationStatus.Resubmit) && userStatus.SubmitCount < 5)
-            {
-                //ReSubmit Package
-                userStatus.SubmitCount++;
-            }
-
-            try
-            {
-                // userStatus = await _repository.SaveSSAInfo(userStatus);
-                userStatus = await _repository.SaveAsync(userStatus);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, $"Unable to save update for user {userId} exists.");
-                return (ResponseStatus.UnknownError, null);
-            }
-        }
-
-        var response = _responseMapper.Map(userStatus);
-
-        return (ResponseStatus.Successful, response);
     }
 
     private async Task UpdateUserAccountStatusAsync(User updatedUser, UserAccountStatus newStatus)

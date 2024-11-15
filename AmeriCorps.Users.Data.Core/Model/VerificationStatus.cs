@@ -12,5 +12,6 @@ public enum VerificationStatus
     Verified = 1,
     Failed = 2,
     Resubmit = 3,
-    ManuallyVerified = 4
+    ManuallyVerified = 4,
+    Error = 5
 }
