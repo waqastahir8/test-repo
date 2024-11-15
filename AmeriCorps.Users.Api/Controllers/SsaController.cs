@@ -17,8 +17,8 @@ public sealed class SsaController(ISsaControllerService service) : ControllerBas
 
     //Update User's SSA Verification Info
     [HttpPost("SSA/update/{userId}")]
-    public async Task<IActionResult> UpdateUserSSAInfo(int userId, [FromBody] SocialSecurityVerificationRequestModel verificationUpdate) =>
-        await ServeAsync(async () => await _service.UpdateUserSSAInfo(userId, verificationUpdate));
+    public async Task<IActionResult> UpdateUserSSAInfoAsync(int userId, [FromBody] SocialSecurityVerificationRequestModel verificationUpdate) =>
+        await ServeAsync(async () => await _service.UpdateUserSSAInfoAsync(userId, verificationUpdate));
 
     //Update user status to ready for file process
     [HttpGet("submit/{userId}")]

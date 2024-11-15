@@ -10,7 +10,7 @@ public interface ISsaControllerService
 {
     Task<(ResponseStatus Status, bool? Response)> BulkUpdateVerificationDataAsync(List<SocialSecurityVerificationRequestModel> updateList);
 
-    Task<(ResponseStatus Status, SocialSecurityVerificationResponse? Response)> UpdateUserSSAInfo(int userId, SocialSecurityVerificationRequestModel verificationUpdate);
+    Task<(ResponseStatus Status, SocialSecurityVerificationResponse? Response)> UpdateUserSSAInfoAsync(int userId, SocialSecurityVerificationRequestModel verificationUpdate);
 
     Task<(ResponseStatus Status, UserResponse? Response)> SubmitInfoForVerificationAsync(int userId);
 
@@ -106,7 +106,7 @@ public sealed class SsaControllerService : ISsaControllerService
     }
 
 
-    public async Task<(ResponseStatus Status, SocialSecurityVerificationResponse? Response)> UpdateUserSSAInfo(int userId, SocialSecurityVerificationRequestModel verificationUpdate)
+    public async Task<(ResponseStatus Status, SocialSecurityVerificationResponse? Response)> UpdateUserSSAInfoAsync(int userId, SocialSecurityVerificationRequestModel verificationUpdate)
     {
         if (verificationUpdate == null || userId < 1)
         {
