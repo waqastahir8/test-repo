@@ -15,6 +15,8 @@ public interface ISsaControllerService
     Task<(ResponseStatus Status, UserResponse? Response)> SubmitInfoForVerificationAsync(int userId);
 
     Task<(ResponseStatus Status, List<UserResponse>? Response)> FetchPendingUsersForSSAVerificationAsync();
+
+    Task<(ResponseStatus Status, bool? Response)> NotifyFailedUserVerificationsAsync();
 }
 
 public sealed class SsaControllerService : ISsaControllerService
@@ -25,6 +27,7 @@ public sealed class SsaControllerService : ISsaControllerService
     private readonly IUserRepository _userRepository;
     private readonly ISocialSecurityVerificationRepository _ssvRepository;
     private readonly IEncryptionService _encryptionService;
+    private readonly IUserHelperService _userHelperService;
 
     public SsaControllerService(
     ILogger<SsaControllerService> logger,
@@ -32,7 +35,8 @@ public sealed class SsaControllerService : ISsaControllerService
     IResponseMapper responseMapper,
     IUserRepository userRepository,
     IEncryptionService encryptionService,
-    ISocialSecurityVerificationRepository ssvRepository)
+    ISocialSecurityVerificationRepository ssvRepository,
+    IUserHelperService userHelperService)
     {
         _logger = logger;
         _requestMapper = requestMapper;
@@ -40,6 +44,7 @@ public sealed class SsaControllerService : ISsaControllerService
         _userRepository = userRepository;
         _ssvRepository = ssvRepository;
         _encryptionService = encryptionService;
+        _userHelperService = userHelperService;
     }
 
 
@@ -239,4 +244,26 @@ public sealed class SsaControllerService : ISsaControllerService
         return (ResponseStatus.Successful, response);
     }
 
+    public async Task<(ResponseStatus Status, bool? Response)> NotifyFailedUserVerificationsAsync()
+    {
+        List<User>? userList;
+        try
+        {
+            userList = await _userRepository.FetchFailedSSAChecksAsync();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error fetching pending users for ssa verification.");
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        if (userList == null || userList.Count < 1)
+        {
+            return (ResponseStatus.MissingInformation, false);
+        }
+
+        var success = await _userHelperService.SendSSAFailureEmailAsync(userList);
+
+        return (ResponseStatus.Successful, success);
+    }
 }

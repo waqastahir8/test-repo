@@ -30,6 +30,11 @@ public sealed class SsaController(ISsaControllerService service) : ControllerBas
     public async Task<IActionResult> FetchPendingUsersForSSAVerificationAsync() =>
         await ServeAsync(async () => await _service.FetchPendingUsersForSSAVerificationAsync());
 
+    //Send appropriate email to users for failed ssa verifications
+    [HttpGet("notify-failed")]
+    public async Task<IActionResult> NotifyFailedUserVerificationsAsync() =>
+        await ServeAsync(async () => await _service.NotifyFailedUserVerificationsAsync());
+
     private async Task<IActionResult> ServeAsync<T>(Func<Task<(ResponseStatus, T)>> callAsync)
     {
         var (status, response) = await callAsync();

@@ -298,9 +298,9 @@ public sealed partial class UserRepository(
             .Include(u => u.CommunicationMethods)
             .Include(u => u.UserProjects)
             .Where(x => x.SocialSecurityVerification != null && (x.SocialSecurityVerification.CitizenshipStatus == VerificationStatus.Failed &&
-                DateTime.Compare(x.SocialSecurityVerification.CitizenshipUpdatedDate ?? DateTime.MaxValue, updatedDate) <= 0)
+                DateTime.Compare(x.SocialSecurityVerification.CitizenshipUpdatedDate ?? DateTime.MinValue, updatedDate) <= 0)
                 || (x.SocialSecurityVerification.SocialSecurityStatus == VerificationStatus.Failed &&
-                DateTime.Compare(x.SocialSecurityVerification.SocialSecurityUpdatedDate ?? DateTime.MaxValue, updatedDate) <= 0)).ToListAsync());
+                DateTime.Compare(x.SocialSecurityVerification.SocialSecurityUpdatedDate ?? DateTime.MinValue, updatedDate) >= 0)).ToListAsync());
     }
 
     public async Task<List<User>> FetchVistaRecipientsAsync()
@@ -311,9 +311,11 @@ public sealed partial class UserRepository(
             .Include(u => u.Roles)
             .Include(u => u.UserProjects)
             .Where(x => x.Roles != null && x.Roles.Count > 0 && x.UserProjects != null && x.UserProjects.Count > 0 &&
-                x.UserProjects.Find(p => p.ProjectType == "VISTA") != null && x.Roles.Find(r => r.RoleName == "Program Staff" || r.RoleName == "ORO") != null).ToListAsync());
+                x.UserProjects.Where(project => project.ProjectType == "VISTA").ToList().Count > 0 &&
+                x.Roles.Where(role => role.RoleName == "Program Staff" || role.RoleName == "ORO").ToList().Count > 0
+                ).ToListAsync());
     }
-
+    
     public async Task<List<User>> FetchAsnRecipientsAsync()
     {
         //Award Recipient
@@ -322,7 +324,9 @@ public sealed partial class UserRepository(
             .Include(u => u.Roles)
             .Include(u => u.UserProjects)
             .Where(x => x.Roles != null && x.Roles.Count > 0 && x.UserProjects != null && x.UserProjects.Count > 0 &&
-                x.UserProjects.Find(p => p.ProjectType == "ASN") != null && x.Roles.Find(r => r.RoleName == "Award Recipient") != null).ToListAsync());
+                x.UserProjects.Where(project => project.ProjectType == "ASN").ToList().Count > 0 &&
+                x.Roles.Where(role => role.RoleName == "Award Recipient").ToList().Count > 0
+                ).ToListAsync());
     }
 
     public async Task<List<User>> FetchNcccRecipientsAsync()
@@ -333,7 +337,9 @@ public sealed partial class UserRepository(
             .Include(u => u.Roles)
             .Include(u => u.UserProjects)
             .Where(x => x.Roles != null && x.Roles.Count > 0 && x.UserProjects != null && x.UserProjects.Count > 0 &&
-                x.UserProjects.Find(p => p.ProjectType == "NCCC") != null && x.Roles.Find(r => r.RoleName == "Program Staff") != null).ToListAsync());
+                x.UserProjects.Where(project => project.ProjectType == "NCCC").ToList().Count > 0 &&
+                x.Roles.Where(role => role.RoleName == "Program Staff").ToList().Count > 0
+               ).ToListAsync());
     }
 
     public async Task<User?> FetchUserByEncryptedSSNAsync(string encryptedId) =>

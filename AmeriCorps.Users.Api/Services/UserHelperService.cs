@@ -13,7 +13,7 @@ public interface IUserHelperService
 
     Task<bool> SendOperatingSiteInviteAsync(OperatingSite toInvite);
 
-    Task<bool> SendSSAFailureEmailAsync(List<int> userIds);
+    Task<bool> SendSSAFailureEmailAsync(List<User>? userList);
 }
 
 public class UserHelperService : IUserHelperService
@@ -162,19 +162,22 @@ public class UserHelperService : IUserHelperService
         }
     }
 
-    public async Task<bool> SendSSAFailureEmailAsync(List<int> userIds)
+    public async Task<bool> SendSSAFailureEmailAsync(List<User>? userList)
     {
-        List<User> userList;
 
-        try
+        if(userList == null || userList.Count < 1)
         {
-            userList = await _repository.FetchFailedSSAChecksAsync();
+            try
+            {
+                userList = await _repository.FetchFailedSSAChecksAsync();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error fetching users for invite reminder.");
+                return false;
+            }
         }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Error fetching users for invite reminder.");
-            return false;
-        }
+
 
         var errorCount = 0;
 
@@ -395,9 +398,9 @@ public class UserHelperService : IUserHelperService
 
         string link = "";
         string htmlContent = "";
-        if (!string.IsNullOrEmpty(htmlTemplate))
+        if (!string.IsNullOrEmpty(htmlTemplate) && recipients.Count > 0)
         {
-            htmlContent = string.Format(htmlTemplate, fullName, link);
+            htmlContent = string.Format(htmlTemplate, fullName, link,link);
 
             email.Recipients = recipients;
             email.Subject = subject;
@@ -431,7 +434,7 @@ public class UserHelperService : IUserHelperService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error fetching users for invite reminder.");
+            _logger.LogError(e, "Error fetching additional users for failure notification.");
             return userList;
         }
 
