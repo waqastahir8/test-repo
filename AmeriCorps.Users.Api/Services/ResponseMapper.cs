@@ -231,7 +231,7 @@ public sealed class ResponseMapper : IResponseMapper
         UserAccountStatus = (AccountStatusRequestModel)user.UserAccountStatus,
         InviteUserId = user.InviteUserId,
         InviteDate = user.InviteDate,
-        SocialSecurityVerification =  Map(user.SocialSecurityVerification),
+        SocialSecurityVerification = Map(user.SocialSecurityVerification),
         Attributes = MapperUtils.MapList<AmeriCorps.Users.Data.Core.Attribute, AttributeRequestModel>(
                         user.Attributes,
                         a => new AttributeRequestModel
@@ -698,7 +698,7 @@ public sealed class ResponseMapper : IResponseMapper
                 UserAccountStatus = (AccountStatusRequestModel)user.UserAccountStatus,
                 InviteUserId = user.InviteUserId,
                 InviteDate = user.InviteDate,
-                SocialSecurityVerification =  Map(user.SocialSecurityVerification),
+                SocialSecurityVerification = Map(user.SocialSecurityVerification),
                 Attributes = MapperUtils.MapList<AmeriCorps.Users.Data.Core.Attribute, AttributeRequestModel>(
                                 user.Attributes,
                                 a => new AttributeRequestModel
