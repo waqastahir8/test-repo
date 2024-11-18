@@ -58,10 +58,10 @@ public sealed partial class SsaControllerTests : BaseTests<SsaController>
         var updated = Fixture.Create<SocialSecurityVerificationResponse>();
 
         _serviceMock!
-            .Setup(x => x.UpdateUserSSAInfoAsync(userId,update))
+            .Setup(x => x.UpdateUserSSAInfoAsync(userId, update))
             .ReturnsAsync((ResponseStatus.Successful, updated));
         //Act
-        var actual = await sut.UpdateUserSSAInfoAsync(userId,update);
+        var actual = await sut.UpdateUserSSAInfoAsync(userId, update);
 
         //Assert
         var response = actual as OkObjectResult;
@@ -78,10 +78,10 @@ public sealed partial class SsaControllerTests : BaseTests<SsaController>
         var update = Fixture.Create<SocialSecurityVerificationRequestModel>();
 
         _serviceMock!
-            .Setup(x => x.UpdateUserSSAInfoAsync(userId,update))
+            .Setup(x => x.UpdateUserSSAInfoAsync(userId, update))
             .ReturnsAsync((ResponseStatus.MissingInformation, null));
         //Act
-        var actual = await sut.UpdateUserSSAInfoAsync(userId,update);
+        var actual = await sut.UpdateUserSSAInfoAsync(userId, update);
 
         //Assert
         var response = actual as StatusCodeResult;
@@ -127,7 +127,7 @@ public sealed partial class SsaControllerTests : BaseTests<SsaController>
         Assert.NotNull(response);
         Assert.Equal((int)HttpStatusCode.UnprocessableEntity, response.StatusCode);
     }
-    
+
     [Fact]
     public async Task FetchPendingUsersForSSAVerificationAsync_SuccessProcessing_200StatusCode()
     {
@@ -203,7 +203,7 @@ public sealed partial class SsaControllerTests : BaseTests<SsaController>
         Assert.NotNull(response);
         Assert.Equal((int)HttpStatusCode.UnprocessableEntity, response.StatusCode);
     }
-    
+
     protected override SsaController Setup()
     {
         _serviceMock = new();

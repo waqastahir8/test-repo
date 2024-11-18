@@ -165,7 +165,7 @@ public class UserHelperService : IUserHelperService
     public async Task<bool> SendSSAFailureEmailAsync(List<User>? userList)
     {
 
-        if(userList == null || userList.Count < 1)
+        if (userList == null || userList.Count < 1)
         {
             try
             {
@@ -400,7 +400,7 @@ public class UserHelperService : IUserHelperService
         string htmlContent = "";
         if (!string.IsNullOrEmpty(htmlTemplate) && recipients.Count > 0)
         {
-            htmlContent = string.Format(htmlTemplate, fullName, link,link);
+            htmlContent = string.Format(htmlTemplate, fullName, link, link);
 
             email.Recipients = recipients;
             email.Subject = subject;
@@ -416,17 +416,17 @@ public class UserHelperService : IUserHelperService
 
         try
         {
-            if (toNotify.UserProjects != null && toNotify.UserProjects.Count > 0 
+            if (toNotify.UserProjects != null && toNotify.UserProjects.Count > 0
                 && toNotify.UserProjects.Find(p => p.ProjectType == "VISTA") != null)
             {
                 userList = await _repository.FetchVistaRecipientsAsync();
             }
-            else if (toNotify.UserProjects != null && toNotify.UserProjects.Count > 0 
+            else if (toNotify.UserProjects != null && toNotify.UserProjects.Count > 0
                 && toNotify.UserProjects.Find(p => p.ProjectType == "ASN") != null)
             {
                 userList = await _repository.FetchAsnRecipientsAsync();
             }
-            else if (toNotify.UserProjects != null && toNotify.UserProjects.Count > 0 
+            else if (toNotify.UserProjects != null && toNotify.UserProjects.Count > 0
                 && toNotify.UserProjects.Find(p => p.ProjectType == "NCCC") != null)
             {
                 userList = await _repository.FetchNcccRecipientsAsync();
