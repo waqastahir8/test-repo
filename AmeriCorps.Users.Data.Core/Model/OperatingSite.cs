@@ -22,4 +22,9 @@ public sealed class OperatingSite : EntityWithProjectId
     public DateTime? InviteDate { get; set; }
     public int InviteUserId { get; set; }
     public DateTime? UpdatedDate { get; set; }
+    public double AwardedMsys { get; set; }
+ 
+    public double LivingAllowanceMsys { get; set; }
+ 
+    public double NonLivingAllowanceMsys { get; set; }
 }

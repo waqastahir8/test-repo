@@ -27,4 +27,9 @@ public sealed class SubGrantee : Entity
 
     [Column(TypeName = "varchar(8)")]
     public string ZipCode { get; set; } = string.Empty;
+    
+    public double AwardedMsys { get; set; }
+
+    public double LivingAllowanceMsys { get; set; }
+    public double NonLivingAllowanceMsys { get; set; }
 }

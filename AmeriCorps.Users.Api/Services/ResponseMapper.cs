@@ -515,14 +515,20 @@ public sealed class ResponseMapper : IResponseMapper
                                         ZipCode = o.ZipCode,
                                         Plus4 = o.Plus4,
                                         InviteUserId = o.InviteUserId,
-                                        InviteDate = o.InviteDate
+                                        InviteDate = o.InviteDate,
+                                        AwardedMsys = o.AwardedMsys,
+                                        LivingAllowanceMsys = o.LivingAllowanceMsys,
+                                        NonLivingAllowanceMsys = o.NonLivingAllowanceMsys
                                     }),
 
                                //Map(p.OperatingSites),
                                SubGrantees = Map(p.SubGrantees),
 
                                ProjectType = p.ProjectType,
-                               Description = p.Description
+                               Description = p.Description,
+                               TotalAwardedMsys = p.TotalAwardedMsys,
+                               LivingAllowanceMsys = p.LivingAllowanceMsys,
+                               NonLivingAllowanceMsys = p.NonLivingAllowanceMsys
                            });
 
     public OrganizationResponse? Map(Organization? organization) => organization == null ? null : new()
@@ -576,13 +582,19 @@ public sealed class ResponseMapper : IResponseMapper
                             ZipCode = o.ZipCode,
                             Plus4 = o.Plus4,
                             InviteUserId = o.InviteUserId,
-                            InviteDate = o.InviteDate
+                            InviteDate = o.InviteDate,
+                            AwardedMsys = o.AwardedMsys,
+                            LivingAllowanceMsys = o.LivingAllowanceMsys,
+                            NonLivingAllowanceMsys = o.NonLivingAllowanceMsys
                         }),
 
         SubGrantees = Map(project.SubGrantees),
 
         ProjectType = project.ProjectType,
-        Description = project.Description
+        Description = project.Description,
+        TotalAwardedMsys = project.TotalAwardedMsys,
+        LivingAllowanceMsys = project.LivingAllowanceMsys,
+        NonLivingAllowanceMsys = project.NonLivingAllowanceMsys
     };
 
     public AwardResponse Map(Award award) => new()
@@ -605,7 +617,10 @@ public sealed class ResponseMapper : IResponseMapper
         StreetAddress = subGrantee.StreetAddress,
         City = subGrantee.City,
         State = subGrantee.State,
-        ZipCode = subGrantee.ZipCode
+        ZipCode = subGrantee.ZipCode,
+        AwardedMsys = subGrantee.AwardedMsys,
+        LivingAllowanceMsys = subGrantee.LivingAllowanceMsys,
+        NonLivingAllowanceMsys = subGrantee.NonLivingAllowanceMsys
     };
 
     public List<SubGranteeRequestModel> Map(List<SubGrantee> subGranteeList) =>
@@ -619,7 +634,10 @@ public sealed class ResponseMapper : IResponseMapper
                                StreetAddress = o.StreetAddress,
                                City = o.City,
                                State = o.State,
-                               ZipCode = o.ZipCode
+                               ZipCode = o.ZipCode,
+                               AwardedMsys = o.AwardedMsys,
+                               LivingAllowanceMsys = o.LivingAllowanceMsys,
+                               NonLivingAllowanceMsys = o.NonLivingAllowanceMsys
                            });
 
     public OperatingSiteResponse? Map(OperatingSite? operatingSite) => operatingSite == null ? null : new()
@@ -638,7 +656,10 @@ public sealed class ResponseMapper : IResponseMapper
         ZipCode = operatingSite.ZipCode,
         Plus4 = operatingSite.Plus4,
         InviteUserId = operatingSite.InviteUserId,
-        InviteDate = operatingSite.InviteDate
+        InviteDate = operatingSite.InviteDate,
+        AwardedMsys = operatingSite.AwardedMsys,
+        LivingAllowanceMsys = operatingSite.LivingAllowanceMsys,
+        NonLivingAllowanceMsys = operatingSite.NonLivingAllowanceMsys
     };
 
     public List<OperatingSiteResponse> Map(List<OperatingSite> operatingSiteList) =>
@@ -660,7 +681,10 @@ public sealed class ResponseMapper : IResponseMapper
                                ZipCode = o.ZipCode,
                                Plus4 = o.Plus4,
                                InviteUserId = o.InviteUserId,
-                               InviteDate = o.InviteDate
+                               InviteDate = o.InviteDate,
+                               AwardedMsys = o.AwardedMsys,
+                               LivingAllowanceMsys = o.LivingAllowanceMsys,
+                               NonLivingAllowanceMsys = o.NonLivingAllowanceMsys
                            });
 
     public AccessResponse? Map(Access? access) => access == null ? null : new()
