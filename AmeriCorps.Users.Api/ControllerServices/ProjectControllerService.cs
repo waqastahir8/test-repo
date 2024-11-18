@@ -217,7 +217,7 @@ public sealed class ProjectControllerService : IProjectControllerService
             _logger.LogWarning($"The specified operating site MSYs results in MSY higher than awarded MSYs to project.");
             return (ResponseStatus.MissingInformation, null);
         }
-        
+
         try
         {
             var foundSite = await _repository.GetOperatingSiteByIdAsync(opSiteRequest.Id);

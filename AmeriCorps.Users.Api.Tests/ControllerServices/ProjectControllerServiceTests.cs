@@ -132,7 +132,7 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
         var (_, actual) = await sut.CreateProjectAsync(model);
 
         // Assert
-        if(actual != null)
+        if (actual != null)
         {
             Assert.Equal(expected, actual);
         }
@@ -226,7 +226,7 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
         var (status, _) = await sut.UpdateProjectAsync(model);
 
         // Assert
-        if(status == ResponseStatus.Successful)
+        if (status == ResponseStatus.Successful)
         {
             Assert.Equal(ResponseStatus.Successful, status);
         }
@@ -267,7 +267,7 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
         var (_, actual) = await sut.UpdateProjectAsync(model);
 
         // Assert
-        if(actual != null)
+        if (actual != null)
         {
             Assert.Equal(expected, actual);
         }
@@ -373,7 +373,7 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
         var (status, actual) = await sut.UpdateOperatingSiteAsync(model);
 
         // Assert
-        if(status == ResponseStatus.Successful)
+        if (status == ResponseStatus.Successful)
         {
             Assert.Equal(expected, actual);
         }

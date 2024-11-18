@@ -31,8 +31,8 @@ public class ProjectRequestModel
     public bool Active { get; set; } = true;
 
     public double TotalAwardedMsys { get; set; }
- 
+
     public double LivingAllowanceMsys { get; set; }
- 
+
     public double NonLivingAllowanceMsys { get; set; }
 }

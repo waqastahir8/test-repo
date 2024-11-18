@@ -20,8 +20,8 @@ public sealed class OperatingSiteResponse
     public int InviteUserId { get; set; }
     public DateTime? InviteDate { get; set; }
     public double AwardedMsys { get; set; }
- 
+
     public double LivingAllowanceMsys { get; set; }
- 
+
     public double NonLivingAllowanceMsys { get; set; }
 }
