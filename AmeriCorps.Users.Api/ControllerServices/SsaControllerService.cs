@@ -281,7 +281,7 @@ public sealed class SsaControllerService : ISsaControllerService
 
     private async Task<bool> AddUserToFile(User user)
     {
-        if(user != null && user.SocialSecurityVerification != null)
+        if (user != null && user.SocialSecurityVerification != null)
         {
             user.SocialSecurityVerification.FileStatus = SSAFileStatus.OnFile;
 
