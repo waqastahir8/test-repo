@@ -59,4 +59,10 @@ public sealed class Project : Entity
     public string Description { get; set; } = string.Empty;
 
     public bool Active { get; set; } = true;
+
+    public double TotalAwardedMsys { get; set; }
+
+    public double LivingAllowanceMsys { get; set; }
+
+    public double NonLivingAllowanceMsys { get; set; }
 }
