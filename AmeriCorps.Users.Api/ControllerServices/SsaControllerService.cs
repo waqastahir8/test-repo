@@ -125,20 +125,22 @@ public sealed class SsaControllerService : ISsaControllerService
             return (ResponseStatus.UnknownError, null);
         }
 
-        if(userStatus != null){
+        if (userStatus != null)
+        {
             userStatus.LastSubmitUser = verificationUpdate.LastSubmitUser;
-            if(userStatus.CitizenshipStatus != (VerificationStatus)verificationUpdate.CitizenshipStatus)
+            if (userStatus.CitizenshipStatus != (VerificationStatus)verificationUpdate.CitizenshipStatus)
             {
                 userStatus.CitizenshipStatus = (VerificationStatus)verificationUpdate.CitizenshipStatus;
                 userStatus.CitizenshipUpdatedDate = DateTime.UtcNow;
             }
-            if(userStatus.SocialSecurityStatus != (VerificationStatus)verificationUpdate.SocialSecurityStatus)
+            if (userStatus.SocialSecurityStatus != (VerificationStatus)verificationUpdate.SocialSecurityStatus)
             {
                 userStatus.SocialSecurityStatus = (VerificationStatus)verificationUpdate.SocialSecurityStatus;
                 userStatus.SocialSecurityUpdatedDate = DateTime.UtcNow;
             }
 
-            if((userStatus.SocialSecurityStatus == VerificationStatus.Resubmit || userStatus.CitizenshipStatus == VerificationStatus.Resubmit)&& userStatus.SubmitCount < 5){
+            if ((userStatus.SocialSecurityStatus == VerificationStatus.Resubmit || userStatus.CitizenshipStatus == VerificationStatus.Resubmit) && userStatus.SubmitCount < 5)
+            {
                 userStatus.SubmitCount++;
 
                 userStatus.FileStatus = SSAFileStatus.PendingToSend;
@@ -183,8 +185,9 @@ public sealed class SsaControllerService : ISsaControllerService
             return (ResponseStatus.MissingInformation, null);
         }
 
-        if(user.SocialSecurityVerification == null){
-            SocialSecurityVerification userStatus =  new SocialSecurityVerification()
+        if (user.SocialSecurityVerification == null)
+        {
+            SocialSecurityVerification userStatus = new SocialSecurityVerification()
             {
                 UserId = user.Id,
                 CitizenshipStatus = VerificationStatus.Pending,
@@ -237,12 +240,12 @@ public sealed class SsaControllerService : ISsaControllerService
 
         List<UserResponse> response = new List<UserResponse>();
 
-        if(userList != null && userList.Count > 0)
+        if (userList != null && userList.Count > 0)
         {
-            for(int i = 0; i < userList.Count; i++)
+            for (int i = 0; i < userList.Count; i++)
             {
                 var mapped = _responseMapper.Map(userList[i]);
-                if(mapped != null)
+                if (mapped != null)
                 {
                     mapped.EncryptedSocialSecurityNumber = _encryptionService.Decrypt(mapped.EncryptedSocialSecurityNumber);
                     response.Add(mapped);

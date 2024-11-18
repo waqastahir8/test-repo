@@ -319,7 +319,7 @@ public sealed partial class UserRepository(
                 x.Roles.Where(role => role.RoleName == "Program Staff" || role.RoleName == "ORO").ToList().Count > 0
                 ).ToListAsync());
     }
-    
+
     public async Task<List<User>> FetchAsnRecipientsAsync()
     {
         //Award Recipient
