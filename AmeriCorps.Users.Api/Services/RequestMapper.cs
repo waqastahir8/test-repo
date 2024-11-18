@@ -320,7 +320,10 @@ public sealed class RequestMapper : IRequestMapper
         SubGrantees = Map(requestModel.SubGrantees),
 
         ProjectType = requestModel.ProjectType,
-        Description = requestModel.Description
+        Description = requestModel.Description,
+        TotalAwardedMsys = requestModel.TotalAwardedMsys,
+        LivingAllowanceMsys = requestModel.LivingAllowanceMsys,
+        NonLivingAllowanceMsys = requestModel.NonLivingAllowanceMsys
     };
 
     public Access Map(AccessRequestModel requestModel) => new()
@@ -371,7 +374,10 @@ public sealed class RequestMapper : IRequestMapper
         ZipCode = requestModel.ZipCode,
         Plus4 = requestModel.Plus4,
         InviteUserId = requestModel.InviteUserId,
-        InviteDate = requestModel.InviteDate
+        InviteDate = requestModel.InviteDate,
+        AwardedMsys = requestModel.AwardedMsys,
+        LivingAllowanceMsys = requestModel.LivingAllowanceMsys,
+        NonLivingAllowanceMsys = requestModel.NonLivingAllowanceMsys
     };
 
     public List<OperatingSite> Map(List<OperatingSiteRequestModel> operatingSite) =>
@@ -393,7 +399,10 @@ public sealed class RequestMapper : IRequestMapper
                                ZipCode = o.ZipCode,
                                Plus4 = o.Plus4,
                                InviteUserId = o.InviteUserId,
-                               InviteDate = o.InviteDate
+                               InviteDate = o.InviteDate,
+                               AwardedMsys = o.AwardedMsys,
+                               LivingAllowanceMsys = o.LivingAllowanceMsys,
+                               NonLivingAllowanceMsys = o.NonLivingAllowanceMsys
                            });
 
     public SubGrantee Map(SubGranteeRequestModel requestModel) => new()
@@ -404,7 +413,10 @@ public sealed class RequestMapper : IRequestMapper
         StreetAddress = requestModel.StreetAddress,
         City = requestModel.City,
         State = requestModel.State,
-        ZipCode = requestModel.ZipCode
+        ZipCode = requestModel.ZipCode,
+        AwardedMsys = requestModel.AwardedMsys,
+        LivingAllowanceMsys = requestModel.LivingAllowanceMsys,
+        NonLivingAllowanceMsys = requestModel.NonLivingAllowanceMsys
     };
 
     public List<SubGrantee> Map(List<SubGranteeRequestModel> requestModel) =>
@@ -418,7 +430,10 @@ public sealed class RequestMapper : IRequestMapper
                                StreetAddress = o.StreetAddress,
                                City = o.City,
                                State = o.State,
-                               ZipCode = o.ZipCode
+                               ZipCode = o.ZipCode,
+                               AwardedMsys = o.AwardedMsys,
+                               LivingAllowanceMsys = o.LivingAllowanceMsys,
+                               NonLivingAllowanceMsys = o.NonLivingAllowanceMsys
                            });
 
     public DirectDeposit Map(DirectDepositRequestModel requestModel) => new()

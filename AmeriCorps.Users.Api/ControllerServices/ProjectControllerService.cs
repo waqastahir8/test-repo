@@ -100,12 +100,24 @@ public sealed class ProjectControllerService : IProjectControllerService
 
         Project? project = _requestMapper.Map(projRequest);
 
+        double proposedMsyUsage = project.OperatingSites.Sum(x => x.AwardedMsys);
+
+        if (proposedMsyUsage > project.TotalAwardedMsys)
+        {
+            _logger.LogWarning($"The specified operating site MSYs results in MSY higher than awarded MSYs to project.");
+            return (ResponseStatus.MissingInformation, null);
+        }
+
         try
         {
             var foundProj = await _repository.GetProjectByCodeAsync(project.ProjectCode);
             if (foundProj == null)
             {
                 project = await _repository.SaveAsync(project);
+            }
+            else
+            {
+                project = foundProj;
             }
         }
         catch (Exception e)
@@ -127,6 +139,14 @@ public sealed class ProjectControllerService : IProjectControllerService
         }
 
         Project? updatedProject = _requestMapper.Map(projRequest);
+
+        double proposedMsyUsage = projRequest.OperatingSites.Sum(x => x.AwardedMsys);
+
+        if (proposedMsyUsage > projRequest.TotalAwardedMsys)
+        {
+            _logger.LogWarning($"The specified operating site MSYs results in MSY higher than awarded MSYs to project.");
+            return (ResponseStatus.MissingInformation, null);
+        }
 
         try
         {
@@ -154,7 +174,6 @@ public sealed class ProjectControllerService : IProjectControllerService
                 {
                     updatedProject.SubGrantees = foundProj.SubGrantees;
                 }
-
                 await _repository.UpdateProjectAsync(updatedProject);
             }
             else
@@ -182,6 +201,22 @@ public sealed class ProjectControllerService : IProjectControllerService
         }
 
         OperatingSite updatedSite = _requestMapper.Map(opSiteRequest);
+
+        var project = await _repository.GetProjectByCodeAsync(opSiteRequest.ProjectCode);
+
+        if (project == null)
+        {
+            _logger.LogWarning($"Operating site not created. Project with id {opSiteRequest.ProjectCode} was not found.");
+            return (ResponseStatus.MissingInformation, null);
+        }
+
+        double proposedMsyUsage = project.OperatingSites.Sum(x => x.AwardedMsys) + opSiteRequest.AwardedMsys;
+
+        if (proposedMsyUsage > project?.TotalAwardedMsys)
+        {
+            _logger.LogWarning($"The specified operating site MSYs results in MSY higher than awarded MSYs to project.");
+            return (ResponseStatus.MissingInformation, null);
+        }
 
         try
         {
