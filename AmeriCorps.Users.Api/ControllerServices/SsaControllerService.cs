@@ -89,8 +89,6 @@ public sealed class SsaControllerService : ISsaControllerService
                         foundUser.SocialSecurityVerification.CitizenshipUpdatedDate = DateTime.UtcNow;
                     }
 
-                    foundUser.SocialSecurityVerification.FileStatus = SSAFileStatus.OnFile;
-
                     try
                     {
                         await _ssvRepository.SaveAsync(foundUser.SocialSecurityVerification);
@@ -246,6 +244,8 @@ public sealed class SsaControllerService : ISsaControllerService
                 {
                     mapped.EncryptedSocialSecurityNumber = _encryptionService.Decrypt(mapped.EncryptedSocialSecurityNumber);
                     response.Add(mapped);
+
+                    await AddUserToFile(userList[i]);
                 }
             }
         }
@@ -274,5 +274,27 @@ public sealed class SsaControllerService : ISsaControllerService
         var success = await _userHelperService.SendSSAFailureEmailAsync(userList);
 
         return (ResponseStatus.Successful, success);
+    }
+
+    private async Task<bool> AddUserToFile(User user)
+    {
+        if(user != null && user.SocialSecurityVerification != null)
+        {
+            user.SocialSecurityVerification.FileStatus = SSAFileStatus.OnFile;
+
+
+            try
+            {
+                await _ssvRepository.SaveAsync(user.SocialSecurityVerification);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error saving adding user to file for verification for user {Identifier}.", user.UserName.ToString().Replace(Environment.NewLine, ""));
+                return false;
+            }
+
+            return true;
+        }
+        return false;
     }
 }
