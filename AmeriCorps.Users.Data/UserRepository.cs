@@ -33,6 +33,7 @@ public sealed partial class UserRepository(
                 .Include(u => u.UserProjects).ThenInclude(a => a.ProjectAccess)
                 .Include(u => u.DirectDeposits)
                 .Include(u => u.TaxWithHoldings)
+                .Include(u => u.SocialSecurityVerification)
                 .FirstOrDefaultAsync(x => x.Id == id));
 
     public async Task<User?> GetByExternalAccountIdAsync(string externalAccountId) =>
@@ -53,6 +54,7 @@ public sealed partial class UserRepository(
                 .Include(u => u.UserProjects).ThenInclude(a => a.ProjectAccess)
                 .Include(u => u.DirectDeposits)
                 .Include(u => u.TaxWithHoldings)
+                .Include(u => u.SocialSecurityVerification)
                 .FirstOrDefaultAsync(x => x.ExternalAccountId == externalAccountId));
 
     public async Task<IEnumerable<User>?> GetByAttributeAsync(string type, string value) =>
@@ -245,6 +247,7 @@ public sealed partial class UserRepository(
                     .Include(u => u.Roles)
                     .Include(u => u.UserProjects).ThenInclude(p => p.ProjectRoles)
                     .Include(u => u.UserProjects).ThenInclude(a => a.ProjectAccess)
+                    .Include(u => u.SocialSecurityVerification)
                     .Where(x => x.OrgCode == orgCode).ToListAsync());
 
         UserList? userList = new UserList()
@@ -281,6 +284,7 @@ public sealed partial class UserRepository(
                 .Include(u => u.Roles)
                 .Include(u => u.UserProjects).ThenInclude(p => p.ProjectRoles)
                 .Include(u => u.UserProjects).ThenInclude(a => a.ProjectAccess)
+                .Include(u => u.SocialSecurityVerification)
                 .FirstOrDefaultAsync(x => x.UserName == userEmail && x.OrgCode == orgCode && (x.UserAccountStatus == UserAccountStatus.INVITED || x.UserAccountStatus == UserAccountStatus.PENDING)));
 
 
@@ -296,40 +300,50 @@ public sealed partial class UserRepository(
         return await ExecuteAsync(async context => await context.Users
             .Include(u => u.SocialSecurityVerification)
             .Include(u => u.CommunicationMethods)
+            .Include(u => u.UserProjects)
             .Where(x => x.SocialSecurityVerification != null && (x.SocialSecurityVerification.CitizenshipStatus == VerificationStatus.Failed &&
-                DateTime.Compare(x.SocialSecurityVerification.SocialSecurityUpdatedDate ?? DateTime.MaxValue, updatedDate) <= 0)
+                DateTime.Compare(x.SocialSecurityVerification.CitizenshipUpdatedDate ?? DateTime.MinValue, updatedDate) <= 0)
                 || (x.SocialSecurityVerification.SocialSecurityStatus == VerificationStatus.Failed &&
-                DateTime.Compare(x.SocialSecurityVerification.CitizenshipUpdatedDate ?? DateTime.MaxValue, updatedDate) <= 0)).ToListAsync());
+                DateTime.Compare(x.SocialSecurityVerification.SocialSecurityUpdatedDate ?? DateTime.MinValue, updatedDate) >= 0)).ToListAsync());
     }
 
     public async Task<List<User>> FetchVistaRecipientsAsync()
     {
-
+        //ORO and Vista
         return await ExecuteAsync(async context => await context.Users
             .Include(u => u.CommunicationMethods)
             .Include(u => u.Roles)
             .Include(u => u.UserProjects)
-            .Where(x => x.SocialSecurityVerification != null).ToListAsync());
+            .Where(x => x.Roles != null && x.Roles.Count > 0 && x.UserProjects != null && x.UserProjects.Count > 0 &&
+                x.UserProjects.Where(project => project.ProjectType == "VISTA").ToList().Count > 0 &&
+                x.Roles.Where(role => role.RoleName == "Program Staff" || role.RoleName == "ORO").ToList().Count > 0
+                ).ToListAsync());
     }
-
+    
     public async Task<List<User>> FetchAsnRecipientsAsync()
     {
-
+        //Award Recipient
         return await ExecuteAsync(async context => await context.Users
             .Include(u => u.CommunicationMethods)
             .Include(u => u.Roles)
             .Include(u => u.UserProjects)
-            .Where(x => x.SocialSecurityVerification != null).ToListAsync());
+            .Where(x => x.Roles != null && x.Roles.Count > 0 && x.UserProjects != null && x.UserProjects.Count > 0 &&
+                x.UserProjects.Where(project => project.ProjectType == "ASN").ToList().Count > 0 &&
+                x.Roles.Where(role => role.RoleName == "Award Recipient").ToList().Count > 0
+                ).ToListAsync());
     }
 
     public async Task<List<User>> FetchNcccRecipientsAsync()
     {
-
+        //NCCC
         return await ExecuteAsync(async context => await context.Users
             .Include(u => u.CommunicationMethods)
             .Include(u => u.Roles)
             .Include(u => u.UserProjects)
-            .Where(x => x.SocialSecurityVerification != null).ToListAsync());
+            .Where(x => x.Roles != null && x.Roles.Count > 0 && x.UserProjects != null && x.UserProjects.Count > 0 &&
+                x.UserProjects.Where(project => project.ProjectType == "NCCC").ToList().Count > 0 &&
+                x.Roles.Where(role => role.RoleName == "Program Staff").ToList().Count > 0
+               ).ToListAsync());
     }
 
     public async Task<User?> FetchUserByEncryptedSSNAsync(string encryptedId) =>
@@ -338,5 +352,13 @@ public sealed partial class UserRepository(
                 .AsNoTracking()
                 .Include(u => u.SocialSecurityVerification)
                 .FirstOrDefaultAsync(x => x.EncryptedSocialSecurityNumber == encryptedId));
+
+    public async Task<List<User>?> FetchPendingUsersForSSAVerificationAsync()
+    {
+        return await ExecuteAsync(async context => await context.Users
+            .Include(u => u.SocialSecurityVerification)
+            .Include(u => u.Attributes)
+            .Where(x => x.SocialSecurityVerification != null && x.SocialSecurityVerification.FileStatus == SSAFileStatus.PendingToSend).ToListAsync());
+    }
 
 }
