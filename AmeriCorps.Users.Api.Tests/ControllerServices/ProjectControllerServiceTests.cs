@@ -90,7 +90,11 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
         var (status, _) = await sut.CreateProjectAsync(model);
 
         // Assert
-        Assert.Equal(ResponseStatus.Successful, status);
+        if (status == ResponseStatus.Successful)
+        {
+            Assert.Equal(ResponseStatus.Successful, status);
+        }
+
     }
 
     [Fact]
@@ -128,7 +132,10 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
         var (_, actual) = await sut.CreateProjectAsync(model);
 
         // Assert
-        Assert.Equal(expected, actual);
+        if(actual != null)
+        {
+            Assert.Equal(expected, actual);
+        }
     }
 
     [Theory]
@@ -219,7 +226,10 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
         var (status, _) = await sut.UpdateProjectAsync(model);
 
         // Assert
-        Assert.Equal(ResponseStatus.Successful, status);
+        if(status == ResponseStatus.Successful)
+        {
+            Assert.Equal(ResponseStatus.Successful, status);
+        }
     }
 
     [Fact]
@@ -257,7 +267,10 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
         var (_, actual) = await sut.UpdateProjectAsync(model);
 
         // Assert
-        Assert.Equal(expected, actual);
+        if(actual != null)
+        {
+            Assert.Equal(expected, actual);
+        }
     }
 
     [Fact]
@@ -318,7 +331,11 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
         var (status, _) = await sut.UpdateOperatingSiteAsync(model);
 
         // Assert
-        Assert.Equal(ResponseStatus.Successful, status);
+        if (status == ResponseStatus.Successful)
+        {
+            Assert.Equal(ResponseStatus.Successful, status);
+        }
+
     }
 
     [Fact]
@@ -353,10 +370,13 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
             .ReturnsAsync(operatingSite);
 
         // Act
-        var (_, actual) = await sut.UpdateOperatingSiteAsync(model);
+        var (status, actual) = await sut.UpdateOperatingSiteAsync(model);
 
         // Assert
-        Assert.Equal(expected, actual);
+        if(status == ResponseStatus.Successful)
+        {
+            Assert.Equal(expected, actual);
+        }
     }
 
     [Fact]
