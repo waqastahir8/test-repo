@@ -183,23 +183,32 @@ public sealed class SsaControllerService : ISsaControllerService
             return (ResponseStatus.MissingInformation, null);
         }
 
-        SocialSecurityVerification userStatus =  new SocialSecurityVerification()
+        if(user.SocialSecurityVerification == null){
+            SocialSecurityVerification userStatus =  new SocialSecurityVerification()
+            {
+                UserId = user.Id,
+                CitizenshipStatus = VerificationStatus.Pending,
+                SocialSecurityStatus = VerificationStatus.Pending,
+
+                ProcessStartDate = DateTime.UtcNow,
+                SubmitCount = 1,
+                LastSubmitUser = 0,
+                FileStatus = SSAFileStatus.PendingToSend
+            };
+            user.SocialSecurityVerification = userStatus;
+        }
+        else
         {
-            UserId = user.Id,
-            CitizenshipStatus = VerificationStatus.Pending,
-            SocialSecurityStatus = VerificationStatus.Pending,
+            user.SocialSecurityVerification.CitizenshipStatus = VerificationStatus.Pending;
+            user.SocialSecurityVerification.SocialSecurityStatus = VerificationStatus.Pending;
+            user.SocialSecurityVerification.ProcessStartDate = DateTime.UtcNow;
+            user.SocialSecurityVerification.FileStatus = SSAFileStatus.PendingToSend;
+        }
 
-            ProcessStartDate = DateTime.UtcNow,
-            SubmitCount = 1,
-            LastSubmitUser = 0,
-            FileStatus = SSAFileStatus.PendingToSend
-        };
-
-        user.SocialSecurityVerification = userStatus;
 
         try
         {
-            await _ssvRepository.SaveAsync(userStatus);
+            await _ssvRepository.SaveAsync(user.SocialSecurityVerification);
         }
         catch (Exception e)
         {
