@@ -10,7 +10,7 @@ public interface ISsaControllerService
 {
     Task<(ResponseStatus Status, bool? Response)> BulkUpdateVerificationDataAsync(List<SocialSecurityVerificationRequestModel> updateList);
 
-    Task<(ResponseStatus Status, SocialSecurityVerificationResponse? Response)> UpdateUserSSAInfoAsync(int userId, SocialSecurityVerificationRequestModel verificationUpdate);
+    Task<(ResponseStatus Status, SocialSecurityVerificationResponse? Response)> UpdateUserSSAInfoAsync(SocialSecurityVerificationRequestModel verificationUpdate);
 
     Task<(ResponseStatus Status, UserResponse? Response)> SubmitInfoForVerificationAsync(int userId);
 
@@ -104,9 +104,9 @@ public sealed class SsaControllerService : ISsaControllerService
     }
 
 
-    public async Task<(ResponseStatus Status, SocialSecurityVerificationResponse? Response)> UpdateUserSSAInfoAsync(int userId, SocialSecurityVerificationRequestModel verificationUpdate)
+    public async Task<(ResponseStatus Status, SocialSecurityVerificationResponse? Response)> UpdateUserSSAInfoAsync(SocialSecurityVerificationRequestModel verificationUpdate)
     {
-        if (verificationUpdate == null || userId < 1)
+        if (verificationUpdate == null || verificationUpdate.UserId < 1)
         {
             return (ResponseStatus.MissingInformation, null);
         }
@@ -115,11 +115,11 @@ public sealed class SsaControllerService : ISsaControllerService
 
         try
         {
-            userStatus = await _userRepository.FindSocialSecurityVerificationByUserId(userId);
+            userStatus = await _userRepository.FindSocialSecurityVerificationByUserId(verificationUpdate.UserId);
         }
         catch (Exception e)
         {
-            _logger.LogError(e, $"Unable to check if verification for {userId} exists.");
+            _logger.LogError(e, $"Unable to check if verification for {verificationUpdate.UserId} exists.");
             return (ResponseStatus.UnknownError, null);
         }
 
@@ -150,7 +150,7 @@ public sealed class SsaControllerService : ISsaControllerService
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Unable to save update for user {userId} exists.");
+                _logger.LogError(e, $"Unable to save update for user {verificationUpdate.UserId} exists.");
                 return (ResponseStatus.UnknownError, null);
             }
         }

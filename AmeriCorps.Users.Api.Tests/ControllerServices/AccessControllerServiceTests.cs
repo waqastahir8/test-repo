@@ -48,6 +48,23 @@ public sealed partial class AccessControllerServiceTests : BaseTests<AccessContr
     }
 
     [Theory]
+    [InlineData("name")]
+    public async Task GetAccessByNameAsync_UnknownErrorStatus(string access)
+    {
+        // Arrange
+        var sut = Setup();
+        _repositoryMock!
+            .Setup(x => x.GetAccessByNameAsync(access))
+            .ThrowsAsync(new Exception());
+
+        // Act
+        var (status, _) = await sut.GetAccessByNameAsync(access);
+
+        // Assert
+        Assert.Equal(ResponseStatus.UnknownError, status);
+    }
+
+    [Theory]
     [InlineData("type")]
     public async Task GetAccessListByTypeAsync_Successful_Status(string access)
     {
@@ -83,6 +100,23 @@ public sealed partial class AccessControllerServiceTests : BaseTests<AccessContr
         Assert.Equal(ResponseStatus.MissingInformation, status);
     }
 
+    [Theory]
+    [InlineData("type")]
+    public async Task GetAccessListByTypeAsync_NonExistent_UnknownErrorStatus(string access)
+    {
+        // Arrange
+        var sut = Setup();
+        _repositoryMock!
+            .Setup(x => x.GetAccessListByTypeAsync(access))
+            .ThrowsAsync(new Exception());
+
+        // Act
+        var (status, _) = await sut.GetAccessListByTypeAsync(access);
+
+        // Assert
+        Assert.Equal(ResponseStatus.UnknownError, status);
+    }
+
     [Fact]
     public async Task GetAccessListAsync_Successful_Status()
     {
@@ -115,6 +149,22 @@ public sealed partial class AccessControllerServiceTests : BaseTests<AccessContr
 
         // Assert
         Assert.Equal(ResponseStatus.MissingInformation, status);
+    }
+
+    [Fact]
+    public async Task GetAccessListAsync_UnknownErrorStatus()
+    {
+        // Arrange
+        var sut = Setup();
+        _repositoryMock!
+            .Setup(x => x.GetAccessListAsync())
+            .ThrowsAsync(new Exception());
+
+        // Act
+        var (status, _) = await sut.GetAccessListAsync();
+
+        // Assert
+        Assert.Equal(ResponseStatus.UnknownError, status);
     }
 
     [Fact]
@@ -196,6 +246,36 @@ public sealed partial class AccessControllerServiceTests : BaseTests<AccessContr
 
         // Assert
         Assert.Equal(expected, actual);
+    }
+
+    [Fact]
+    public async Task CreateAccessAsync_UnknownErrorStatus()
+    {
+        // Arrange
+        var sut = Setup();
+
+        var model =
+            Fixture
+            .Create<AccessRequestModel>();
+
+        var access =
+            Fixture
+            .Build<Access>()
+            .Create();
+
+        _requestMapperMock!
+            .Setup(x => x.Map(model))
+            .Returns(access);
+
+        _repositoryMock!
+            .Setup(x => x.GetAccessByNameAsync(It.IsAny<string>()))
+            .ThrowsAsync(new Exception());
+
+        // Act
+        var (status, _) = await sut.CreateAccessAsync(model);
+
+        // Assert
+        Assert.Equal(ResponseStatus.UnknownError, status);
     }
 
     protected override AccessControllerService Setup()
