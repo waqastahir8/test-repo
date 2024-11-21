@@ -612,6 +612,7 @@ public sealed class ResponseMapper : IResponseMapper
 
     public SubGranteeResponse Map(SubGrantee subGrantee) => new()
     {
+        Id = subGrantee.Id,
         GranteeCode = subGrantee.GranteeCode,
         GranteeName = subGrantee.GranteeName,
         Uei = subGrantee.Uei,

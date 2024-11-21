@@ -48,6 +48,23 @@ public sealed partial class OrgControllerServiceTests : BaseTests<OrgControllerS
         Assert.Equal(ResponseStatus.MissingInformation, status);
     }
 
+    [Theory]
+    [InlineData("org")]
+    public async Task GetOrgByCodeAsync_UnknownErrorStatus(string orgCode)
+    {
+        // Arrange
+        var sut = Setup();
+        _repositoryMock!
+            .Setup(x => x.GetOrgByCodeAsync(orgCode))
+            .ThrowsAsync(new Exception());
+
+        // Act
+        var (status, _) = await sut.GetOrgByCodeAsync(orgCode);
+
+        // Assert
+        Assert.Equal(ResponseStatus.UnknownError, status);
+    }
+
     [Fact]
     public async Task CreateOrgAsync_NullOrg_MissingInformationStatus()
     {
@@ -59,6 +76,36 @@ public sealed partial class OrgControllerServiceTests : BaseTests<OrgControllerS
 
         //Assert
         Assert.Equal(ResponseStatus.MissingInformation, status);
+    }
+
+    [Fact]
+    public async Task CreateOrgAsync_UnknownErrorStatus()
+    {
+        // Arrange
+        var sut = Setup();
+
+        var model =
+            Fixture
+            .Create<OrganizationRequestModel>();
+
+        var org =
+            Fixture
+            .Build<Organization>()
+            .Create();
+
+        _requestMapperMock!
+            .Setup(x => x.Map(model))
+            .Returns(org);
+
+        _repositoryMock!
+            .Setup(x => x.GetOrgByCodeAsync(It.IsAny<string>()))
+            .ThrowsAsync(new Exception());
+
+        // Act
+        var (status, _) = await sut.CreateOrgAsync(model);
+
+        //Assert
+        Assert.Equal(ResponseStatus.UnknownError, status);
     }
 
     [Fact]
@@ -162,6 +209,22 @@ public sealed partial class OrgControllerServiceTests : BaseTests<OrgControllerS
 
         // Assert
         Assert.Equal(ResponseStatus.MissingInformation, status);
+    }
+
+    [Fact]
+    public async Task GetOrgListAsync_UnknownErrorStatus()
+    {
+        // Arrange
+        var sut = Setup();
+        _repositoryMock!
+            .Setup(x => x.GetOrgListAsync())
+            .ThrowsAsync(new Exception());
+
+        // Act
+        var (status, _) = await sut.GetOrgListAsync();
+
+        // Assert
+        Assert.Equal(ResponseStatus.UnknownError, status);
     }
 
     protected override OrgControllerService Setup()

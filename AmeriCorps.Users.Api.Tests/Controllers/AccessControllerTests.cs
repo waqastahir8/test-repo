@@ -173,6 +173,62 @@ public sealed partial class AccessControllerTests : BaseTests<AccessController>
         Assert.Equal((int)HttpStatusCode.OK, response.StatusCode);
     }
 
+    [Fact]
+    public async Task GetAccessListAsync_UnknownError_500StatusCode()
+    {
+        //Arrange
+        var sut = Setup();
+
+        _serviceMock!
+            .Setup(x => x.GetAccessListAsync())
+            .ReturnsAsync((ResponseStatus.UnknownError, null));
+        //Act
+        var actual = await sut.GetAccessListAsync();
+
+        //Assert
+        var response = actual as StatusCodeResult;
+        Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.InternalServerError, response.StatusCode);
+    }
+
+
+    [Fact]
+    public async Task GetAccessListAsync_SuccessProcessing_200StatusCode()
+    {
+        //Arrange
+        var sut = Setup();
+        var accessResponse = Fixture.Create<List<AccessResponse>>();
+
+        _serviceMock!
+            .Setup(x => x.GetAccessListAsync())
+            .ReturnsAsync((ResponseStatus.Successful, accessResponse));
+        //Act
+        var actual = await sut.GetAccessListAsync();
+
+        //Assert
+        var response = actual as OkObjectResult;
+        Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.OK, response.StatusCode);
+    }
+
+
+    [Fact]
+    public async Task GetAccessListAsync_NonExistent_UnprocessableEntity_422StatusCode()
+    {
+        //Arrange
+        var sut = Setup();
+
+        _serviceMock!
+            .Setup(x => x.GetAccessListAsync())
+            .ReturnsAsync((ResponseStatus.MissingInformation, null));
+        //Act
+        var actual = await sut.GetAccessListAsync();
+
+        //Assert
+        var response = actual as StatusCodeResult;
+        Assert.NotNull(response);
+        Assert.Equal((int)HttpStatusCode.UnprocessableEntity, response.StatusCode);
+    }
 
     protected override AccessController Setup()
     {

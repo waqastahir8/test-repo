@@ -10,13 +10,13 @@ public interface ISsaControllerService
 {
     Task<(ResponseStatus Status, bool? Response)> BulkUpdateVerificationDataAsync(List<SocialSecurityVerificationRequestModel> updateList);
 
-    Task<(ResponseStatus Status, SocialSecurityVerificationResponse? Response)> UpdateUserSSAInfoAsync(int userId, SocialSecurityVerificationRequestModel verificationUpdate);
+    Task<(ResponseStatus Status, SocialSecurityVerificationResponse? Response)> UpdateUserSSAInfoAsync(SocialSecurityVerificationRequestModel verificationUpdate);
 
     Task<(ResponseStatus Status, UserResponse? Response)> SubmitInfoForVerificationAsync(int userId);
 
     Task<(ResponseStatus Status, List<UserResponse>? Response)> FetchPendingUsersForSSAVerificationAsync();
 
-    Task<(ResponseStatus Status, bool? Response)> NotifyFailedUserVerificationsAsync();
+    Task<(ResponseStatus Status, bool? Response)> NotifyFailedUserVerificationsAsync(int userId);
 }
 
 public sealed class SsaControllerService : ISsaControllerService
@@ -104,9 +104,9 @@ public sealed class SsaControllerService : ISsaControllerService
     }
 
 
-    public async Task<(ResponseStatus Status, SocialSecurityVerificationResponse? Response)> UpdateUserSSAInfoAsync(int userId, SocialSecurityVerificationRequestModel verificationUpdate)
+    public async Task<(ResponseStatus Status, SocialSecurityVerificationResponse? Response)> UpdateUserSSAInfoAsync(SocialSecurityVerificationRequestModel verificationUpdate)
     {
-        if (verificationUpdate == null || userId < 1)
+        if (verificationUpdate == null || verificationUpdate.UserId < 1)
         {
             return (ResponseStatus.MissingInformation, null);
         }
@@ -115,11 +115,11 @@ public sealed class SsaControllerService : ISsaControllerService
 
         try
         {
-            userStatus = await _userRepository.FindSocialSecurityVerificationByUserId(userId);
+            userStatus = await _userRepository.FindSocialSecurityVerificationByUserId(verificationUpdate.UserId);
         }
         catch (Exception e)
         {
-            _logger.LogError(e, $"Unable to check if verification for {userId} exists.");
+            _logger.LogError(e, $"Unable to check if verification for {verificationUpdate.UserId} exists.");
             return (ResponseStatus.UnknownError, null);
         }
 
@@ -150,7 +150,7 @@ public sealed class SsaControllerService : ISsaControllerService
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Unable to save update for user {userId} exists.");
+                _logger.LogError(e, $"Unable to save update for user {verificationUpdate.UserId} exists.");
                 return (ResponseStatus.UnknownError, null);
             }
         }
@@ -238,7 +238,7 @@ public sealed class SsaControllerService : ISsaControllerService
 
         List<UserResponse> response = new List<UserResponse>();
 
-        if (userList != null && userList.Count > 0)
+        if (userList != null)
         {
             for (int i = 0; i < userList.Count; i++)
             {
@@ -248,7 +248,7 @@ public sealed class SsaControllerService : ISsaControllerService
                     mapped.EncryptedSocialSecurityNumber = _encryptionService.Decrypt(mapped.EncryptedSocialSecurityNumber);
                     response.Add(mapped);
 
-                    await AddUserToFile(userList[i]);
+                    await AddUserToFileAsync(userList[i]);
                 }
             }
         }
@@ -256,20 +256,40 @@ public sealed class SsaControllerService : ISsaControllerService
         return (ResponseStatus.Successful, response);
     }
 
-    public async Task<(ResponseStatus Status, bool? Response)> NotifyFailedUserVerificationsAsync()
+    public async Task<(ResponseStatus Status, bool? Response)> NotifyFailedUserVerificationsAsync(int userId)
     {
-        List<User>? userList;
-        try
+        List<User>? userList = new List<User>();
+
+        if (userId > 0)
         {
-            userList = await _userRepository.FetchFailedSSAChecksAsync();
+            try
+            {
+                User? foundUser = await _userRepository.GetAsync(userId);
+                if (foundUser != null)
+                {
+                    userList.Add(foundUser);
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error fetching user {Identifier} for ssa verification.", userId.ToString().Replace(Environment.NewLine, ""));
+                return (ResponseStatus.UnknownError, null);
+            }
         }
-        catch (Exception e)
+        else
         {
-            _logger.LogError(e, "Error fetching pending users for ssa verification.");
-            return (ResponseStatus.UnknownError, null);
+            try
+            {
+                userList = await _userRepository.FetchFailedSSAChecksAsync();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error fetching user list for failed ssa verification.");
+                return (ResponseStatus.UnknownError, null);
+            }
         }
 
-        if (userList == null || userList.Count < 1)
+        if (userList == null)
         {
             return (ResponseStatus.MissingInformation, false);
         }
@@ -279,7 +299,7 @@ public sealed class SsaControllerService : ISsaControllerService
         return (ResponseStatus.Successful, success);
     }
 
-    private async Task<bool> AddUserToFile(User user)
+    private async Task<bool> AddUserToFileAsync(User user)
     {
         if (user != null && user.SocialSecurityVerification != null)
         {
