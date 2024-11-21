@@ -344,8 +344,20 @@ public class UserHelperService : IUserHelperService
     private async Task<EmailModel> FormatSSAEmailAsync(User toNotify)
     {
         EmailModel email = new EmailModel();
-
         string htmlTemplate = _templates.InviteUserTemplate();
+
+        if (toNotify.SocialSecurityVerification?.VerificationCode == "1")
+        {
+            htmlTemplate = _templates.SSNNotInFileTemplate();
+        }
+        else if (toNotify.SocialSecurityVerification?.VerificationCode == "3" || toNotify.SocialSecurityVerification?.VerificationCode == "4")
+        {
+            htmlTemplate = _templates.NameDOBGenderNotInFileTemplate();
+        }
+        else if (toNotify.SocialSecurityVerification?.VerificationCode == "5" || toNotify.SocialSecurityVerification?.VerificationCode == "6")
+        {
+            htmlTemplate = _templates.NameDoesNotMathOrOtherTemplate();
+        }
 
         List<string> recipients = new List<string>();
 
