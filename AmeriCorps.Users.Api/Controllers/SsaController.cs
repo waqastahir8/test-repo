@@ -32,8 +32,13 @@ public sealed class SsaController(ISsaControllerService service) : ControllerBas
 
     //Send appropriate email to users for failed ssa verifications
     [HttpGet("notify-failed")]
-    public async Task<IActionResult> NotifyFailedUserVerificationsAsync() =>
-        await ServeAsync(async () => await _service.NotifyFailedUserVerificationsAsync());
+    public async Task<IActionResult> NotifyAllFailedUsersVerificationsAsync() =>
+        await ServeAsync(async () => await _service.NotifyFailedUserVerificationsAsync(0));
+
+    //Send email to specific user for failed ssa verification
+    [HttpGet("notify-failed/{userId}")]
+    public async Task<IActionResult> NotifyFailedUserVerificationAsync(int userId) =>
+        await ServeAsync(async () => await _service.NotifyFailedUserVerificationsAsync(userId));
 
     private async Task<IActionResult> ServeAsync<T>(Func<Task<(ResponseStatus, T)>> callAsync)
     {

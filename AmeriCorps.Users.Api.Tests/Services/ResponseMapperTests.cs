@@ -553,7 +553,17 @@ public sealed class ResponseMapperTests : ResponseMapperSetup
     [Fact]
     public void Map_CorrectlyMapsPropertiesOperatingSiteResponse()
     {
+        var contact = Fixture.Build<User>()
+              .Without(a => a.DateOfBirth)
+              .Without(a => a.Education)
+              .Without(a => a.Skills)
+              .Without(a => a.MilitaryService)
+              .Without(a => a.References)
+              .Without(a => a.DocumentExpirationDate)
+              .Create();
+                    
         var model = Fixture.Build<OperatingSite>()
+              .With(o => o.Contact, contact)
               .Create();
 
         IResponseMapper mapper = new ResponseMapper();
