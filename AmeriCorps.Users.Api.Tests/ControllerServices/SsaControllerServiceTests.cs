@@ -239,7 +239,7 @@ public sealed partial class SsaControllerServiceTests : BaseTests<SsaControllerS
         // Arrange
         var sut = Setup();
 
-        if(userId > 0)
+        if (userId > 0)
         {
             _userRepositoryMock!
                 .Setup(x => x.GetAsync(userId))

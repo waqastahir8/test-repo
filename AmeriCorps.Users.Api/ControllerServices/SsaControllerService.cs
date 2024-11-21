@@ -260,12 +260,12 @@ public sealed class SsaControllerService : ISsaControllerService
     {
         List<User>? userList = new List<User>();
 
-        if(userId > 0)
+        if (userId > 0)
         {
             try
             {
                 User? foundUser = await _userRepository.GetAsync(userId);
-                if(foundUser != null)
+                if (foundUser != null)
                 {
                     userList.Add(foundUser);
                 }

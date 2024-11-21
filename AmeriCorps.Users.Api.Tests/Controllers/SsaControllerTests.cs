@@ -118,7 +118,7 @@ public sealed partial class SsaControllerTests : BaseTests<SsaController>
             .Setup(x => x.UpdateUserSSAInfoAsync(update))
             .ReturnsAsync((ResponseStatus.UnknownError, null));
         //Act
-        var actual = await sut.UpdateUserSSAInfoAsync( update);
+        var actual = await sut.UpdateUserSSAInfoAsync(update);
 
         //Assert
         var response = actual as StatusCodeResult;

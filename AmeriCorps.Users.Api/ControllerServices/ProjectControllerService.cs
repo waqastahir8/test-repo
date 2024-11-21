@@ -406,7 +406,7 @@ public sealed class ProjectControllerService : IProjectControllerService
     {
         User toInvite = new User();
 
-        if(!string.IsNullOrEmpty(inviteSite.ContactName))
+        if (!string.IsNullOrEmpty(inviteSite.ContactName))
         {
             var contactName = inviteSite.ContactName.Split(' ', 2);
 
@@ -455,7 +455,7 @@ public sealed class ProjectControllerService : IProjectControllerService
             return (inviteSite);
         }
 
-        if(toInvite != null && toInvite.Id > 1)
+        if (toInvite != null && toInvite.Id > 1)
         {
             inviteSite.Contact = toInvite;
         }

@@ -21,7 +21,7 @@ public sealed class OperatingSiteResponse
     public DateTime? InviteDate { get; set; }
 
     public UserResponse? Contact { get; set; }
-    
+
     public double AwardedMsys { get; set; }
 
     public double LivingAllowanceMsys { get; set; }

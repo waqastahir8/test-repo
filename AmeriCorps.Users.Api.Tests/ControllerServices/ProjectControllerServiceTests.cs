@@ -601,6 +601,6 @@ public sealed partial class ProjectControllerServiceTests : BaseTests<ProjectCon
             _repositoryMock.Object,
             _userHelperService.Object,
             _userRepositoryMock.Object);
-            
+
     }
 }

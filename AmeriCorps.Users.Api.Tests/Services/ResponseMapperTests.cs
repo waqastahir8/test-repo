@@ -561,7 +561,7 @@ public sealed class ResponseMapperTests : ResponseMapperSetup
               .Without(a => a.References)
               .Without(a => a.DocumentExpirationDate)
               .Create();
-                    
+
         var model = Fixture.Build<OperatingSite>()
               .With(o => o.Contact, contact)
               .Create();
