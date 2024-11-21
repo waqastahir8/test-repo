@@ -28,19 +28,22 @@ public sealed class ProjectControllerService : IProjectControllerService
     private readonly IRequestMapper _requestMapper;
     private readonly IProjectRepository _repository;
     private readonly IUserHelperService _userHelperService;
+    private readonly IUserRepository _userRepository;
 
     public ProjectControllerService(
     ILogger<ProjectControllerService> logger,
     IRequestMapper requestMapper,
     IResponseMapper responseMapper,
     IProjectRepository repository,
-    IUserHelperService userHelperService)
+    IUserHelperService userHelperService,
+    IUserRepository userRepository)
     {
         _logger = logger;
         _requestMapper = requestMapper;
         _responseMapper = responseMapper;
         _repository = repository;
         _userHelperService = userHelperService;
+        _userRepository = userRepository;
     }
 
     public async Task<(ResponseStatus Status, ProjectResponse? Response)> GetProjectByCodeAsync(string projCode)
@@ -268,6 +271,8 @@ public sealed class ProjectControllerService : IProjectControllerService
             inviteSite.UpdatedDate = DateTime.UtcNow;
             inviteSite.InviteDate = DateTime.UtcNow;
 
+            inviteSite = await CreateOperatingSiteContactAsync(inviteSite, foundProject);
+
             if (string.IsNullOrEmpty(inviteSite.Id.ToString()) || inviteSite.Id < 1)
             {
                 foundProject.OperatingSites.Add(inviteSite);
@@ -394,5 +399,67 @@ public sealed class ProjectControllerService : IProjectControllerService
         var response = _responseMapper.Map(opSiteList);
 
         return (ResponseStatus.Successful, response);
+    }
+
+
+    private async Task<OperatingSite> CreateOperatingSiteContactAsync(OperatingSite inviteSite, Project project)
+    {
+        User toInvite = new User();
+
+        if (!string.IsNullOrEmpty(inviteSite.ContactName))
+        {
+            var contactName = inviteSite.ContactName.Split(' ', 2);
+
+            toInvite.FirstName = contactName[0];
+            toInvite.LastName = contactName[1];
+        }
+
+        toInvite.OrgCode = project.ProjectOrgCode;
+        toInvite.InviteUserId = inviteSite.InviteUserId;
+        toInvite.InviteDate = DateTime.UtcNow;
+
+        CommunicationMethod email = new CommunicationMethod()
+        {
+            Type = "email",
+            Value = inviteSite.EmailAddress,
+            IsPreferred = true
+        };
+
+        List<CommunicationMethod> commList = new List<CommunicationMethod>();
+        commList.Add(email);
+        toInvite.CommunicationMethods = commList;
+        toInvite.UserName = inviteSite.EmailAddress;
+
+
+        UserProject userProject = new UserProject()
+        {
+            ProjectName = project.ProjectName,
+            ProjectCode = project.ProjectCode,
+            ProjectType = project.ProjectType,
+            ProjectOrg = project.ProjectOrgCode,
+            Active = true
+        };
+
+        List<UserProject> projects = new List<UserProject>();
+        projects.Add(userProject);
+
+        toInvite.UserProjects = projects;
+
+        try
+        {
+            toInvite = await _userRepository.SaveAsync(toInvite);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Unable to save contact for new operating site {inviteSite}.");
+            return (inviteSite);
+        }
+
+        if (toInvite != null && toInvite.Id > 1)
+        {
+            inviteSite.Contact = toInvite;
+        }
+
+        return inviteSite;
     }
 }

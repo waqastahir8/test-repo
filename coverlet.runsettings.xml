@@ -9,7 +9,8 @@
             [AmeriCorps.Users.Data.Core]*NpgsqlContext,
             [AmeriCorps.Users.Api]*.Configuration.*,
             [AmeriCorps.Users.Api]*.Http.*,
-            [AmeriCorps.Users.Api]*.Scheduler.*
+            [AmeriCorps.Users.Api]*.Scheduler.*,
+            [AmeriCorps.Users.Api]*.Services.EmailTemplatesService*
             </Exclude>
           </Configuration>
       </DataCollector>
