@@ -107,8 +107,8 @@ public class EmailTemplatesService() : IEmailTemplatesService
     }
 
     public string SSNNotInFileTemplate()
-        {
-            string htmlTemplate = @"
+    {
+        string htmlTemplate = @"
                         <!DOCTYPE html>
                         <html lang='en'>
                         <head>
@@ -195,12 +195,12 @@ public class EmailTemplatesService() : IEmailTemplatesService
                         </body>
                         </html>";
 
-            return htmlTemplate;
-        }
+        return htmlTemplate;
+    }
 
-        public string NameDOBGenderNotInFileTemplate()
-        {
-            string htmlTemplate = @"
+    public string NameDOBGenderNotInFileTemplate()
+    {
+        string htmlTemplate = @"
                         <!DOCTYPE html>
                         <html lang='en'>
                         <head>
@@ -287,12 +287,12 @@ public class EmailTemplatesService() : IEmailTemplatesService
                         </body>
                         </html>";
 
-            return htmlTemplate;
-        }
-        
-        public string NameDoesNotMathOrOtherTemplate()
-        {
-            string htmlTemplate = @"
+        return htmlTemplate;
+    }
+
+    public string NameDoesNotMathOrOtherTemplate()
+    {
+        string htmlTemplate = @"
                         <!DOCTYPE html>
                         <html lang='en'>
                         <head>
@@ -381,6 +381,6 @@ public class EmailTemplatesService() : IEmailTemplatesService
                         </body>
                         </html>";
 
-            return htmlTemplate;
-        }
+        return htmlTemplate;
+    }
 }

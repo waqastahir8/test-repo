@@ -346,11 +346,16 @@ public class UserHelperService : IUserHelperService
         EmailModel email = new EmailModel();
         string htmlTemplate = _templates.InviteUserTemplate();
 
-        if(toNotify.SocialSecurityVerification?.VerificationCode == "1") {
+        if (toNotify.SocialSecurityVerification?.VerificationCode == "1")
+        {
             htmlTemplate = _templates.SSNNotInFileTemplate();
-        } else if(toNotify.SocialSecurityVerification?.VerificationCode == "3" || toNotify.SocialSecurityVerification?.VerificationCode =="4") {
+        }
+        else if (toNotify.SocialSecurityVerification?.VerificationCode == "3" || toNotify.SocialSecurityVerification?.VerificationCode == "4")
+        {
             htmlTemplate = _templates.NameDOBGenderNotInFileTemplate();
-        } else if(toNotify.SocialSecurityVerification?.VerificationCode == "5" || toNotify.SocialSecurityVerification?.VerificationCode =="6") {
+        }
+        else if (toNotify.SocialSecurityVerification?.VerificationCode == "5" || toNotify.SocialSecurityVerification?.VerificationCode == "6")
+        {
             htmlTemplate = _templates.NameDoesNotMathOrOtherTemplate();
         }
 
