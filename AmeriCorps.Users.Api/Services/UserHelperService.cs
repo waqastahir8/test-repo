@@ -346,18 +346,19 @@ public class UserHelperService : IUserHelperService
         EmailModel email = new EmailModel();
         string htmlTemplate = _templates.InviteUserTemplate();
 
-        if (toNotify.SocialSecurityVerification?.VerificationCode == "1")
+        var verificationCode = toNotify.SocialSecurityVerification?.VerificationCode;
+        var citizenshipCode = toNotify.SocialSecurityVerification?.CitizenshipCode;
+
+        var citizenshipCodes = new HashSet<string> { "", "*", "B", "C", "D", "E", "F" };
+
+        htmlTemplate = verificationCode switch
         {
-            htmlTemplate = _templates.SSNNotInFileTemplate();
-        }
-        else if (toNotify.SocialSecurityVerification?.VerificationCode == "3" || toNotify.SocialSecurityVerification?.VerificationCode == "4")
-        {
-            htmlTemplate = _templates.NameDOBGenderNotInFileTemplate();
-        }
-        else if (toNotify.SocialSecurityVerification?.VerificationCode == "5" || toNotify.SocialSecurityVerification?.VerificationCode == "6")
-        {
-            htmlTemplate = _templates.NameDoesNotMathOrOtherTemplate();
-        }
+            "1" => _templates.SSNNotInFileTemplate(),
+            "3" or "4" => _templates.NameDOBGenderNotInFileTemplate(),
+            "5" or "6" => _templates.NameDoesNotMathOrOtherTemplate(),
+            _ when citizenshipCode != null && citizenshipCodes.Contains(citizenshipCode) => _templates.CitizenshipValidationCodeTemplate(),
+            _ => htmlTemplate 
+        };
 
         List<string> recipients = new List<string>();
 

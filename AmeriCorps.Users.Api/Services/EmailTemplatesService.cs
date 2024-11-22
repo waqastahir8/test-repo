@@ -6,6 +6,7 @@ public interface IEmailTemplatesService
     string SSNNotInFileTemplate();
     string NameDOBGenderNotInFileTemplate();
     string NameDoesNotMathOrOtherTemplate();
+    string CitizenshipValidationCodeTemplate();
 }
 
 public class EmailTemplatesService() : IEmailTemplatesService
@@ -378,6 +379,106 @@ public class EmailTemplatesService() : IEmailTemplatesService
                                 <p>If the individual was recently married or divorced and their information is up to date in the My AmeriCorps portal, their name might not be up to date with the Social Security Administration.</p>
                                 <p>If this is the case, they will need to contact the Social Security Administration to update their information: https://faq.ssa.gov/link/portal/34011/34019/Article/3749/How-do-I-change-or-correct-my-name-on-my-Social-Security-number-card</p>
                             </div>
+                        </body>
+                        </html>";
+
+        return htmlTemplate;
+    }
+
+    public string CitizenshipValidationCodeTemplate()
+    {
+        string htmlTemplate = @"
+                        <!DOCTYPE html>
+                        <html lang='en'>
+                        <head>
+                            <meta charset='UTF-8'>
+                            <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+                            <style>
+                                body {{
+                                    font-family: Arial, sans-serif;
+                                    background-color: #2d3e50;
+                                    margin: 0;
+                                    padding: 10px 0;
+                                    display: flex;
+                                    justify-content: center;
+                                    align-items: center;
+                                    min-height: 100vh;
+                                }}
+                                .email-wrapper {{
+                                    background-color: #ffffff;
+                                    padding: 40px;
+                                    border-radius: 0; /* Removed border radius */
+                                    width: 80%;
+                                    max-width: 600px;
+                                    margin: 0 10%;
+                                    text-align: center;
+                                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                                }}
+                                .email-content {{
+                                    text-align: justify;
+                                }}
+                                .email-content p {{
+                                    line-height: 1.6;
+                                    margin-bottom: 20px;
+                                    font-size: 14px; /* Adjusted font size */
+                                    color: #333333; /* Adjusted font color */
+                                    font-weight: bold; /* Make content bold */
+                                }}
+                                .email-content .recipient-name {{
+                                    font-weight: bold;
+                                    display: block;
+                                    text-align: center;
+                                    font-size: 18px; /* Increased font size */
+                                    color: #000000; /* Black color */
+                                    margin-top: -10px; /* Reduced space between Dear and recipient name */
+                                }}
+                                .email-button {{
+                                    display: inline-block;
+                                    padding: 12px 24px; /* Increased padding for the button */
+                                    color: #ffffff;
+                                    background-color: #007bff;
+                                    border-radius: 25px;
+                                    text-decoration: none;
+                                    font-size: 18px; /* Increased font size */
+                                    margin: 5px auto; /* Reduced space around button */
+                                    font-weight: bold;
+                                }}
+                                .greeting {{
+                                    font-size: 18px; /* Increased font size */
+                                    color: #333333;
+                                    font-weight: bold;
+                                    text-align: center; /* Center align the greeting */
+                                }}
+                                .note {{
+                                    font-size: 14px; /* Increased font size */
+                                    color: #777777;
+                                    font-weight: bold;
+                                    text-align: center; /* Center align the note */
+                                }}
+                                .center-text {{
+                                    text-align: center;
+                                }}
+                            </style>
+                        </head>
+                        <body>
+                            <div class='email-wrapper'>
+                                <div class='email-content'>
+                                    <p class='greeting'>Dear</p>
+                                    <p class='recipient-name'>{0}</p>
+                                    <p>AmeriCorps Verification</p>
+                                    <p>{0}</p>
+                                    <p>AmeriCorps Verification</p>
+                                    <p>Please have the individual fax a copy of one of the following government authorized documents to the National Service Hotline:</p>
+                                    <ul>
+                                        <li>Certified birth certificate issued by the city, county or state of birth,</li>
+                                        <li>U.S. consular report of birth,</li>
+                                        <li>U.S. passport,</li>
+                                        <li>Certificate of Naturalization, or</li>
+                                        <li>Certificate of Citizenship.</li>
+                                    </ul>
+                                    <p>On the cover letter, please write as the subject heading “Verification check” and include the person’s name and NSPID or NAAID as shown in this email. The fax number is 606-330-2530.</p>
+                                    <p>Please include contact information in case the copies in the fax are not readable.</p>
+                                </div>
                         </body>
                         </html>";
 
