@@ -10,8 +10,12 @@ public enum VerificationStatusResponse
 {
     Pending = 0,
     Verified = 1,
-    Failed = 2,
+    Returned = 2,
     Resubmit = 3,
     ManuallyVerified = 4,
-    Error = 5
+    ManuallyReturned = 5,
+    CannotBeManuallyVerified = 6,
+    PendingManualVerification = 7,
+    PreviouslyServed = 8,
+    Error = 100,
 }

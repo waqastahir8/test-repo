@@ -9,7 +9,7 @@ namespace AmeriCorps.Users.Models;
 public class SocialSecurityVerificationRequestModel
 {
     public int UserId { get; set; }
-    public string SocialSecurity { get; set; }
+    public string? SocialSecurity { get; set; }
     public VerificationStatusResponse CitizenshipStatus { get; set; } = new VerificationStatusResponse();
     public VerificationStatusResponse SocialSecurityStatus { get; set; } = new VerificationStatusResponse();
     public string VerificationCode { get; set; } = string.Empty;
