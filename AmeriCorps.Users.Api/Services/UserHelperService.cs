@@ -226,7 +226,7 @@ public class UserHelperService : IUserHelperService
                 return false;
             }
 
-            _logger.LogInformation("notification email sent for {Identifier}.", toNotify.UserName.ToString().Replace(Environment.NewLine, ""));
+            _logger.LogInformation("Notification email sent for {Identifier}.", toNotify.UserName.ToString().Replace(Environment.NewLine, ""));
             return true;
         }
         else
@@ -357,7 +357,7 @@ public class UserHelperService : IUserHelperService
             "3" or "4" => _templates.NameDOBGenderNotInFileTemplate(),
             "5" or "6" => _templates.NameDoesNotMathOrOtherTemplate(),
             _ when citizenshipCode != null && citizenshipCodes.Contains(citizenshipCode) => _templates.CitizenshipValidationCodeTemplate(),
-            _ => htmlTemplate 
+            _ => htmlTemplate
         };
 
         List<string> recipients = new List<string>();

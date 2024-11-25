@@ -301,10 +301,10 @@ public sealed partial class UserRepository(
             .Include(u => u.SocialSecurityVerification)
             .Include(u => u.CommunicationMethods)
             .Include(u => u.UserProjects)
-            .Where(x => x.SocialSecurityVerification != null && (x.SocialSecurityVerification.CitizenshipStatus == VerificationStatus.Failed &&
+            .Where(x => x.SocialSecurityVerification != null && ((x.SocialSecurityVerification.CitizenshipStatus == VerificationStatus.Returned &&
                 DateTime.Compare(x.SocialSecurityVerification.CitizenshipUpdatedDate ?? DateTime.MinValue, updatedDate) <= 0)
-                || (x.SocialSecurityVerification.SocialSecurityStatus == VerificationStatus.Failed &&
-                DateTime.Compare(x.SocialSecurityVerification.SocialSecurityUpdatedDate ?? DateTime.MinValue, updatedDate) >= 0)).ToListAsync());
+                || (x.SocialSecurityVerification.SocialSecurityStatus == VerificationStatus.Returned &&
+                DateTime.Compare(x.SocialSecurityVerification.SocialSecurityUpdatedDate ?? DateTime.MinValue, updatedDate) >= 0))).ToListAsync());
     }
 
     public async Task<List<User>> FetchVistaRecipientsAsync()

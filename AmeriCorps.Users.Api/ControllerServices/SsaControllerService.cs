@@ -58,7 +58,11 @@ public sealed class SsaControllerService : ISsaControllerService
 
         for (int i = 0; i < updateList.Count; i++)
         {
-            var encryptedId = _encryptionService.Encrypt(updateList[i].SocialSecurity);
+            var encryptedId = "";
+            if (!string.IsNullOrWhiteSpace(updateList[i].SocialSecurity))
+            {
+                encryptedId = _encryptionService.Encrypt(updateList[i].SocialSecurity);
+            }
 
             if (!string.IsNullOrWhiteSpace(encryptedId))
             {
@@ -130,18 +134,24 @@ public sealed class SsaControllerService : ISsaControllerService
             {
                 userStatus.CitizenshipStatus = (VerificationStatus)verificationUpdate.CitizenshipStatus;
                 userStatus.CitizenshipUpdatedDate = DateTime.UtcNow;
+                if (userStatus.CitizenshipStatus == VerificationStatus.Resubmit)
+                {
+                    userStatus.FileStatus = SSAFileStatus.PendingToSend;
+                }
             }
             if (userStatus.SocialSecurityStatus != (VerificationStatus)verificationUpdate.SocialSecurityStatus)
             {
                 userStatus.SocialSecurityStatus = (VerificationStatus)verificationUpdate.SocialSecurityStatus;
                 userStatus.SocialSecurityUpdatedDate = DateTime.UtcNow;
+                if (userStatus.SocialSecurityStatus == VerificationStatus.Resubmit)
+                {
+                    userStatus.FileStatus = SSAFileStatus.PendingToSend;
+                }
             }
 
-            if ((userStatus.SocialSecurityStatus == VerificationStatus.Resubmit || userStatus.CitizenshipStatus == VerificationStatus.Resubmit) && userStatus.SubmitCount < 5)
+            if (userStatus.FileStatus == SSAFileStatus.PendingToSend)
             {
                 userStatus.SubmitCount++;
-
-                userStatus.FileStatus = SSAFileStatus.PendingToSend;
             }
 
             try
