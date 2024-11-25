@@ -357,7 +357,7 @@ public class UserHelperService : IUserHelperService
             "3" or "4" => _templates.NameDOBGenderNotInFileTemplate(),
             "5" or "6" => _templates.NameDoesNotMathOrOtherTemplate(),
             _ when citizenshipCode != null && citizenshipCodes.Contains(citizenshipCode) => _templates.CitizenshipValidationCodeTemplate(),
-            _ => htmlTemplate 
+            _ => htmlTemplate
         };
 
         List<string> recipients = new List<string>();

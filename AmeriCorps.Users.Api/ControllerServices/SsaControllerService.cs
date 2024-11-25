@@ -59,7 +59,7 @@ public sealed class SsaControllerService : ISsaControllerService
         for (int i = 0; i < updateList.Count; i++)
         {
             var encryptedId = "";
-            if(!string.IsNullOrWhiteSpace(updateList[i].SocialSecurity))
+            if (!string.IsNullOrWhiteSpace(updateList[i].SocialSecurity))
             {
                 encryptedId = _encryptionService.Encrypt(updateList[i].SocialSecurity);
             }
@@ -134,7 +134,7 @@ public sealed class SsaControllerService : ISsaControllerService
             {
                 userStatus.CitizenshipStatus = (VerificationStatus)verificationUpdate.CitizenshipStatus;
                 userStatus.CitizenshipUpdatedDate = DateTime.UtcNow;
-                if(userStatus.CitizenshipStatus == VerificationStatus.Resubmit)
+                if (userStatus.CitizenshipStatus == VerificationStatus.Resubmit)
                 {
                     userStatus.FileStatus = SSAFileStatus.PendingToSend;
                 }
@@ -149,7 +149,7 @@ public sealed class SsaControllerService : ISsaControllerService
                 }
             }
 
-            if(userStatus.FileStatus == SSAFileStatus.PendingToSend)
+            if (userStatus.FileStatus == SSAFileStatus.PendingToSend)
             {
                 userStatus.SubmitCount++;
             }
