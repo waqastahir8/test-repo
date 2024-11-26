@@ -29,6 +29,11 @@ public interface IRequestMapper
 
     SubGrantee Map(SubGranteeRequestModel requestModel);
 
+    EncryptedSocialSecurityNumber Map(EncryptedSocialSecurityNumberRequestModel requestModel);
+    CountryOfBirth Map(CountryOfBirthRequestModel requestModel);
+    StateOfBirth Map(StateOfBirthRequestModel requestModel);
+    CityOfBirth Map(CityOfBirthRequestModel requestModel);
+    DateOfBirth Map(DateOfBirthRequestModel requestModel);
     DirectDeposit Map(DirectDepositRequestModel requestModel);
     TaxWithHolding Map(TaxWithHoldingRequestModel requestModel);
 }
@@ -48,10 +53,34 @@ public sealed class RequestMapper : IRequestMapper
         Suffix = requestModel.Suffix,
         Prefix = requestModel.Prefix,
         OrgCode = requestModel.OrgCode,
+        PPIUpdateNote = requestModel.PPIUpdateNote,
         UserAccountStatus = (UserAccountStatus)requestModel.UserAccountStatus,
         EncryptedSocialSecurityNumber = requestModel.EncryptedSocialSecurityNumber,
-        CountryOfBirth = requestModel.CountryOfBirth,
-        CityOfBirth = requestModel.CityOfBirth,
+        CountryOfBirth = MapperUtils.MapList<CountryOfBirthRequestModel, CountryOfBirth>(
+            requestModel.CountryOfBirth, c =>
+                new CountryOfBirth
+                {
+                    BirthCountry = c.BirthCountry
+                }),
+        StateOfBirth = MapperUtils.MapList<StateOfBirthRequestModel, StateOfBirth>(
+            requestModel.StateOfBirth, c =>
+                new StateOfBirth
+                {
+                    BirthState = c.BirthState
+                }),
+        CityOfBirth = MapperUtils.MapList<CityOfBirthRequestModel, CityOfBirth>(
+            requestModel.CityOfBirth, c =>
+                new CityOfBirth
+                {
+                    BirthCity = c.BirthCity
+                }),
+        EncryptedSocialSecurityNumbers = MapperUtils.MapList<EncryptedSocialSecurityNumberRequestModel, EncryptedSocialSecurityNumber>(
+            requestModel.EncryptedSocialSecurityNumbers, c =>
+                new EncryptedSocialSecurityNumber
+                {
+                    SociaSecurityNumber = c.SociaSecurityNumber
+                }),
+                
         CitzenShipStatus = (Data.Core.Model.CitizenshipStatus)requestModel.CitzenShipStatus,
         InviteUserId = requestModel.InviteUserId,
 
@@ -229,6 +258,12 @@ public sealed class RequestMapper : IRequestMapper
                     Deductions = t.Deductions,
                     ExtraWithHoldingAmount = t.ExtraWithHoldingAmount,
                     ModifiedDate = t.ModifiedDate
+                }),
+        DateOfBirths = MapperUtils.MapList<DateOfBirthRequestModel, DateOfBirth>(
+            requestModel.DateOfBirths, d => 
+                new DateOfBirth
+                {
+                    BirthDate = d.BirthDate
                 })
     };
 
@@ -447,6 +482,23 @@ public sealed class RequestMapper : IRequestMapper
         MailByPaycheck = requestModel.MailByPaycheck
     };
 
+    public CountryOfBirth Map(CountryOfBirthRequestModel requestModel) => new() 
+    {
+        BirthCountry = requestModel.BirthCountry
+    };
+    
+    public StateOfBirth Map(StateOfBirthRequestModel requestModel) => new() {
+        BirthState = requestModel.BirthState
+    };
+    public CityOfBirth Map(CityOfBirthRequestModel requestModel) => new() {
+        BirthCity = requestModel.BirthCity
+    };
+    public DateOfBirth Map(DateOfBirthRequestModel requestModel) => new() {
+        BirthDate = requestModel.BirthDate
+    };
+    public EncryptedSocialSecurityNumber Map(EncryptedSocialSecurityNumberRequestModel requestModel) => new() {
+        SociaSecurityNumber = requestModel.SociaSecurityNumber
+    };
     public TaxWithHolding Map(TaxWithHoldingRequestModel requestModel) => new()
     {
         TaxWithHoldingType = (Data.Core.Model.TaxWithHoldingType)requestModel.TaxWithHoldingType,
