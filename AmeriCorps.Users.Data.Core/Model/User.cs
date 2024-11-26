@@ -16,6 +16,7 @@ public sealed class User : Entity
     public string MiddleName { get; set; } = string.Empty;
     public string PreferredName { get; set; } = string.Empty;
     public DateOnly DateOfBirth { get; set; }
+    public List<DateOfBirth>? DateOfBirths { get; set; } = new List<DateOfBirth>();
     public string Pronouns { get; set; } = string.Empty;
     public List<Attribute> Attributes { get; set; } = new List<Attribute>();
     public List<Language> Languages { get; set; } = new List<Language>();
@@ -32,10 +33,11 @@ public sealed class User : Entity
     public List<UserProject> UserProjects { get; set; } = new List<UserProject>();
     public string OrgCode { get; set; } = string.Empty;
     public string EncryptedSocialSecurityNumber { get; set; } = string.Empty;
+    public List<EncryptedSocialSecurityNumber> EncryptedSocialSecurityNumbers { get; set; } = new List<EncryptedSocialSecurityNumber>();
     public CitizenshipStatus CitzenShipStatus { get; set; }
-    public string CountryOfBirth { get; set; } = string.Empty;
-    public string? StateOfBirth { get; set; } = string.Empty;
-    public string CityOfBirth { get; set; } = string.Empty;
+    public List<CountryOfBirth> CountryOfBirth { get; set; } = new List<CountryOfBirth>();
+    public List<StateOfBirth> StateOfBirth { get; set; } = new List<StateOfBirth>();
+    public List<CityOfBirth> CityOfBirth { get; set; } = new List<CityOfBirth>();
     public string? ResidentRegistrationNumber { get; set; } = string.Empty;
     public DateOnly? DocumentExpirationDate { get; set; }
     public UserAccountStatus UserAccountStatus { get; set; }
@@ -45,4 +47,5 @@ public sealed class User : Entity
     public List<DirectDeposit> DirectDeposits { get; set; } = new List<DirectDeposit>();
     public List<TaxWithHolding> TaxWithHoldings { get; set; } = new List<TaxWithHolding>();
     public SocialSecurityVerification? SocialSecurityVerification { get; set; }
+    public string? PPIUpdateNote { get; set; } = string.Empty;
 }

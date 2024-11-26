@@ -560,6 +560,7 @@ public sealed class ResponseMapperTests : ResponseMapperSetup
               .Without(a => a.MilitaryService)
               .Without(a => a.References)
               .Without(a => a.DocumentExpirationDate)
+              .Without(a => a.DateOfBirths)
               .Create();
 
         var model = Fixture.Build<OperatingSite>()

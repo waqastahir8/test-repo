@@ -12,6 +12,7 @@ public class UserRequestModel
     public string? Prefix { get; set; } = string.Empty;
     public string? Suffix { get; set; } = string.Empty;
     public DateOnly DateOfBirth { get; set; }
+    public List<DateOfBirthRequestModel>? DateOfBirths { get; set; } = new List<DateOfBirthRequestModel>();
     public string Pronouns { get; set; } = string.Empty;
     public string OrgCode { get; set; } = string.Empty;
     public List<AttributeRequestModel> Attributes { get; set; } = new List<AttributeRequestModel>();
@@ -28,10 +29,11 @@ public class UserRequestModel
     public List<UserRoleRequestModel> UserRoles { get; set; } = new List<UserRoleRequestModel>();
     public List<UserProjectRequestModel> UserProjects { get; set; } = new List<UserProjectRequestModel>();
     public string EncryptedSocialSecurityNumber { get; set; } = string.Empty;
+    public List<EncryptedSocialSecurityNumberRequestModel> EncryptedSocialSecurityNumbers { get; set; } = new List<EncryptedSocialSecurityNumberRequestModel>();
     public CitizenshipStatusRequestModel CitzenShipStatus { get; set; }
-    public string CountryOfBirth { get; set; } = string.Empty;
-    public string CityOfBirth { get; set; } = string.Empty;
-    public string? StateOfBirth { get; set; } = string.Empty;
+    public List<CountryOfBirthRequestModel> CountryOfBirth { get; set; } = new List<CountryOfBirthRequestModel>();
+    public List<CityOfBirthRequestModel> CityOfBirth { get; set; } = new List<CityOfBirthRequestModel>();
+    public List<StateOfBirthRequestModel> StateOfBirth { get; set; } = new List<StateOfBirthRequestModel>();
     public string? ResidentRegistrationNumber { get; set; } = string.Empty;
     public DateOnly? DocumentExpirationDate { get; set; }
     public AccountStatusRequestModel UserAccountStatus { get; set; }
@@ -39,4 +41,5 @@ public class UserRequestModel
     public DateTime? InviteDate { get; set; }
     public List<DirectDepositRequestModel> DirectDeposits { get; set; } = new List<DirectDepositRequestModel>();
     public List<TaxWithHoldingRequestModel> TaxWithHoldings { get; set; } = new List<TaxWithHoldingRequestModel>();
+    public string? PPIUpdateNote { get; set; } = string.Empty;
 }

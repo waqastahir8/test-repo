@@ -31,6 +31,11 @@ public sealed partial class UserRepository(
                 .Include(u => u.Roles)
                 .Include(u => u.UserProjects).ThenInclude(p => p.ProjectRoles)
                 .Include(u => u.UserProjects).ThenInclude(a => a.ProjectAccess)
+                .Include(u => u.CountryOfBirth)
+                .Include(u => u.StateOfBirth)
+                .Include(u => u.CityOfBirth)
+                .Include(u => u.DateOfBirths)
+                .Include(u => u.EncryptedSocialSecurityNumbers)
                 .Include(u => u.DirectDeposits)
                 .Include(u => u.TaxWithHoldings)
                 .Include(u => u.SocialSecurityVerification)
@@ -52,6 +57,11 @@ public sealed partial class UserRepository(
                 .Include(u => u.Roles)
                 .Include(u => u.UserProjects).ThenInclude(p => p.ProjectRoles)
                 .Include(u => u.UserProjects).ThenInclude(a => a.ProjectAccess)
+                .Include(u => u.CountryOfBirth)
+                .Include(u => u.StateOfBirth)
+                .Include(u => u.CityOfBirth)
+                .Include(u => u.DateOfBirths)
+                .Include(u => u.EncryptedSocialSecurityNumbers)
                 .Include(u => u.DirectDeposits)
                 .Include(u => u.TaxWithHoldings)
                 .Include(u => u.SocialSecurityVerification)
@@ -316,7 +326,7 @@ public sealed partial class UserRepository(
             .Include(u => u.UserProjects)
             .Where(x => x.Roles != null && x.Roles.Count > 0 &&
                 ((x.UserProjects != null && x.UserProjects.Count > 0 && x.UserProjects.Where(project => project.ProjectType == "VISTA").ToList().Count > 0 &&
-                x.Roles.Where(role => role.RoleName == "Program Staff").ToList().Count > 0) 
+                x.Roles.Where(role => role.RoleName == "Program Staff").ToList().Count > 0)
                 || x.Roles.Where(role => role.RoleName == "VISTA Program Staff" || role.RoleName == "ORO").ToList().Count > 0)
                 ).ToListAsync());
     }
