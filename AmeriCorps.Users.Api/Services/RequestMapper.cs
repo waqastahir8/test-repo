@@ -80,7 +80,7 @@ public sealed class RequestMapper : IRequestMapper
                 {
                     SociaSecurityNumber = c.SociaSecurityNumber
                 }),
-                
+
         CitzenShipStatus = (Data.Core.Model.CitizenshipStatus)requestModel.CitzenShipStatus,
         InviteUserId = requestModel.InviteUserId,
 
@@ -260,7 +260,7 @@ public sealed class RequestMapper : IRequestMapper
                     ModifiedDate = t.ModifiedDate
                 }),
         DateOfBirths = MapperUtils.MapList<DateOfBirthRequestModel, DateOfBirth>(
-            requestModel.DateOfBirths, d => 
+            requestModel.DateOfBirths, d =>
                 new DateOfBirth
                 {
                     BirthDate = d.BirthDate
@@ -482,21 +482,25 @@ public sealed class RequestMapper : IRequestMapper
         MailByPaycheck = requestModel.MailByPaycheck
     };
 
-    public CountryOfBirth Map(CountryOfBirthRequestModel requestModel) => new() 
+    public CountryOfBirth Map(CountryOfBirthRequestModel requestModel) => new()
     {
         BirthCountry = requestModel.BirthCountry
     };
-    
-    public StateOfBirth Map(StateOfBirthRequestModel requestModel) => new() {
+
+    public StateOfBirth Map(StateOfBirthRequestModel requestModel) => new()
+    {
         BirthState = requestModel.BirthState
     };
-    public CityOfBirth Map(CityOfBirthRequestModel requestModel) => new() {
+    public CityOfBirth Map(CityOfBirthRequestModel requestModel) => new()
+    {
         BirthCity = requestModel.BirthCity
     };
-    public DateOfBirth Map(DateOfBirthRequestModel requestModel) => new() {
+    public DateOfBirth Map(DateOfBirthRequestModel requestModel) => new()
+    {
         BirthDate = requestModel.BirthDate
     };
-    public EncryptedSocialSecurityNumber Map(EncryptedSocialSecurityNumberRequestModel requestModel) => new() {
+    public EncryptedSocialSecurityNumber Map(EncryptedSocialSecurityNumberRequestModel requestModel) => new()
+    {
         SociaSecurityNumber = requestModel.SociaSecurityNumber
     };
     public TaxWithHolding Map(TaxWithHoldingRequestModel requestModel) => new()

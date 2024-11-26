@@ -32,7 +32,7 @@ public class UserRequestModel
     public List<EncryptedSocialSecurityNumberRequestModel> EncryptedSocialSecurityNumbers { get; set; } = new List<EncryptedSocialSecurityNumberRequestModel>();
     public CitizenshipStatusRequestModel CitzenShipStatus { get; set; }
     public List<CountryOfBirthRequestModel> CountryOfBirth { get; set; } = new List<CountryOfBirthRequestModel>();
-    public List<CityOfBirthRequestModel> CityOfBirth{ get; set; } = new List<CityOfBirthRequestModel>();
+    public List<CityOfBirthRequestModel> CityOfBirth { get; set; } = new List<CityOfBirthRequestModel>();
     public List<StateOfBirthRequestModel> StateOfBirth { get; set; } = new List<StateOfBirthRequestModel>();
     public string? ResidentRegistrationNumber { get; set; } = string.Empty;
     public DateOnly? DocumentExpirationDate { get; set; }

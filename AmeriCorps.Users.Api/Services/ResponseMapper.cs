@@ -160,34 +160,34 @@ public sealed class ResponseMapper : IResponseMapper
                 BirthCountry = c.BirthCountry
             });
 
-    public List<StateOfBirthResponse> Map(List<StateOfBirth> stateOfBirth) => 
+    public List<StateOfBirthResponse> Map(List<StateOfBirth> stateOfBirth) =>
         MapperUtils.MapList<StateOfBirth, StateOfBirthResponse>(
             stateOfBirth,
             c => new StateOfBirthResponse
             {
                 BirthState = c.BirthState
             });
- public List<CityOfBirthResponse> Map(List<CityOfBirth> cityOfBirth) => 
-        MapperUtils.MapList<CityOfBirth, CityOfBirthResponse>(
-            cityOfBirth,
-            c => new CityOfBirthResponse
-            {
-                BirthCity = c.BirthCity
-            });
-public List<DateOfBirthResponse> Map(List<DateOfBirth> dateOfBirth) =>
-        MapperUtils.MapList<DateOfBirth, DateOfBirthResponse>(
-            dateOfBirth,
-            c => new DateOfBirthResponse
-            {
-                BirthDate = c.BirthDate
-            });
-public List<EncryptedSocialSecurityNumberResponse> Map(List<EncryptedSocialSecurityNumber> encryptedSocialSecurityNumber) =>
-        MapperUtils.MapList<EncryptedSocialSecurityNumber, EncryptedSocialSecurityNumberResponse>(
-            encryptedSocialSecurityNumber,
-            c => new EncryptedSocialSecurityNumberResponse
-            {
-                SociaSecurityNumber = c.SociaSecurityNumber
-            });
+    public List<CityOfBirthResponse> Map(List<CityOfBirth> cityOfBirth) =>
+           MapperUtils.MapList<CityOfBirth, CityOfBirthResponse>(
+               cityOfBirth,
+               c => new CityOfBirthResponse
+               {
+                   BirthCity = c.BirthCity
+               });
+    public List<DateOfBirthResponse> Map(List<DateOfBirth> dateOfBirth) =>
+            MapperUtils.MapList<DateOfBirth, DateOfBirthResponse>(
+                dateOfBirth,
+                c => new DateOfBirthResponse
+                {
+                    BirthDate = c.BirthDate
+                });
+    public List<EncryptedSocialSecurityNumberResponse> Map(List<EncryptedSocialSecurityNumber> encryptedSocialSecurityNumber) =>
+            MapperUtils.MapList<EncryptedSocialSecurityNumber, EncryptedSocialSecurityNumberResponse>(
+                encryptedSocialSecurityNumber,
+                c => new EncryptedSocialSecurityNumberResponse
+                {
+                    SociaSecurityNumber = c.SociaSecurityNumber
+                });
     public List<DirectDepositResponse> Map(List<DirectDeposit> directDeposits) =>
         MapperUtils.MapList<AmeriCorps.Users.Data.Core.Model.DirectDeposit, DirectDepositResponse>(
                             directDeposits,
@@ -224,32 +224,36 @@ public List<EncryptedSocialSecurityNumberResponse> Map(List<EncryptedSocialSecur
                 ModifiedDate = t.ModifiedDate
             });
 
-    public CountryOfBirthResponse Map(CountryOfBirth countryOfBirth) => new() 
+    public CountryOfBirthResponse Map(CountryOfBirth countryOfBirth) => new()
     {
         Id = countryOfBirth.Id,
         BirthCountry = countryOfBirth.BirthCountry,
         UserId = countryOfBirth.UserId
     };
 
-    public StateOfBirthResponse Map(StateOfBirth stateOfBirth) => new() {
+    public StateOfBirthResponse Map(StateOfBirth stateOfBirth) => new()
+    {
         Id = stateOfBirth.Id,
         BirthState = stateOfBirth.BirthState,
         UserId = stateOfBirth.UserId
     };
-    public CityOfBirthResponse Map(CityOfBirth cityOfBirth) => new() {
+    public CityOfBirthResponse Map(CityOfBirth cityOfBirth) => new()
+    {
         Id = cityOfBirth.Id,
         BirthCity = cityOfBirth.BirthCity,
         UserId = cityOfBirth.UserId
     };
-    public DateOfBirthResponse Map(DateOfBirth dateOfBirth) => new() {
+    public DateOfBirthResponse Map(DateOfBirth dateOfBirth) => new()
+    {
         Id = dateOfBirth.Id,
         BirthDate = dateOfBirth.BirthDate,
         UserId = dateOfBirth.UserId
     };
-    public EncryptedSocialSecurityNumberResponse Map(EncryptedSocialSecurityNumber encryptedSocialSecurityNumber) => new() {
-       Id = encryptedSocialSecurityNumber.Id,
-       SociaSecurityNumber = encryptedSocialSecurityNumber.SociaSecurityNumber,
-       UserId = encryptedSocialSecurityNumber.UserId  
+    public EncryptedSocialSecurityNumberResponse Map(EncryptedSocialSecurityNumber encryptedSocialSecurityNumber) => new()
+    {
+        Id = encryptedSocialSecurityNumber.Id,
+        SociaSecurityNumber = encryptedSocialSecurityNumber.SociaSecurityNumber,
+        UserId = encryptedSocialSecurityNumber.UserId
     };
     public DirectDepositResponse Map(DirectDeposit directDeposit) => new()
     {
@@ -315,13 +319,13 @@ public List<EncryptedSocialSecurityNumberResponse> Map(List<EncryptedSocialSecur
                     BirthCity = c.BirthCity
                 }),
         DateOfBirths = MapperUtils.MapList<DateOfBirth, DateOfBirthRequestModel>(
-            user.DateOfBirths, d => 
+            user.DateOfBirths, d =>
                 new DateOfBirthRequestModel
                 {
                     BirthDate = d.BirthDate
                 }),
         EncryptedSocialSecurityNumbers = MapperUtils.MapList<EncryptedSocialSecurityNumber, EncryptedSocialSecurityNumberRequestModel>(
-            user.EncryptedSocialSecurityNumbers, d => 
+            user.EncryptedSocialSecurityNumbers, d =>
                 new EncryptedSocialSecurityNumberRequestModel
                 {
                     SociaSecurityNumber = d.SociaSecurityNumber
@@ -836,17 +840,17 @@ public List<EncryptedSocialSecurityNumberResponse> Map(List<EncryptedSocialSecur
                             BirthCity = c.BirthCity
                         }),
                 DateOfBirths = MapperUtils.MapList<DateOfBirth, DateOfBirthRequestModel>(
-                    user.DateOfBirths, d => 
+                    user.DateOfBirths, d =>
                         new DateOfBirthRequestModel
                         {
                             BirthDate = d.BirthDate
-                }),
+                        }),
                 EncryptedSocialSecurityNumbers = MapperUtils.MapList<EncryptedSocialSecurityNumber, EncryptedSocialSecurityNumberRequestModel>(
-                    user.EncryptedSocialSecurityNumbers, d => 
+                    user.EncryptedSocialSecurityNumbers, d =>
                         new EncryptedSocialSecurityNumberRequestModel
                         {
                             SociaSecurityNumber = d.SociaSecurityNumber
-                }),
+                        }),
                 UserAccountStatus = (AccountStatusRequestModel)user.UserAccountStatus,
                 InviteUserId = user.InviteUserId,
                 InviteDate = user.InviteDate,

@@ -37,7 +37,7 @@ public sealed class User : Entity
     public CitizenshipStatus CitzenShipStatus { get; set; }
     public List<CountryOfBirth> CountryOfBirth { get; set; } = new List<CountryOfBirth>();
     public List<StateOfBirth> StateOfBirth { get; set; } = new List<StateOfBirth>();
-    public List<CityOfBirth> CityOfBirth{ get; set; } = new List<CityOfBirth>();
+    public List<CityOfBirth> CityOfBirth { get; set; } = new List<CityOfBirth>();
     public string? ResidentRegistrationNumber { get; set; } = string.Empty;
     public DateOnly? DocumentExpirationDate { get; set; }
     public UserAccountStatus UserAccountStatus { get; set; }
