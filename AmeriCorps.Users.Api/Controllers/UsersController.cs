@@ -39,6 +39,22 @@ public sealed class UsersController(IUsersControllerService service) : Controlle
     public async Task<IActionResult> CreateSearchAsync(int userId, [FromBody] SavedSearchRequestModel? searchRequest) =>
         await ServeAsync(async () => await _service.CreateSearchAsync(userId, searchRequest));
 
+    [HttpGet("Get-All-Users")]
+    public async Task<IActionResult> GetAllUsersAsync() =>
+        await ServeAsync(async () => await _service.GetAllUsersAsync());
+
+    [HttpGet("{userId}/Get-Template-By-UserId")]
+    public async Task<IActionResult> GetTemplateByUserIdAsync(int userId) =>
+       await ServeAsync(async () => await _service.GetTemplateByUserIdAsync(userId));
+
+    [HttpPost("Assign-Template")]
+    public async Task<IActionResult> AssignTemplateAsync(long templateId) =>
+        await ServeAsync(async () => await _service.AssignTemplateAsync(templateId));
+
+    [HttpPost("Assign-Template-Manually")]
+    public async Task<IActionResult> AssignTemplateManuallyAsync([FromBody] AssignTemplateRequestModel request) =>
+    await ServeAsync(async () => await _service.AssignTemplateManuallyAsync(request.TemplateId, request.AwardIds));
+
     [HttpPut("{userId}/Searches/{searchId}")]
     public async Task<IActionResult> UpdateSearchAsync(int userId, int searchId, [FromBody] SavedSearchRequestModel? searchRequest) =>
        await ServeAsync(async () => await _service.UpdateSearchAsync(userId, searchId, searchRequest));

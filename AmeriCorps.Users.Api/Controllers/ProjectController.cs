@@ -43,6 +43,14 @@ public sealed class ProjectController(IProjectControllerService service) : Contr
     public async Task<IActionResult> SearchOperatingSitesAsync([FromBody] SearchFiltersRequestModel filters) =>
         await ServeAsync(async () => await _service.SearchOperatingSitesAsync(filters));
 
+    [HttpGet("get-all-awards")]
+    public async Task<IActionResult> GetAllAwardsAsync() =>
+        await ServeAsync(async () => await _service.GetAllAwardsAsync());
+
+    [HttpGet("get-all-assigned-templates/{userId}")]
+    public async Task<IActionResult> GetAllAssignedTemplatesAsync(long userId) =>
+        await ServeAsync(async () => await _service.GetAllAssignedTemplatesAsync(userId));
+
     private async Task<IActionResult> ServeAsync<T>(Func<Task<(ResponseStatus, T)>> callAsync)
     {
         var (status, response) = await callAsync();

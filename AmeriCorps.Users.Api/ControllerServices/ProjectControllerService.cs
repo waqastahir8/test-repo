@@ -19,6 +19,10 @@ public interface IProjectControllerService
     Task<(ResponseStatus Status, List<ProjectResponse>? Response)> SearchProjectsAsync(SearchFiltersRequestModel filters);
 
     Task<(ResponseStatus Status, List<OperatingSiteResponse>? Response)> SearchOperatingSitesAsync(SearchFiltersRequestModel filters);
+
+    Task<(ResponseStatus Status, List<AwardResponse>? Response)> GetAllAwardsAsync();
+
+    Task<(ResponseStatus Status, List<int> Response)> GetAllAssignedTemplatesAsync(long userId);
 }
 
 public sealed class ProjectControllerService : IProjectControllerService
@@ -401,6 +405,63 @@ public sealed class ProjectControllerService : IProjectControllerService
         return (ResponseStatus.Successful, response);
     }
 
+    public async Task<(ResponseStatus Status, List<AwardResponse>? Response)> GetAllAwardsAsync()
+    {
+        List<Award>? awardList;
+
+        try
+        {
+            awardList = await _repository.GetAllAwardsAsync();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Could not retrieve awards list.");
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        if (awardList == null)
+        {
+            return (ResponseStatus.MissingInformation, null);
+        }
+
+        var response = awardList.Select(award => new AwardResponse
+        {
+            Id = award.Id,
+            AwardCode = award.AwardCode,
+            AwardName = award.AwardName,
+            GspListingNumber = award.GspListingNumber,
+            Fain = award.Fain,
+            Uei = award.Uei,
+            PerformanceStartDt = award.PerformanceStartDt,
+            PerformanceEndDt = award.PerformanceEndDt
+        }).ToList();
+
+        //var response = _responseMapper.Map(awardList);
+
+        return (ResponseStatus.Successful, response);
+    }
+
+    public async Task<(ResponseStatus Status, List<int> Response)> GetAllAssignedTemplatesAsync(long userId)
+    {
+        List<int> assignedTemplates;
+
+        try
+        {
+            assignedTemplates = await _repository.GetAllAssignedTemplatesAsync(userId);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Could not retrieve assigned tempaltes.");
+            return (ResponseStatus.UnknownError, null);
+        }
+
+        if (assignedTemplates == null)
+        {
+            return (ResponseStatus.MissingInformation, null);
+        }
+
+        return (ResponseStatus.Successful, assignedTemplates);
+    }
 
     private async Task<OperatingSite> CreateOperatingSiteContactAsync(OperatingSite inviteSite, Project project)
     {

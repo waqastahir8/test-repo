@@ -34,6 +34,10 @@ public interface IUsersControllerService
 
     Task<(ResponseStatus Status, ReferenceResponseModel? Response)> CreateReferenceAsync(int userId, ReferenceRequestModel? referenceRequest);
 
+    Task<(ResponseStatus Status, bool Response)> AssignTemplateAsync(long templateId);
+
+    Task<(ResponseStatus Status, List<AssignTemplate> Response)> GetTemplateByUserIdAsync(int userId);
+
     Task<(ResponseStatus Status, ReferenceResponseModel? Response)> UpdateReferenceAsync(int userId, int referenceId, ReferenceRequestModel? referenceRequest);
 
     Task<(ResponseStatus Status, bool Response)> DeleteReferenceAsync(int userId, int referenceId);
@@ -59,7 +63,9 @@ public interface IUsersControllerService
 
     Task<(ResponseStatus Status, bool Response)> DeleteTaxWithholdingFormAsync(int userId, int taxWithHoldingId);
 
+    Task<(ResponseStatus Status, bool Response)> AssignTemplateManuallyAsync(long templateId, List<int> userIds);
 
+    Task<(ResponseStatus Status, List<User> Response)> GetAllUsersAsync();
 }
 
 public sealed class UsersControllerService : IUsersControllerService
@@ -358,6 +364,168 @@ public sealed class UsersControllerService : IUsersControllerService
         var response = _responseMapper.Map(reference);
 
         return (ResponseStatus.Successful, response);
+    }
+
+    public async Task<(ResponseStatus Status, List<AssignTemplate> Response)>
+           GetTemplateByUserIdAsync(int userId)
+    {
+        List <AssignTemplate>? templates = new List<AssignTemplate>();
+
+        try
+        {
+            templates = await _repository.GetTemplatesByUserId(userId);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error fetching Template for user.");
+            return (ResponseStatus.UnknownError, templates);
+        }
+
+        if (templates == null || !templates.Any())
+        {
+            _logger.LogInformation("No templates available for this user.");
+            return (ResponseStatus.MissingInformation, templates);
+        }
+
+
+        return (ResponseStatus.Successful,templates);
+    }
+
+
+    public async Task<(ResponseStatus Status, bool Response)>
+            AssignTemplateAsync(long templateId)
+    {
+        bool isTemplateAssigned = false;
+
+        List<User>? users;
+
+        try
+        {
+            users = await _repository.GetAllUser();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error fetching users for template assignment.");
+            return (ResponseStatus.UnknownError, false);
+        }
+
+        if (users == null || !users.Any())
+        {
+            _logger.LogInformation("No users available for template assignment.");
+            return (ResponseStatus.MissingInformation, false);
+        }
+
+        List<AssignTemplate> assignments = new List<AssignTemplate>();
+
+        foreach (var user in users)
+        {
+            assignments.Add(new AssignTemplate
+            {
+                UserID = user.Id,
+                TemplateID = Convert.ToInt32(templateId)
+            });
+        }
+
+        try
+        {
+            await _repository.SaveAssignTemplatesAsync(assignments);
+            isTemplateAssigned = true;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error saving template assignments to the database.");
+            return (ResponseStatus.UnknownError, false);
+        }
+
+        _logger.LogInformation("Successfully assigned template ID {TemplateId} to {UserCount} users.", templateId, users.Count);
+
+        return (ResponseStatus.Successful, isTemplateAssigned);
+    }
+
+    public async Task<(ResponseStatus Status, List<User> Response)>
+            GetAllUsersAsync()
+    {
+        bool isTemplateAssigned = false;
+
+        List<User> users = new List<User>();
+
+        try
+        {
+            users = await _repository.GetAllUser();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error fetching users");
+            return (ResponseStatus.UnknownError, users);
+        }
+
+        if (users == null || !users.Any())
+        {
+            _logger.LogInformation("No users available");
+            return (ResponseStatus.MissingInformation, users);
+        }
+
+        return (ResponseStatus.Successful, users);
+    }
+
+    public async Task<(ResponseStatus Status, bool Response)>
+            AssignTemplateManuallyAsync(long templateId, List<int> awardIds)
+    {
+
+        if (awardIds == null || !awardIds.Any())
+        {
+            _logger.LogWarning("No award IDs provided for template assignment.");
+            return (ResponseStatus.MissingInformation, false);
+        }
+
+        bool isTemplateAssigned = false;
+
+        var awardRecipients = await _repository.GetAwardedRecipientAsync(awardIds);
+
+        List<AssignTemplate>? assignTemplates;
+
+        try
+        {
+            assignTemplates = await _repository.GetAllAssigendTemplates();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error fetching users for template assignment.");
+            return (ResponseStatus.UnknownError, false);
+        }
+
+        List<AssignTemplate> assignments = new List<AssignTemplate>();
+
+        foreach (var userId in awardRecipients)
+        {
+            if (!assignTemplates.Any(a => a.UserID == userId && a.TemplateID == templateId))
+            {
+                assignments.Add(new AssignTemplate
+                {
+                    UserID = userId,
+                    TemplateID = Convert.ToInt32(templateId)
+                });
+            }
+        }
+
+        if (assignments == null || !assignments.Any())
+        {
+            _logger.LogWarning("template already assigned to these awards");
+            return (ResponseStatus.UnknownError, isTemplateAssigned);
+        }
+
+        try
+        {
+            await _repository.SaveAssignTemplatesAsync(assignments);
+            isTemplateAssigned = true;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error saving template assignments to the database.");
+            return (ResponseStatus.UnknownError, false);
+        }
+
+        return (ResponseStatus.Successful, isTemplateAssigned);
     }
 
     public async Task<(ResponseStatus Status, SavedSearchResponseModel? Response)>

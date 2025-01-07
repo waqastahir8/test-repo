@@ -172,6 +172,52 @@ public sealed partial class UserRepository(
         return upatedUser;
     }
 
+    public async Task<List<User>> GetAllUser() =>
+        await ExecuteAsync(async context => await context.Users.ToListAsync());
+
+    public async Task<List<AssignTemplate>> GetAllAssigendTemplates() =>
+        await ExecuteAsync(async context => await context.AssignTemplates.ToListAsync());
+
+    public async Task<List<AssignTemplate>> GetTemplatesByUserId(int userId) =>
+    await ExecuteAsync(async context =>
+        await context.AssignTemplates
+                     .Where(template => template.UserID == userId)
+                     .ToListAsync());
+
+
+    public async Task SaveAssignTemplatesAsync(IEnumerable<AssignTemplate> assignments)
+    {
+        if (assignments == null || !assignments.Any())
+        {
+            throw new ArgumentException("Assignments list is null or empty.", nameof(assignments));
+        }
+
+        await ExecuteAsync(async context =>
+        {
+            try
+            {
+                await context.AssignTemplates.AddRangeAsync(assignments);
+
+                await context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error saving AssignTemplate entities to the database.");
+                throw;
+            }
+        });
+    }
+
+    public async Task<List<int>> GetAwardedRecipientAsync(List<int> awardIds) =>
+    await ExecuteAsync(async context =>
+    {
+        return await context.Projects
+            .Where(p => awardIds.Contains(p.Award.Id))
+            .Select(p => p.AuthorizedRep.Id)
+            .Distinct()
+            .ToListAsync();
+    });
+
     public async Task<bool> DeleteAsync<T>(int id) where T : Entity =>
         await ExecuteAsync(async context =>
         {

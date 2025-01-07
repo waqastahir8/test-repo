@@ -27,6 +27,10 @@ public interface IProjectRepository
     Task<List<Project>?> SearchAllProjectsAsync(string query, string orgCode);
 
     Task<List<OperatingSite>?> SearchOperatingSitesAsync(int projectId, bool active, string query);
+
+    Task<List<Award>> GetAllAwardsAsync();
+
+    Task<List<int>> GetAllAssignedTemplatesAsync(long userId);
 }
 
 public sealed partial class ProjectRepository(
@@ -185,5 +189,16 @@ public sealed partial class ProjectRepository(
                 + " " + o.EmailAddress + " " + o.PhoneNumber + " " + o.StreetAddress + " " + o.StreetAddress2
                 + " " + o.City + " " + o.State + " " + o.ZipCode)
             .Matches(EF.Functions.ToTsQuery(query)))
+            .ToListAsync());
+
+    public async Task<List<Award>> GetAllAwardsAsync() =>
+        await ExecuteAsync(async context => await context.Award
+            .OrderBy(a => a.AwardCode)
+            .ToListAsync());
+
+    public async Task<List<int>> GetAllAssignedTemplatesAsync(long userId) =>
+        await ExecuteAsync(async context => await context.AssignTemplates
+            .Where(a => a.UserID == userId)
+            .Select(a => a.TemplateID)
             .ToListAsync());
 }

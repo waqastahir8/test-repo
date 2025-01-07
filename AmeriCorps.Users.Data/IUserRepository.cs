@@ -1,4 +1,5 @@
 using AmeriCorps.Users.Data.Core;
+using AmeriCorps.Users.Data.Core.Model;
 using System.Linq.Expressions;
 
 namespace AmeriCorps.Users.Data;
@@ -52,4 +53,15 @@ public interface IUserRepository
     Task<User?> FetchUserByEncryptedSSNAsync(string encryptedId);
 
     Task<List<User>?> FetchPendingUsersForSSAVerificationAsync();
+
+    Task<List<User>> GetAllUser();
+
+    Task<List<AssignTemplate>> GetAllAssigendTemplates();
+
+    Task SaveAssignTemplatesAsync(IEnumerable<AssignTemplate> assignments);
+
+    Task <List<int>> GetAwardedRecipientAsync(List<int> awardIds);
+
+    Task<List<AssignTemplate>> GetTemplatesByUserId(int userId);
+
 }

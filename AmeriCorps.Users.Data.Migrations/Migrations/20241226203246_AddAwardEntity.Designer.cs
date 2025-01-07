@@ -3,6 +3,7 @@ using System;
 using AmeriCorps.Users.Data.Migrations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AmeriCorps.Users.Data.Migrations.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    partial class UserDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241226203246_AddAwardEntity")]
+    partial class AddAwardEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -198,18 +201,18 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                         .HasColumnName("uei");
 
                     b.HasKey("Id")
-                        .HasName("pk_award");
+                        .HasName("pk_awards");
 
                     b.HasIndex("AwardCode")
-                        .HasDatabaseName("ix_award_award_code");
+                        .HasDatabaseName("ix_awards_award_code");
 
                     b.HasIndex("AwardCode", "AwardName", "GspListingNumber")
-                        .HasDatabaseName("ix_award_award_code_award_name_gsp_listing_number")
+                        .HasDatabaseName("ix_awards_award_code_award_name_gsp_listing_number")
                         .HasAnnotation("Npgsql:TsVectorConfig", "english");
 
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("AwardCode", "AwardName", "GspListingNumber"), "GIST");
 
-                    b.ToTable("award", "users");
+                    b.ToTable("awards", "users");
                 });
 
             modelBuilder.Entity("AmeriCorps.Users.Data.Core.Collection", b =>
@@ -1757,7 +1760,7 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                         .HasForeignKey("AwardId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_project_award_award_id");
+                        .HasConstraintName("fk_project_awards_award_id");
 
                     b.HasOne("AmeriCorps.Users.Data.Core.User", "ProjectDirector")
                         .WithMany()

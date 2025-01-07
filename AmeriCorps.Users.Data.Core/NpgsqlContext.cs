@@ -1,4 +1,5 @@
 ﻿using AmeriCorps.Data;
+using AmeriCorps.Users.Data.Core.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -15,6 +16,10 @@ public abstract class NpgsqlContext : ContextBase
 
     public DbSet<User> Users { get; set; }
     public DbSet<Role> Roles { get; set; }
+
+    public DbSet<AssignTemplate> AssignTemplates { get; set; }
+
+    public DbSet<Award> Award { get; set; }
 
     public DbSet<SavedSearch> SavedSearch { get; set; }
 
