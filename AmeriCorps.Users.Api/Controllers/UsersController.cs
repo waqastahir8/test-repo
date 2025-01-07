@@ -1,13 +1,9 @@
-﻿using System.Net;
-using Asp.Versioning;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace AmeriCorps.Users.Controllers;
 
-[ApiController]
-[Route("api/[controller]")]
-[ApiVersion("1.0")]
-public sealed class UsersController(IUsersControllerService service) : ControllerBase
+public sealed class UsersController(IUsersControllerService service) : BaseApiController
 {
     private readonly IUsersControllerService _service = service;
 

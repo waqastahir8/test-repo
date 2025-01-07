@@ -1,6 +1,6 @@
 ﻿using AmeriCorps.Users.Data.Core;
 using AmeriCorps.Users.Data.Core.Model;
-
+using AmeriCorps.Users.Common.Enums;
 namespace AmeriCorps.Users.Api.Services;
 
 public interface IRequestMapper
@@ -18,6 +18,7 @@ public interface IRequestMapper
     Reference Map(ReferenceRequestModel requestModel);
 
     Organization Map(OrganizationRequestModel requestModel);
+    PushNotification Map(PushNotificationModel requestModel);
 
     Project Map(ProjectRequestModel requestModel);
 
@@ -330,6 +331,18 @@ public sealed class RequestMapper : IRequestMapper
         OrgName = requestModel.OrgName,
         OrgCode = requestModel.OrgCode,
         Description = requestModel.Description
+    };
+
+    public PushNotification Map(PushNotificationModel model) => new()
+    {
+        Title = model.Title,
+        Message = model.Message,
+        NotificationType = model.NotificationType,
+        NotificationCategory = model.NotificationCategory,
+        IsRead = model.IsRead,
+        Status = "Sent", // Default value
+        CreatedDate = DateTime.UtcNow,
+        UserId = model.UserId
     };
 
     public Project Map(ProjectRequestModel requestModel) => new()

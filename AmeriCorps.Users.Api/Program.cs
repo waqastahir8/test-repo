@@ -1,4 +1,6 @@
 using AmeriCorps.Users.Configuration;
+using AmeriCorps.Users.Data.IRepository;
+using AmeriCorps.Users.Data.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +25,8 @@ builder.Services
     .AddScoped<IUsersControllerService, UsersControllerService>()
     .AddScoped<IRolesControllerService, RolesControllerService>()
     .AddScoped<IOrgControllerService, OrgControllerService>()
+    .AddScoped<IPushNotificationService, PushNotificationService>()
+    .AddScoped<IPushNotificationRepository, PushNotificationRepository>()
     .AddScoped<IProjectControllerService, ProjectControllerService>()
     .AddScoped<IAccessControllerService, AccessControllerService>()
     .AddScoped<IUserHelperService, UserHelperService>()
@@ -57,9 +61,9 @@ if (!string.IsNullOrEmpty(keyVaultUri) &&
 }
 else if (!string.IsNullOrEmpty(keyVaultUri))
 {
-    builder.Configuration
-        .AddAzureKeyVault(new Uri(keyVaultUri),
-            new DefaultAzureCredential());
+    //builder.Configuration
+    //    .AddAzureKeyVault(new Uri(keyVaultUri),
+    //        new DefaultAzureCredential());
 }
 
 builder.Configuration

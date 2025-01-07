@@ -1,7 +1,10 @@
 global using AmeriCorps.Data;
 global using AmeriCorps.Users.Api;
-global using AmeriCorps.Users.Data;
-global using AmeriCorps.Users.Models;
-global using AmeriCorps.Users.Http;
+global using AmeriCorps.Users.Api.ControllerServices;
 global using AmeriCorps.Users.Api.Services;
+global using AmeriCorps.Users.Data;
+global using AmeriCorps.Users.Data.Core.Model;
+global using AmeriCorps.Users.Http;
+global using AmeriCorps.Users.Models;
 global using Azure.Identity;
+global using Microsoft.AspNetCore.Mvc;

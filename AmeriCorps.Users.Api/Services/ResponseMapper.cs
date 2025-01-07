@@ -43,7 +43,8 @@ public interface IResponseMapper
     List<AccessResponse> Map(List<Access> access);
 
     List<OrganizationResponse> Map(List<Organization> orgList);
-
+    PushNotificationModel Map(PushNotification requestModel);
+    List<PushNotificationModel> Map(List<PushNotification> notificationList);
     List<ProjectResponse> Map(List<Project> projList);
 
     List<OperatingSiteResponse> Map(List<OperatingSite> operatingSiteList);
@@ -571,6 +572,31 @@ public sealed class ResponseMapper : IResponseMapper
                                OrgCode = o.OrgCode,
                                Description = o.Description
                            });
+
+    public PushNotificationModel Map(PushNotification model) => new PushNotificationModel()
+    {
+        Id = model.Id,
+        Title = model.Title,
+        Message = model.Message,
+        NotificationType = model.NotificationType,
+        NotificationCategory = model.NotificationCategory,
+        IsRead = model.IsRead,
+        //Status = model.Status,
+        CreatedDate = model.CreatedDate,
+        UserId = model.UserId
+    };
+
+    public List<PushNotificationModel> Map(List<PushNotification> notificationList) =>
+    MapperUtils.MapList(notificationList, n => new PushNotificationModel
+    {
+        Id = n.Id,
+        UserId = n.UserId, 
+        Title = n.Title,
+        Message = n.Message,
+        NotificationType = n.NotificationType,
+        NotificationCategory = n.NotificationCategory,
+        IsRead = n.IsRead
+    });
 
     public List<ProjectResponse> Map(List<Project> projList) =>
        MapperUtils.MapList<Project, ProjectResponse>(

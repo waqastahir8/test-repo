@@ -24,6 +24,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EF Migrations", "EF Migrati
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AmeriCorps.Users.Models", "AmeriCorps.Users.Models\AmeriCorps.Users.Models.csproj", "{AD389577-A6EF-4EB1-A2F4-9697971AF64B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AmeriCorps.Users.Common", "AmeriCorps.Users.Common\AmeriCorps.Users.Common.csproj", "{77C50CB2-50E4-48D6-8F17-4AD8C63E8374}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -106,6 +108,18 @@ Global
 		{AD389577-A6EF-4EB1-A2F4-9697971AF64B}.Release|x64.Build.0 = Release|Any CPU
 		{AD389577-A6EF-4EB1-A2F4-9697971AF64B}.Release|x86.ActiveCfg = Release|Any CPU
 		{AD389577-A6EF-4EB1-A2F4-9697971AF64B}.Release|x86.Build.0 = Release|Any CPU
+		{77C50CB2-50E4-48D6-8F17-4AD8C63E8374}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77C50CB2-50E4-48D6-8F17-4AD8C63E8374}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77C50CB2-50E4-48D6-8F17-4AD8C63E8374}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{77C50CB2-50E4-48D6-8F17-4AD8C63E8374}.Debug|x64.Build.0 = Debug|Any CPU
+		{77C50CB2-50E4-48D6-8F17-4AD8C63E8374}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{77C50CB2-50E4-48D6-8F17-4AD8C63E8374}.Debug|x86.Build.0 = Debug|Any CPU
+		{77C50CB2-50E4-48D6-8F17-4AD8C63E8374}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77C50CB2-50E4-48D6-8F17-4AD8C63E8374}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77C50CB2-50E4-48D6-8F17-4AD8C63E8374}.Release|x64.ActiveCfg = Release|Any CPU
+		{77C50CB2-50E4-48D6-8F17-4AD8C63E8374}.Release|x64.Build.0 = Release|Any CPU
+		{77C50CB2-50E4-48D6-8F17-4AD8C63E8374}.Release|x86.ActiveCfg = Release|Any CPU
+		{77C50CB2-50E4-48D6-8F17-4AD8C63E8374}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

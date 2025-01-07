@@ -5,4 +5,7 @@
     <Nullable>enable</Nullable>
 	<Version>1.0.32</Version>
   </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AmeriCorps.Users.Common\AmeriCorps.Users.Common.csproj" />
+  </ItemGroup>
 </Project>

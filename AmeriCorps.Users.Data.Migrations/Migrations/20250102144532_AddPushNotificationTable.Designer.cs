@@ -3,6 +3,7 @@ using System;
 using AmeriCorps.Users.Data.Migrations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AmeriCorps.Users.Data.Migrations.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    partial class UserDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250102144532_AddPushNotificationTable")]
+    partial class AddPushNotificationTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -409,29 +412,6 @@ namespace AmeriCorps.Users.Data.Migrations.Migrations
                         .HasDatabaseName("ix_military_service_user_id");
 
                     b.ToTable("military_service", "users");
-                });
-
-            modelBuilder.Entity("AmeriCorps.Users.Data.Core.Model.AssignTemplate", b =>
-                {
-                    b.Property<int>("AssignmentID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("assignment_id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("AssignmentID"));
-
-                    b.Property<int>("TemplateID")
-                        .HasColumnType("integer")
-                        .HasColumnName("template_id");
-
-                    b.Property<int>("UserID")
-                        .HasColumnType("integer")
-                        .HasColumnName("user_id");
-
-                    b.HasKey("AssignmentID")
-                        .HasName("pk_assign_templates");
-
-                    b.ToTable("assign_templates", "users");
                 });
 
             modelBuilder.Entity("AmeriCorps.Users.Data.Core.Model.CityOfBirth", b =>

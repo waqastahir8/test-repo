@@ -2,6 +2,7 @@
 using AmeriCorps.Users.Data.Core.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.Extensions.Logging;
 
 namespace AmeriCorps.Users.Data.Core;
 
@@ -35,6 +36,8 @@ public abstract class NpgsqlContext : ContextBase
     public DbSet<OperatingSite> OperatingSites { get; set; }
 
     public DbSet<SocialSecurityVerification> SocialSecurityVerification { get; set; }
+
+    public DbSet<PushNotification> PushNotification { get; set; }
 
     public static string Schema => "users";
 
@@ -85,6 +88,7 @@ public abstract class NpgsqlContext : ContextBase
         var collection = Create<Collection>("collection");
 
         var operatingSite = Create<OperatingSite>("operatingSite");
+        var pushNotification = Create<PushNotification>("push_notification");
 
         var socialSecurityVerification = Create<SocialSecurityVerification>("socialSecurityVerification");
 
@@ -128,11 +132,18 @@ public abstract class NpgsqlContext : ContextBase
             .HasMethod("GIST")
             .IsTsVectorExpressionIndex("english");
 
+        modelBuilder.Entity<PushNotification>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.NotificationType).HasConversion<string>();
+            entity.Property(e => e.NotificationCategory).HasConversion<string>();
+        });
+
         EntityTypeBuilder<T> Create<T>(string tableName) where T : Entity
         {
             var entity = modelBuilder.Entity<T>();
 
-            entity.ToTable(tableName);
+            entity.ToTable(tableName, Schema);
             entity.HasKey(x => x.Id);
             entity.Property(x => x.Id).ValueGeneratedOnAdd();
 
@@ -142,6 +153,7 @@ public abstract class NpgsqlContext : ContextBase
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
+        optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);
         base.OnConfiguring(optionsBuilder);
         if (!optionsBuilder.IsConfigured)
         {
